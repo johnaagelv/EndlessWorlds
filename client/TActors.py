@@ -14,15 +14,15 @@ class TActor:
 				"y" : 0, # Y coordinate in the map
 				"z" : 0, # Index of the current map in the world
 			},
+			"play" : True, # False/True = stopping/running
 		}
-		self.is_running = True
 
 		# Behaviours are activities that the player may be able to do
 		self.behaviours = {}
 
 	@property
 	def is_playing(self) -> bool:
-		return self.is_running
+		return self.states["play"]
 
 	def run():
 		pass

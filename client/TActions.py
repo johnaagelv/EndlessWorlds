@@ -40,11 +40,11 @@ class TGameLoadAction(TAction):
 		pass
 
 """
-TGameQuitAction initializes the player for a new game
+TGameQuitAction marks the player for stopping the current game
 """
 class TGameQuitAction(TAction):
 	def run(self, actor: TActor):
-		actor.is_running = False
+		actor.states["play"] = False
 
 
 """
