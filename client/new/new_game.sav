@@ -1,0 +1,29 @@
+{
+	"world":{
+		"ip":"127.0.0.1",
+		"port":50000
+	},
+	"states":{
+		"position":{
+			"x":0,
+			"y":0,
+			"z":0
+		}
+		"health":{
+			"max":1000,
+			"value":1000
+		}
+	}
+	"triggers":{
+		"000":{
+			"condition":{
+				"state":"health",
+				"logic":"le",
+				"value":0
+			}
+			"action":{
+				"execute":"die"
+			}
+		}
+	}
+}

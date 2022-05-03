@@ -1,0 +1,22 @@
+{
+	"world":{
+		"ip":"127.0.0.1",
+		"port":50000
+	},
+	"actor":[
+		"states",
+		"abilities",
+		"behaviours"
+	],
+	"states":{
+		"position":{
+			"x":0,
+			"y":0,
+			"z":0
+		},
+		"health":{
+			"max":1000,
+			"current":1000
+		}
+	}
+}
