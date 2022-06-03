@@ -43,17 +43,12 @@ World 2 will provide:
 # Design
 The design is separated into the server side, the World server hub, and the client side. 
 
-- +--------+               +--------+
-- | World  <------data-----> Player |
-- | server |               | client |
-- |        <------+        |        |
-- +--------+      |        +--------+
--               register
-- +--------+      |        +--------+
-- |        <------+        |        |
-- | Hub    |               | Hub    |
-- | server <--synchronize--> server |
-- +--------+               +--------+
+###### Design model
+Player client <-data-> World server <-register-> Hub server <-synchronize-> Hub server ...
+
+- Player client exchanges data with the World server it is connected to.
+- World server registers with a Hub server, if the World server has a player starting point.
+- Hub server synchronizes with other Hub servers.
 
 ## Server
 Server starts up with loading the World information
