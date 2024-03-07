@@ -16,8 +16,8 @@ class TMessage:
 		self.request = None
 		self.response_created = False
 
+	""" Switch message handling between read and write """
 	def _set_selector_events_mask(self, mode):
-		"""Set selector to listen for events: mode is 'r', 'w', or 'rw'."""
 		if mode == "r":
 			events = selectors.EVENT_READ
 		elif mode == "w":
@@ -26,9 +26,9 @@ class TMessage:
 			events = selectors.EVENT_READ | selectors.EVENT_WRITE
 		else:
 			raise ValueError(f"Invalid events mask mode {mode!r}.")
-		# Switch 
 		self.selector.modify(self.sock, events, data=self)
 
+	""" 1. Read client data """
 	def _read(self):
 		try:
 			# Should be ready to read
@@ -82,14 +82,32 @@ class TMessage:
 		message = message_hdr + jsonheader_bytes + content_bytes
 		return message
 
+	""" 1.1 Prepare the content as json """
 	def _create_response_json_content(self):
-		action = self.request.get("action")
-		if action == "search":
-			query = self.request.get("value")
-			answer = "Who knows"
-			content = {"result": answer}
+		action = self.request.get("cmd")
+		if action == "fos":
+			x = self.request.get("x") # Get coordinates (x, y, z)
+			y = self.request.get("y")
+			z = self.request.get("z")
+			r = self.request.get("r") # Get radius of FOS
+			i = self.request.get("i") # Get client ID
+			#
+			# world.get_fos(x, y, z, r) - get the fov and all the actors and items in the fov
+			# fos structure = {"l": int, "a": array of actor objects {"c": char, "i": uuid}}
+			content = {
+				"res": "ok",
+				"fos": (
+					(32, 32, 32, 32, 32, 32, 32),
+					(32, 32, 32, 32, 32, 64, 32),
+					(32, 32, 32, 32, 32, 32, 32),
+					(32, 32, 32, 32, 32, 32, 32),
+					(32, 32, 32, 32, 32, 32, 32),
+					(32, 32, 32, 32, 32, 32, 32),
+					(32, 32, 32, 32, 32, 32, 32)
+				)
+			}
 		else:
-			content = {"result": f"Error: invalid action '{action}'."}
+			content = {"res": "error", "msg": f"Invalid action '{action}'."}
 		content_encoding = "utf-8"
 		response = {
 			"content_bytes": self._json_encode(content, content_encoding),
@@ -114,24 +132,30 @@ class TMessage:
 			self.write()
 
 	def read(self):
+		# 1. Read client data
 		self._read()
 
+		# 2. Process the proto header of the client message
 		if self._jsonheader_len is None:
 			self.process_protoheader()
 
+		# 3. Process the json header of the client message
 		if self._jsonheader_len is not None:
 			if self.jsonheader is None:
 				self.process_jsonheader()
 
+		# 4. Process the request of the client message
 		if self.jsonheader:
 			if self.request is None:
 				self.process_request()
 
 	def write(self):
+		# 1. Create a message to send to the client
 		if self.request:
 			if not self.response_created:
 				self.create_response()
 
+		# 2. Write data to the client
 		self._write()
 
 	def close(self):
@@ -152,6 +176,8 @@ class TMessage:
 			# Delete reference to socket object for garbage collection
 			self.sock = None
 
+	""" 2. Process the proto header of the client message """
+	# Extract the first 2 bytes to get the length of the json header
 	def process_protoheader(self):
 		hdrlen = 2
 		if len(self._recv_buffer) >= hdrlen:
@@ -160,6 +186,8 @@ class TMessage:
 			)[0]
 			self._recv_buffer = self._recv_buffer[hdrlen:]
 
+	""" 3. Process the json header of the client message """
+	# Extract the json header when the length of data has been received
 	def process_jsonheader(self):
 		hdrlen = self._jsonheader_len
 		if len(self._recv_buffer) >= hdrlen:
@@ -176,7 +204,7 @@ class TMessage:
 				if reqhdr not in self.jsonheader:
 					raise ValueError(f"Missing required header '{reqhdr}'.")
 
-	""" Process the client request and respond to it """
+	""" 4. Process the request of the client message """
 	def process_request(self):
 		content_len = self.jsonheader["content-length"]
 		if not len(self._recv_buffer) >= content_len:
@@ -198,12 +226,16 @@ class TMessage:
 		# Set selector to listen for write events, we're done reading.
 		self._set_selector_events_mask("w")
 
+	""" 1. Create a message to send to the client """
 	def create_response(self):
 		if self.jsonheader["content-type"] == "text/json":
+			# 1.1 Prepare the content as json
 			response = self._create_response_json_content()
 		else:
 			# Binary or unknown content-type
 			response = self._create_response_binary_content()
+		# 1.2 Create the message itself
 		message = self._create_message(**response)
 		self.response_created = True
+		# 1.3 Append the send buffer with the message
 		self._send_buffer += message

@@ -1,14 +1,7 @@
 import selectors, socket, traceback
 
 from world import TWorld
-class TMessage:
-	def __init__(self, sel: selectors.BaseSelector, conn, addr):
-		self.sel = sel
-		self.conn = conn
-		self.addr = addr
-
-	def process_events(self, mask):
-		pass
+from message import TMessage
 
 class TServer:
 	def __init__(self, ip: str, port: int):
@@ -17,8 +10,8 @@ class TServer:
 		self.port = port
 		self.is_running = True
 
-	def accept(self):
-		conn, addr = self.sock.accept()  # Should be ready to read
+	def accept(self, sock):
+		conn, addr = sock.accept()  # Should be ready to read
 		# print(f"- {addr}")
 		conn.setblocking(False)
 		message = TMessage(self.sel, conn, addr)
@@ -45,7 +38,7 @@ class TServer:
 				for key, mask in events:
 					print(f"key={key}, mask={mask}")
 					if key.data is None:
-						self.accept_wrapper(key.fileobj)
+						self.accept(key.fileobj)
 					else:
 						message: TMessage = key.data
 						try:
