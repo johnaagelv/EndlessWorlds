@@ -94,17 +94,10 @@ class TMessage:
 			#
 			# world.get_fos(x, y, z, r) - get the fov and all the actors and items in the fov
 			# fos structure = {"l": int, "a": array of actor objects {"c": char, "i": uuid}}
+			fos = self.world.fov(x, y, z, r)
 			content = {
 				"res": "ok",
-				"fos": (
-					(32, 32, 32, 32, 32, 32, 32),
-					(32, 32, 32, 32, 32, 64, 32),
-					(32, 32, 32, 32, 32, 32, 32),
-					(32, 32, 32, 32, 32, 32, 32),
-					(32, 32, 32, 32, 32, 32, 32),
-					(32, 32, 32, 32, 32, 32, 32),
-					(32, 32, 32, 32, 32, 32, 32)
-				)
+				"fos": fos
 			}
 		else:
 			content = {"res": "error", "msg": f"Invalid action '{action}'."}

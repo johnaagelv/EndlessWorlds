@@ -3,7 +3,7 @@ import selectors
 import json
 import io
 import struct
-
+import numpy as np
 
 class TMessage:
 	def __init__(self, selector, sock, addr, request):
@@ -82,8 +82,6 @@ class TMessage:
 
 	def _process_response_json_content(self):
 		content = self.response
-		result = content.get("result")
-		print(f"Got result: {result}")
 
 	def _process_response_binary_content(self):
 		content = self.response
@@ -111,7 +109,8 @@ class TMessage:
 		# 4. Process the message content
 		if self.jsonheader:
 			if self.response is None:
-				self.process_response()
+				return self.process_response()
+		return None
 
 	def write(self):
 		if not self._request_queued:
@@ -200,7 +199,7 @@ class TMessage:
 		if self.jsonheader["content-type"] == "text/json":
 			encoding = self.jsonheader["content-encoding"]
 			self.response = self._json_decode(data, encoding)
-			print(f"Received response {self.response!r} from {self.addr}")
+#			print(f"Received response {self.response!r} from {self.addr}")
 			self._process_response_json_content()
 		else:
 			# Binary or unknown content-type
@@ -212,3 +211,4 @@ class TMessage:
 			self._process_response_binary_content()
 		# Close when response has been processed
 		self.close()
+		return self.response
