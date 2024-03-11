@@ -19,7 +19,7 @@ def create_request(action: str = "fos"):
 				y = 3,
 				z = 0,
 				r = 3,
-				i = "ABC-DEF-GHI-JKL"
+#				i = "ABC-DEF-GHI-JKL"
 			)
 		)
 	else:
@@ -51,7 +51,9 @@ def main():
 			for key, mask in events:
 				message: TMessage = key.data
 				try:
-					message.process_events(mask)
+					data = message.process_events(mask)
+					if data is not None:
+						print(f"{data!r}")
 				except Exception:
 					print(
 						f"Main: Error: Exception for {message.addr}:\n"

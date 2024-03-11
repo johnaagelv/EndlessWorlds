@@ -1,12 +1,43 @@
 #!/usr/bin/env python3
-import sys
+import json
+import numpy as np
 
-def main(name: str = "demo"):
-	pass
+import data
+import construct as cf
+
+def main():
+	with open('server/'+data.build['world']['name']+'/world.json', 'wt') as f:
+		json.dump(data.build['world'], f)
+
+	for map_name in data.build['world']['maps']:
+		# start the map
+		map = np.full( (data.build[map_name]['width'], data.build[map_name]['height']), fill_value=" ", order="F")
+
+		for item in data.build[map_name]['map']:
+
+			if item['type'] == 'entryway':
+				cf.build_entryway(map, item)
+
+			if item['type'] == 'circle':
+				cf.build_circle(map, item)
+
+			if item['type'] == 'circle_wall':
+				cf.build_circle_wall(map, item)
+
+			if item['type'] == 'square':
+				cf.build_square(map, item)
+
+
+		with open('server/'+data.build['world']['name']+'/'+map_name+'.json', 'wt') as f:
+			json.dump(map.tolist(), f)
+	
+		#print(f"{map_name}: {map!r}")
+		for y in range(0,41):
+			row = ""
+			for x in range(0,41):
+				row += map[x, y]
+			print(f"{row}")
+		
 
 if __name__ == "__main__":
-	if len(sys.argv) == 2:
-		name = sys.argv[1]
-	else:
-		name = "demo"
-	main(name=name)
+	main()

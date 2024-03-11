@@ -89,11 +89,12 @@ class TMessage:
 
 	def process_events(self, mask):
 		if mask & selectors.EVENT_READ:
-			self.read()
+			return self.read()
 		if mask & selectors.EVENT_WRITE:
 			self.write()
 
 	def read(self):
+		print("TMessage->read()")
 		# 1. Read server data
 		self._read()
 
@@ -113,6 +114,7 @@ class TMessage:
 		return None
 
 	def write(self):
+		print("TMessage->write()")
 		if not self._request_queued:
 			self.queue_request()
 

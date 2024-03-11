@@ -84,6 +84,8 @@ class TMessage:
 
 	""" 1.1 Prepare the content as json """
 	def _create_response_json_content(self):
+		client_uuid = self.request.get('i')
+		print(f"Client UUID={client_uuid}")
 		action = self.request.get("cmd")
 		if action == "fos":
 			x = self.request.get("x") # Get coordinates (x, y, z)
@@ -99,6 +101,9 @@ class TMessage:
 				"res": "ok",
 				"fos": fos
 			}
+		elif action == "con":
+			i = self.request.get("i")
+			print(f"Client {i}")
 		else:
 			content = {"res": "error", "msg": f"Invalid action '{action}'."}
 		content_encoding = "utf-8"

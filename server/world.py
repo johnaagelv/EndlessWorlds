@@ -39,18 +39,12 @@ class TWorld:
 	def __init__(self, name: str = "demo"):
 		self.name = name
 		self.maps = []
-		self.world = {
-			"name": "Demo",
-			"author": "JAA",
-			"maps": ["Home","City","Country"],
-		}
-		with open('server/data/'+name+'.json', 'wt') as f:
-			json.dump(self.world, f)
+		self.world = {}
 
-#		with open('server/data/'+name+'.json', 'rt') as f:
-#			self.world = json.load(f)
+		with open('server/'+name+'/world.json', 'rt') as f:
+			self.world = json.load(f)
 		
-		print(f"World started for {self.world['name']} by {self.world['author']}")
+		print(f"World started for {self.world['title']} by {self.world['author']}")
 		wall = ord("#")
 		floor = ord(".")
 		the_map = np.array([
@@ -82,7 +76,7 @@ class TWorld:
 		for map in self.world['maps']:
 			with open('server/data/'+map+'.map', 'rt') as f:
 				self.maps.append(json.load(f))
-				self.maps[-1]["map"] = np.asarray(self.maps[-1]["map"], order="F").reshape(self.maps[-1]["width"], self.maps[-1]["height"], order="F")
+				self.maps[-1]["map"] = np.asarray(self.maps[-1]["map"], order="F") #.reshape(self.maps[-1]["width"], self.maps[-1]["height"], order="F")
 
 		#print(f"{self.maps[0]['map']!r}")
 
