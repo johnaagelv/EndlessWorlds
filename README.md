@@ -17,3 +17,29 @@ The server asks the world to provide the FOS information which result in a grid 
 - v is the landscape at the grid coordinate
 - array of a is the list of actors at the grid coordinate
 - array of i is the list of items at the grid coordinate
+
+# Application layer protocol
+Using TCP socket which is like reading from a file on a disk, but there is no option to reposition the socket pointer.
+
+When bytes arrive at the socket, there are network buffers involved. Once the bytes are read, they need to be saved somewhere, else they will have been dropped!
+
+Reading from a socket will be in chunks so read will have to be called and saved in the data buffer until a full message has been read. To keep track of the message boundaries a application layer protocol needs to be defined.
+
+## Application protocol header
+The protocol header consists of a fixed length header and a variable length header.
+
+Fixed header:
+- Variable header length	2 byte integer
+
+Variable header:
+- Variable length text
+- Unicode with the encoding UTF-8
+- A Python dictionary serialized using JSON
+
+The required headers in the protocol header's dictionary are as follows:
+Name	Description
+byteorder	The byte order of the machine (uses sys.byteorder)
+content-length	The length of the content in bytes
+content-type	The type of content in the payload, for example, text/json or binary/my-binary-type
+content-encoding	The encoding used by the content, for example, utf-8 for Unicode text or binary for data
+
