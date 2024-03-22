@@ -49,7 +49,7 @@ The required headers in the protocol header's dictionary are as follows:
 Content protocol defines the information transferred between the client and the server
 
 | Operation | Message properties |
-| --- | --- |
+| --- | --- | --- | --- | --- | --- | --- |
 | OP_MOVE | coordinate x | coordinate y | coordinate z | radius |
 | OP_ATTACK | coordinate x | coordinate y | coordinate z | direction x | direction y | strength |
 
