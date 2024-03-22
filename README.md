@@ -37,9 +37,11 @@ Variable header:
 - A Python dictionary serialized using JSON
 
 The required headers in the protocol header's dictionary are as follows:
-Name	Description
-byteorder	The byte order of the machine (uses sys.byteorder)
-content-length	The length of the content in bytes
-content-type	The type of content in the payload, for example, text/json or binary/my-binary-type
-content-encoding	The encoding used by the content, for example, utf-8 for Unicode text or binary for data
+
+| Name | Description |
+| ---------------- | ------------------------------------------------- | 
+| byteorder | The byte order of the machine (uses sys.byteorder) |
+| content-length | The length of the content in bytes |
+| content-type | The type of content in the payload, for example, text/json or binary/my-binary-type |
+| content-encoding | The encoding used by the content, for example, utf-8 for Unicode text or binary for data |
 
