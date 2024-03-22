@@ -45,3 +45,9 @@ The required headers in the protocol header's dictionary are as follows:
 | content-type | The type of content in the payload, for example, text/json or binary/my-binary-type |
 | content-encoding | The encoding used by the content, for example, utf-8 for Unicode text or binary for data |
 
+## Content protocol
+Content protocol defines the information transferred between the client and the server
+
+| OP_MOVE | coordinate x | coordinate y | coordinate z | radius |
+| OP_ATTACK | coordinate x | coordinate y | coordinate z | direction x | direction y | strength |
+
