@@ -23,7 +23,8 @@ Using TCP socket which is like reading from a file on a disk, but there is no op
 
 When bytes arrive at the socket, there are network buffers involved. Once the bytes are read, they need to be saved somewhere, else they will have been dropped!
 
-Reading from a socket will be in chunks so read will have to be called and saved in the data buffer until a full message has been read. To keep track of the message boundaries a application layer protocol needs to be defined.
+Reading from a socket will be in chunks so read will have to be called and saved in the data buffer until a full message has been read.
+To keep track of the message boundaries a application layer protocol needs to be defined.
 
 ## Application protocol header
 The protocol header consists of a fixed length header and a variable length header.
