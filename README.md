@@ -48,8 +48,20 @@ The required headers in the protocol header's dictionary are as follows:
 ## Application protocol
 Application protocol defines the information transferred between the client and the server
 
-| Operation | X coord. | Y coord. | Z coord. | ___ | ___ | ___ | 
-| --------- | -------- | -------- | -------- | --- | --- | --- |
-| OP_MOVE | coordinate x | coordinate y | coordinate z | radius |
-| OP_ATTACK | coordinate x | coordinate y | coordinate z | direction x | direction y | strength |
+### Field of Sense - OP_FOS
+Client sends this operation every X seconds with the following properties:
+- x, y, z coordinates - this is the x, y coordinates in the z map of the world
+- r - the radius of the field of sense
+
+### Attack - OP_ATTACK
+Client sends this operation when the character is performing an attack in a specific direction
+- x, y, z coordinates - this is the x, y coordinates in the z map of the world
+- dx, dy directions - this is the relative direction that the attack is directed from the x, y coordinate
+- s - the strength of the attack
+
+### Attack - OP_ATTACK
+Client sends this operation when the character is performing an attack on a specific character
+- x, y, z coordinates - this is the x, y coordinates in the z map of the world
+- cuid - the unique ID of the character being attacked
+- s - the strength of the attack
 

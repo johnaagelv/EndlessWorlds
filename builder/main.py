@@ -15,14 +15,11 @@ def main():
 
 		for item in data.build[map_name]['map']:
 
-			if item['type'] == 'entryway':
-				cf.build_entryway(map, item)
+			if item['type'] == 'accessway':
+				cf.build_accessway(map, item)
 
 			if item['type'] == 'circle':
 				cf.build_circle(map, item)
-
-			if item['type'] == 'circle_wall':
-				cf.build_circle_wall(map, item)
 
 			if item['type'] == 'square':
 				cf.build_square(map, item)
