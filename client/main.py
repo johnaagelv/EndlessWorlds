@@ -5,6 +5,7 @@ import selectors
 import traceback
 
 from message import TMessage
+from external_ip import get_ip
 
 sel = selectors.DefaultSelector()
 
@@ -33,24 +34,37 @@ def start_connection(host, port, request):
 	addr = (host, port)
 	print(f"Starting connection to {addr}")
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	print(f"- Initializing socket")
 	sock.setblocking(False)
+	print(f"- blocking false")
+	sock.bind(("0.0.0.0",12345))
+	print(f"- bound port 12345")
 	sock.connect_ex(addr)
+	print(f"- connected")
 	events = selectors.EVENT_READ | selectors.EVENT_WRITE
 	message = TMessage(sel, sock, addr, request)
 	sel.register(sock, events, data=message)
+	print(f"- register socket with selector")
 
 def main():
 	print("Start client")
-	host, port = "192.168.1.106", 54321
+	ip = get_ip(local = True)
+#	ip = "endlessworlds.hopto.org"
+	port = 54321
 	request = create_request()
-	start_connection(host, port, request)
+	start_connection(ip, port, request)
 
 	try:
+		print("Starting loop")
 		while True:
-			events = sel.select(timeout=1)
+			print("- waiting for event")
+			events = sel.select(timeout=5)
+			print(f"- processing events {events!r}")
 			for key, mask in events:
+				print("- getting message instance")
 				message: TMessage = key.data
 				try:
+					print("- try message processing")
 					data = message.process_events(mask)
 					if data is not None:
 						print(f"{data!r}")
@@ -60,6 +74,7 @@ def main():
 						f"{traceback.format_exc()}"
 					)
 					message.close()
+			print("- events processed")
 			# Check for a socket being monitored to continue.
 			if not sel.get_map():
 				break

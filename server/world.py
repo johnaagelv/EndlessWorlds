@@ -69,12 +69,12 @@ class TWorld:
 			self.maps.append({"name": map, "width": 16, "height": 16, "map": the_map.tolist()})
 		
 		for map in self.maps:
-			with open('server/data/' + map["name"] + '.map', "wt") as f:
+			with open('server/'+self.name+'/' + map["name"] + '.map', "wt") as f:
 				json.dump(map, f)
 
 		self.maps = []
 		for map in self.world['maps']:
-			with open('server/data/'+map+'.map', 'rt') as f:
+			with open('server/'+self.name+'/'+map+'.map', 'rt') as f:
 				self.maps.append(json.load(f))
 				self.maps[-1]["map"] = np.asarray(self.maps[-1]["map"], order="F") #.reshape(self.maps[-1]["width"], self.maps[-1]["height"], order="F")
 

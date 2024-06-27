@@ -28,6 +28,7 @@ build = {
 #			"level_4",
 #			"command_level"
 		],
+		"author": "John Aage Andersen",
 	},
 	"engine_level": {
 		"name": "engine_level",

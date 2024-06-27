@@ -1,4 +1,6 @@
-import selectors, socket, traceback
+import selectors
+import socket
+import traceback
 
 from world import TWorld
 from message import TMessage
@@ -18,7 +20,7 @@ class TServer:
 		self.sel.register(conn, selectors.EVENT_READ, data=message)
 
 	def startup(self):
-		print(f"TServer->startup()")
+		print(f"TServer->startup() using ip={self.ip}, port={self.port}")
 		# Using the default selector
 		self.sel = selectors.DefaultSelector()
 		# Set up a socket for network connection
