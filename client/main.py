@@ -25,15 +25,6 @@ def main() -> None:
 		colour = (255, 255, 255),
 	)
 
-	npc = TEntity(
-		x = int(SCREEN_WIDTH / 2 - 5),
-		y = int(SCREEN_HEIGHT / 2 - 3),
-		face = "g",
-		colour = (0, 255, 0),
-	)
-
-	entities = {npc, player}
-
 	event_handler = TEventHandler()
 
 	with tcod.context.new_terminal(

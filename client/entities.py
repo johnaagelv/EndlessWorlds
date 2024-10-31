@@ -50,6 +50,7 @@ class TEntity:
 	def _connect(self):
 
 		self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		#self.client.setblocking(False)
 		self.client.connect((config.servers[0]["host"], config.servers[0]["port"]))
 
 	def run(self, action: TAction):
