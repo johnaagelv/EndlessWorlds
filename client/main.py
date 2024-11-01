@@ -2,13 +2,12 @@
 import tcod
 
 #import config
-
+from engines import TEngine
 from entities import TEntity
 from input_handlers import TEventHandler
 
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
-
 
 def main() -> None:
 	screen_width = SCREEN_WIDTH
@@ -27,6 +26,8 @@ def main() -> None:
 
 	event_handler = TEventHandler()
 
+	engine = TEngine(entities= [player], event_handler=event_handler)
+
 	with tcod.context.new_terminal(
 		screen_width,
 		screen_height,
@@ -39,25 +40,11 @@ def main() -> None:
 
 		while player.data["game_active"]:
 
-			root_console.print(
-				x = player.data["x"],
-				y = player.data["y"],
-				string = player.data["face"]
-			)
+			engine.render(root_console, context)
 
-			# Present the root console
-			context.present(root_console)
+			events = tcod.event.wait()
 
-			# Clear the root console for updates
-			root_console.clear()
-
-			for event in tcod.event.wait():
-				action = event_handler.dispatch(event)
-
-				if action is None:
-					continue
-				
-				player.run(action)
+			engine.handle_events(events)
 				
 
 if __name__ == "__main__":
