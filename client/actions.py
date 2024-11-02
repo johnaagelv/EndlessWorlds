@@ -3,12 +3,15 @@ import pickle
 
 import config
 
+from entities import TEntity
+from game_map import TGameMap
+
 class TAction:
-	def run(self, entity):
+	def run(self, entity: TEntity, game_map: TGameMap):
 		pass
 
 class TEscapeAction(TAction):
-	def run(self, entity):
+	def run(self, entity: TEntity, game_map: TGameMap):
 		command = {
 			"c": "disconnect",
 			"i": entity.cuid,
@@ -21,7 +24,7 @@ class TMoveAction(TAction):
 		self.dx = dx
 		self.dy = dy
 
-	def run(self, entity):
+	def run(self, entity: TEntity, game_map: TGameMap):
 		# Inform server of action and get result
 		command = {
 			"c": "mov",
@@ -33,5 +36,6 @@ class TMoveAction(TAction):
 		data = entity.client.recv(1024)
 
 		print(f"Server sent {pickle.loads(data)}")
-		entity.data["x"] += self.dx
-		entity.data["y"] += self.dy
+		if game_map.tiles["walkable"][entity.data["x"] + self.dx, entity.data["y"] + self.dy]:
+			entity.data["x"] += self.dx
+			entity.data["y"] += self.dy

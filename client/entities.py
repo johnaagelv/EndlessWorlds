@@ -5,7 +5,7 @@ import uuid
 
 from typing import Tuple
 
-from actions import TAction
+#from actions import TAction
 
 class TEntity:
 	"""
@@ -53,5 +53,5 @@ class TEntity:
 		#self.client.setblocking(False)
 		self.client.connect((config.servers[0]["host"], config.servers[0]["port"]))
 
-	def run(self, action: TAction):
+	def run(self, action):
 		action.run(self)
