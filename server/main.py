@@ -8,13 +8,16 @@ import uuid
 
 from typing import Dict
 
+from game_map import TGameMap
+from procgen import generate_dungeon
+
 HOST = "192.168.1.104"
 PORT = 65432
 
 sel = selectors.DefaultSelector()
 clients = dict()
 
-def service_connection(key, mask):
+def service_connection(key, mask, game_map):
 	sock = key.fileobj
 	data = key.data
 	if mask & selectors.EVENT_READ:
@@ -63,6 +66,8 @@ def accept_wrapper(client_socket):
 
 def main() -> None:
 
+	game_map = generate_dungeon(80, 45)
+
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
 		server.bind((HOST, PORT))
 		server.listen()
@@ -76,7 +81,7 @@ def main() -> None:
 				if key.data is None:
 					accept_wrapper(key.fileobj)
 				else:
-					service_connection(key, mask)
+					service_connection(key, mask, game_map)
 	
 	
 if __name__ == "__main__":

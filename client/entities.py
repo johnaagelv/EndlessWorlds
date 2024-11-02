@@ -5,8 +5,9 @@ import uuid
 
 from typing import Tuple
 
-#from actions import TAction
-
+"""
+Entity represents the player or NPC
+"""
 class TEntity:
 	"""
 	A generic object to represent players, enemies, items, etc.

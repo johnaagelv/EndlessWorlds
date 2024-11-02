@@ -1,4 +1,4 @@
-from typing import Any, Iterable, Set
+from typing import Any, Iterable
 from tcod.context import Context
 from tcod.console import Console
 
@@ -6,6 +6,9 @@ from entities import TEntity
 from game_map import TGameMap
 from input_handlers import TEventHandler
 
+"""
+Engine takes care of handling input and output
+"""
 class TEngine:
 	def __init__(
 		self,
@@ -17,6 +20,9 @@ class TEngine:
 		self.event_handler = event_handler
 		self.game_map = game_map
 
+	"""
+	Handle the keyboard events turning them into actions
+	"""
 	def handle_events(
 		self,
 		events: Iterable[Any]
@@ -26,7 +32,9 @@ class TEngine:
 			if action is None:
 				continue				
 			action.run(self.entity, self.game_map)
-	
+	"""
+	Render the map, the NPCs, and the player
+	"""
 	def render(
 		self,
 		console: Console,
