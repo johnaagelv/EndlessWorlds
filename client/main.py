@@ -1,17 +1,28 @@
 #!/usr/bin/env python3
 import tcod
+import json
 
-#import config
+from typing import Dict
+
 from engines import TEngine
 from entities import TEntity
 from game_map import TGameMap
+from connectors import TConnector
 from input_handlers import TEventHandler
+
+SERVER_HOST = "192.168.1.104"
+SERVER_PORT = 65432
 
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
 
 MAP_WIDTH = 80
 MAP_HEIGHT = 45
+
+def load_data() -> Dict:
+	with open("save.sav", "rt") as f:
+		data = json.load(f)
+	return data
 
 def main() -> None:
 	screen_width = SCREEN_WIDTH
@@ -24,12 +35,12 @@ def main() -> None:
 		"dejavu10x10_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD
 	)
 
-	player = TEntity(
-		x = int(SCREEN_WIDTH / 2),
-		y = int(SCREEN_HEIGHT / 2),
-		face = "@",
-		colour = (255, 255, 255),
-	)
+	client = TConnector(host=SERVER_HOST, port=SERVER_PORT)
+
+	player = TEntity(client=client)
+
+	data = load_data()
+	player.load(data=data)
 
 	event_handler = TEventHandler()
 
@@ -45,16 +56,12 @@ def main() -> None:
 		vsync = True,
 	) as context:
 		root_console = tcod.console.Console(screen_width, screen_height, order="F")
-
-
-		while player.data["game_active"]:
-
+		while player.data["playing"]:
 			engine.render(root_console, context)
-
-			events = tcod.event.wait()
-
+			events = tcod.event.wait(timeout=5.0)
+			print("Waiting finished")
 			engine.handle_events(events)
-				
+			
 
 if __name__ == "__main__":
 	main()

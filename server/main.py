@@ -37,6 +37,10 @@ def service_connection(key, mask, game_map):
 						client = uuid.uuid1()
 						clients[client] = client
 						result["i"] = client
+						# return the map size
+						result["w"] = 80
+						result["h"] = 45
+
 				elif command["c"] == "mov":
 					# Get the FOV at the x and y coordinate
 					# Return the FOV

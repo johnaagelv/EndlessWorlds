@@ -1,9 +1,6 @@
-import pickle
-import socket
-import config
-import uuid
+import time
 
-from typing import Tuple
+from connectors import TConnector
 
 """
 Entity represents the player or NPC
@@ -12,47 +9,27 @@ class TEntity:
 	"""
 	A generic object to represent players, enemies, items, etc.
 	"""
-	def __init__(
-		self,
-		x: int,
-		y: int,
-		face: str,
-		colour: Tuple[int, int, int],
-	):
-		self.data = {
-			"x": x,
-			"y": y,
-			"face": face,
-			"colour": colour,
-			"game_active": True,
-		}
-		self._connect()
-		self._identify()
-		print(f"Connected as {self.cuid}")
+	def __init__(self, client: TConnector):
+		self.tick = time.time()
+		self.client = client
+
+	def load(self, data):
+		self.data = data
 
 	"""
-	Identify the client to the server
+	Process one scope [effects, ...]
 	"""
-	def _identify(self, cuid: str = None):
-		command = {
-			"c": "connect",
-		}
-		if cuid is not None:
-			command["i"] = cuid
+	def _process(self, scope):
+		if scope in self.data:
+			for item in self.data[scope]:
+				self.data[item["scope"]][item["key"]]["value"] += item["change"]
+				item["ticks"] -= 1
 
-		self.client.sendall(bytes(pickle.dumps(command)))
-		data = self.client.recv(1024)
-		result = pickle.loads(data)
-		self.cuid = result["i"] # Client unique ID from the server
+				if item["ticks"] == 0:
+					del(item)
 
-	"""
-	Establish a connection to the server
-	"""
-	def _connect(self):
-
-		self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		#self.client.setblocking(False)
-		self.client.connect((config.servers[0]["host"], config.servers[0]["port"]))
-
-	def run(self, action):
-		action.run(self)
+	def run(self):
+		if time.time() - self.tick > 5:
+			self._process("effects")
+			self._process("conditions")
+			self.tick = time.time()

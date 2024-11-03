@@ -14,9 +14,9 @@ class TEscapeAction(TAction):
 	def run(self, entity: TEntity, game_map: TGameMap):
 		command = {
 			"c": "disconnect",
-			"i": entity.cuid,
 		}
-		entity.data["game_active"] = False
+		entity.data["playing"] = False
+		
 
 class TMoveAction(TAction):
 	def __init__(self, dx: int, dy: int):
@@ -28,14 +28,11 @@ class TMoveAction(TAction):
 		# Inform server of action and get result
 		command = {
 			"c": "mov",
-			"i": entity.cuid,
-			"x": entity.data["x"],
-			"y": entity.data["y"],
+			"x": entity.data["location"]["x"],
+			"y": entity.data["location"]["y"],
 		}
-		entity.client.sendall(bytes(pickle.dumps(command)))
-		data = entity.client.recv(1024)
+		data = entity.client.execute(command)
 
-		print(f"Server sent {pickle.loads(data)}")
-		if game_map.tiles["walkable"][entity.data["x"] + self.dx, entity.data["y"] + self.dy]:
-			entity.data["x"] += self.dx
-			entity.data["y"] += self.dy
+		if game_map.tiles["walkable"][entity.data["location"]["x"] + self.dx, entity.data["location"]["y"] + self.dy]:
+			entity.data["location"]["x"] += self.dx
+			entity.data["location"]["y"] += self.dy
