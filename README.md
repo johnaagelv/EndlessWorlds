@@ -50,8 +50,7 @@ The required headers in the protocol header's dictionary are as follows:
 | ---------------- | ------------------------------------------------- | 
 | byteorder | The byte order of the machine (uses sys.byteorder) |
 | content-length | The length of the content in bytes |
-| content-type | The type of content in the payload, for example, text/json or binary/my-binary-type |
-| content-encoding | The encoding used by the content, for example, utf-8 for Unicode text or binary for data |
+
 
 ## Application protocol
 Application protocol defines the information transferred between the client and the server
@@ -101,3 +100,12 @@ Client sends this operation when the character is performing an attack on a spec
 | s      | 2 byte integer | Strength        |
 
 16fd2706-8baf-433b-82eb-8c7fada847da
+
+Actor states: TO DEFINE!
+    ST - 05
+    PE - 07
+    EN - 05
+    CH - 07
+    IN - 08
+    AG - 07
+    LK – 05

@@ -18,7 +18,7 @@ class TEngine:
 		event_handler: TEventHandler,
 		game_map: TGameMap
 	):
-		self.entity = player
+		self.actor = player
 		self.event_handler = event_handler
 		self.game_map = game_map
 		self.update_fov()
@@ -30,18 +30,18 @@ class TEngine:
 		self,
 		events: Iterable[Any]
 	) -> None:
-		self.entity.run()
+		self.actor.run()
 		for event in events:
 			action = self.event_handler.dispatch(event)
 			if action is None:
 				continue				
-			action.run(self.entity, self.game_map)
+			action.run(self.actor, self.game_map)
 			self.update_fov()
 
 	def update_fov(self) -> None:
 		self.game_map.visible[:] = compute_fov(
 			self.game_map.tiles["transparent"],
-			(self.entity.data["location"]["x"], self.entity.data["location"]['y']),
+			(self.actor.data["location"]["x"], self.actor.data["location"]['y']),
 			radius=8, # TODO! Take this from the player entity data
 		)
 		self.game_map.explored |= self.game_map.visible
@@ -56,10 +56,10 @@ class TEngine:
 	) -> None:
 		self.game_map.render(console)
 		console.print(
-			self.entity.data["location"]["x"],
-			self.entity.data["location"]["y"],
-			self.entity.data["character"]["face"],
-			fg=self.entity.data["character"]["colour"]
+			self.actor.data["location"]["x"],
+			self.actor.data["location"]["y"],
+			self.actor.data["character"]["face"],
+			fg=self.actor.data["character"]["colour"]
 		)
 		context.present(console)
 		console.clear()
