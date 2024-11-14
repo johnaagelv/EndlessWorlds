@@ -1,16 +1,20 @@
 import struct
 import selectors
+import socket
 import json
 import io
 import sys
 
+from tcod.map import compute_fov
+
 MSG_ENCODING = "utf-8"
 
 class TMessage:
-	def __init__(self, selector, sock, addr):
+	def __init__(self, selector: selectors.BaseSelector, sock: socket.socket, addr, game_map):
 		self.selector = selector # Selector from the Server
 		self.sock = sock
 		self.addr = addr
+		self.game_map = game_map
 		self._recv_buffer = b""
 		self._send_buffer = b""
 		self._jsonheader_len = None
@@ -22,6 +26,7 @@ class TMessage:
 
 	""" Switch to the specified mode """
 	def _set_selector_events_mask(self, mode):
+		print("TMessage->_set_selector_events_mask(mode)")
 		if mode == "r":
 			events = selectors.EVENT_READ
 		elif mode == "w":
@@ -37,6 +42,7 @@ class TMessage:
 	Read bytes from the connection into the receive buffer
 	"""
 	def _read(self):
+		print("TMessage->_read()")
 		try:
 			data = self.sock.recv(1024)
 		except BlockingIOError:
@@ -51,6 +57,7 @@ class TMessage:
 	Write bytes to the connection from the send buffer
 	"""
 	def _write(self):
+		print("TMessage->_write()")
 		if self._send_buffer:
 			try:
 				sent = self.sock.send(self._send_buffer)
@@ -65,12 +72,14 @@ class TMessage:
 	Encode data into json format
 	"""
 	def _json_encode(self, obj, encoding):
+		print("TMessage->_json_encode(obj, encoding)")
 		return json.dumps(obj, ensure_ascii=False).encode(encoding)
 
 	"""
 	Decode data from json format
 	"""
 	def _json_decode(self, json_bytes, encoding):
+		print("TMessage->_json_decode(json_bytes, encoding)")
 		tiow = io.TextIOWrapper(
 			io.BytesIO(json_bytes), encoding=encoding, newline=""
 		)
@@ -82,6 +91,7 @@ class TMessage:
 	Create a complete message
 	"""
 	def _create_message(self, content_bytes):
+		print("TMessage->_create_message(content_bytes)")
 		jsonheader = {
 			"content-length": len(content_bytes),
 		}
@@ -94,15 +104,15 @@ class TMessage:
 	Encode the content
 	"""
 	def _create_response_json_content(self):
-		response = {
-			"content-bytes": self._json_encode(self.request, MSG_ENCODING),
-		}
+		print("TMessage->_create_response_json_content()")
+		response = {"content_bytes": self._json_encode(self.request, MSG_ENCODING)}
 		return response
 
 	"""
 	Process events from the selector
 	"""	
 	def process_events(self, mask):
+		print("TMessage->process_events()")
 		if mask & selectors.EVENT_READ:
 			self.read()
 		if mask & selectors.EVENT_WRITE:
@@ -112,6 +122,7 @@ class TMessage:
 	Retrieve a complete message - protoheader, jsonheader, content
 	"""
 	def read(self) -> bool:
+		print("TMessage->read()")
 		message_state = False
 		self._read()
 		# Try to get the protoheader (2 bytes)
@@ -131,6 +142,7 @@ class TMessage:
 	Deliver a complete message - protoheader, jsonheader, content
 	"""	
 	def write(self):
+		print("TMessage->write()")
 		# Prepare a message when content is available
 		if self.request:
 			if not self.response_created:
@@ -139,6 +151,7 @@ class TMessage:
 		self._write()
 
 	def close(self):
+		print("TMessage->close()")
 		try:
 			self.selector.unregister(self.sock)
 		except Exception as e:
@@ -157,6 +170,7 @@ class TMessage:
 	Retrieve the protoheader from the receive buffer
 	"""
 	def process_protoheader(self):
+		print("TMessage->process_protoheader()")
 		hdrlen = 2
 		if len(self._recv_buffer) >= hdrlen:
 			self._jsonheader_len = struct.unpack(">H", self._recv_buffer[:hdrlen])[0]
@@ -166,21 +180,25 @@ class TMessage:
 	Retrieve the jsonheader from the receive buffer
 	"""
 	def process_jsonheader(self):
+		print("TMessage->process_jsonheader()")
 		hdrlen = self._jsonheader_len
 		if len(self._recv_buffer) >= hdrlen:
 			self.jsonheader = self._json_decode(
 				self._recv_buffer[:hdrlen], MSG_ENCODING
 			)
 			self._recv_buffer = self._recv_buffer[hdrlen:]
+			print(f"- jsonheader: {self.jsonheader!r}")
 			# Validate that json header is complete!
-			for reqhdr in ("content-length"):
-				if reqhdr not in self.jsonheader:
-					raise ValueError(f"Message missing required header '{reqhdr}'")
+#			for reqhdr in ("content-length"):
+			reqhdr = "content-length"
+			if reqhdr not in self.jsonheader:
+				raise ValueError(f"Message missing required header '{reqhdr}'")
 
 	"""
 	Retrieve the content from the receive buffer
 	"""
 	def process_request(self) -> bool:
+		print(f"TMessage->process_request()")
 		content_len = self.jsonheader["content-length"]
 		# Is all content received?
 		if not len(self._recv_buffer) >= content_len:
@@ -188,18 +206,33 @@ class TMessage:
 		data = self._recv_buffer[:content_len]
 		self._recv_buffer = self._recv_buffer[content_len:]
 		encoding = MSG_ENCODING
-		self.request = self._json_decode(data, encoding)
+		request = self._json_decode(data, encoding)
+		print(f"- request: {request!r}")
 		# PROCESS THE REQUEST FROM THE CLIENT
 		# update client position (x, y, z)
+		x, y, z = request["x"], request["y"], request["z"]
+		fov = compute_fov(
+			self.game_map.tiles["transparent"],
+			(x, y),
+			radius=4
+		)
+		#self.request = {"fov":fov.tolist(), "x": x, "y": y, "radius": 8}
+		self.request = {
+			"cmd": "fov",
+			"x": x,
+			"y": y,
+			"z": z,
+			"r": 4,
+			"fov": fov.tolist(),
+		}
 		# get FOS for the client (field of sense), usually that is FOV (field of view)
 		# get FOA for the client (field of actors), actors within the FOS
 		# package the information and send it back to the client
 		# Set selector to listen for write events, we're done reading.
-		#self._set_selector_events_mask("w")
-		return True
-
+		self._set_selector_events_mask("w")
 
 	def create_response(self):
+		print(f"TMessage->create_response()")
 		response = self._create_response_json_content()
 		message = self._create_message(**response)
 		self.response_created = True

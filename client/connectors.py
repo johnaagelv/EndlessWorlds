@@ -4,6 +4,8 @@ import selectors
 import socket
 import pickle
 
+from messages import TClientMessage
+
 class TConnector:
 	"""
 	Initialize the connection to a HUB server
@@ -17,8 +19,20 @@ class TConnector:
 		self.sel = selectors.DefaultSelector()
 		self.sel.register(self.client, selectors.EVENT_READ | selectors.EVENT_WRITE, data=None)
 
-	def execute(self, command: Dict) -> Dict:
-		self.client.sendall(bytes(pickle.dumps(command)))
-		data = self.client.recv(1024)
-		print(f"{data!r}")
-		return pickle.loads(data)
+	def execute(self, request: Dict) -> Dict:
+		message = TClientMessage(self.sel, self.client, (self.host, self.port), request)
+		self.sel.modify(self.client, selectors.EVENT_READ | selectors.EVENT_WRITE, data=message)
+		while True:
+			events = self.sel.select()
+			for key, mask in events:
+				message: TClientMessage = key.data
+				try:
+					message.process_events(mask)
+				except Exception:
+					pass
+					message.close()
+			if not self.sel.get_map():
+				break
+
+		print(f"Message result: {message.response}")
+#		return message.response
