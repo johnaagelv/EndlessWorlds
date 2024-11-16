@@ -11,7 +11,7 @@ from input_handlers import TEventHandler
 """
 Engine takes care of handling input and output
 """
-class TEngine:
+class TClientEngine:
 	def __init__(
 		self,
 		player: TEntity,

@@ -30,8 +30,8 @@ class TMoveAction(TAction):
 			"c": "mov",
 			"x": entity.data["location"]["x"],
 			"y": entity.data["location"]["y"],
-			"z": 0,
-			"r": entity.data["location"]["z"],
+			"z": entity.data["location"]["z"],
+			"r": 4,
 		}
 		data = entity.client.execute(command)
 

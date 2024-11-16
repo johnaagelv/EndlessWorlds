@@ -4,7 +4,7 @@ import json
 
 from typing import Dict
 
-from engines import TEngine
+from engines import TClientEngine
 from entities import TEntity
 from game_map import TGameMap
 from connectors import TConnector
@@ -46,7 +46,7 @@ def main() -> None:
 
 	game_map = TGameMap(map_width, map_height)
 
-	engine = TEngine(player=player, event_handler=event_handler, game_map=game_map)
+	engine = TClientEngine(player=player, event_handler=event_handler, game_map=game_map)
 
 	with tcod.context.new_terminal(
 		screen_width,

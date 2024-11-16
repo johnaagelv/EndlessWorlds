@@ -1,1 +1,53 @@
-{"playing": true, "character": {"face": "@", "colour": [255, 255, 255]}, "states": {"health": {"value": 10000, "max": 10000, "min": 0}}, "location": {"w": {"host": "192.168.1.104", "port": 65432, "name": "Ankt"}, "m": 0, "x": 15, "y": 15, "z": 0}, "memories": {"maps": [{"name": "", "width": 80, "height": 45, "explored": null}]}, "effects": [{"scope": "states", "key": "health", "name": "poisoned", "ticks": 100, "change": -1, "fixed": 0}]}
+{
+	"playing": true,
+	"character":
+	{
+		"face": "@",
+		"colour": [255, 255, 255]
+	},
+	"states":
+	{
+		"health":
+		{
+			"value": 10000,
+			"max": 10000,
+			"min": 0
+		}
+	},
+	"location":
+	{
+		"w":
+		{
+			"host": "192.168.1.104",
+			"port": 65432,
+			"name": "Ankt"
+		},
+		"m": 0,
+		"x": 15,
+		"y": 15,
+		"z": 0
+	},
+	"memories":
+	{
+		"maps":
+		[
+			{
+				"name": "",
+				"width": 80,
+				"height": 45,
+				"explored": null
+			}
+		]
+	},
+	"effects":
+	[
+		{
+			"scope": "states",
+			"key": "health",
+			"name": "poisoned",
+			"ticks": 100,
+			"change": -1,
+			"fixed": 0
+		}
+	]
+}
