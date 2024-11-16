@@ -107,5 +107,13 @@ With the above effect on the health state as an example:
 The poison effect above will be active for 100 ticks and lower the health state by 1 every tick.
 
 For a single time effect, like eating food to raise the energy state, a tick of 1 would be used!
-
+```
+		{
+			"scope": "states",
+			"key": "energy",
+			"name": "eating",
+			"ticks": 1
+			"value": 10
+		}
+```
 Other effect ideas could be to have the max change, to allow for boosting a state.
