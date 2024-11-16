@@ -13,19 +13,19 @@ the player's properties.
 
 ## Character collection
 The current collection is defined as shown below:
-'''
+```
 	"character":
 	{
 		"face": "@",
 		"colour": [255, 255, 255]
 	},
-'''
+```
 - face - a symbol that represents the character
 - colour - an rgb colour applied to the face symbol
 
 ## States collection
 The current collection is defined as shown below:
-'''
+```
 	"states":
 	{
 		"health":
@@ -35,12 +35,12 @@ The current collection is defined as shown below:
 			"min": 0
 		}
 	},
-'''
+```
 - health - defines the healt current value, the max and the min health value
 
 ## Location collection
 The current collection is defined as shown below:
-'''
+```
 	"location":
 	{
 		"world":
@@ -54,7 +54,7 @@ The current collection is defined as shown below:
 		"y": 15,
 		"z": 0
 	},
-'''
+```
 - world - defines the connection to the world server and the world name
 - map - indicates the map number within the world
 - x, y, z - defines the characters position in the map as x, y, z where x, y are the 2D location and z is the height
