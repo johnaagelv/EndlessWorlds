@@ -10,6 +10,9 @@ the player's properties.
 - states - collection of properties defining the character's states, such as health, ..., etc
 - location - collection of properties defining the character's location in the world, such as world map, position (x, y, z), ..., etc.
 - memories - collection of properties defining the character's memories, such as the world maps, ..., etc.
+- senses - collection of properties defining the character's senses, such as vision, ..., etc.
+- effects - collection of properties defining the character's active effects, such as poisoned, ..., etc.
+- conditions - collection of properties defining the character's active conditions, which may affect other properties
 
 ## Character collection
 The current collection is defined as shown below:
