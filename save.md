@@ -102,7 +102,7 @@ The effects collection is defined as shown below and can contain 0 (zero) to man
 With the above effect on the health state as an example:
 - scope - indicates which collection the effect is to be applied to
 - key - indicates that the health state is to be affected
-- name - name of the effect
+- name - name of the effect (optional)
 - ticks - how much time the effect is in effect. This is decreased for every tick. When reaching 0 (zero) the effect is ended
 - value - a value that is applied every tick to the health value while it is in effect
 
@@ -119,31 +119,84 @@ Example below
 			"value": 10
 		}
 ```
+
+A blinding effect could be defined as the example below:
+```
+		{
+			"scope": "senses",
+			"key": "vision",
+			"name": "blinded",
+			"ticks": 10,
+			"range": -10
+		}
+```
+The above effect would affect a range of 0 for 10 ticks, simulating blindness!
+
 Other effect ideas could be to have the max change, to allow for boosting a state.
+
 ## Senses collection
 The senses collection is defined as shown below.
 ```
 	"senses":
 	{
 		"vision": {
-			"range": 4.
+			"value": 4.
 			"max": 4,
 			"min": 0
 		},
 		"hearing": {
-			"range": 4.
+			"value": 4.
 			"max": 4,
 			"min": 0
 		},
 		"smelling": {
-			"range": 4.
+			"value": 4.
 			"max": 4,
 			"min": 0
 		},
 		...
 	}
 ```
-Currently a sense only has a range for which it is effective. The range is a radius of tiles from the character's location (x,y)
+Currently a sense only has a value for which it is effective. The value is a radius of tiles from the character's location (x,y)
 	
 The max and min properties are used in case an effect will be applied to a sense, so that the range later can
 be returned to its max value when the effect ends.
+
+## Conditions collection
+The conditions collection is processed for each tick and can invoke one or more effects.
+
+```
+	"conditions": [
+		{
+			"scope": "states",
+			"key": "health",
+			"less": 50,
+			"invoke": [
+				"effect": {
+					"scope": "states",
+					"key": "energy",
+					"name": "not feeling well",
+					"ticks": 1,
+					"value": -1
+				}
+			]
+		},
+		{
+			"scope": "states",
+			"key": "health",
+			"greater": 50,
+			"invoke": [
+				"effect": {
+					"scope": "states",
+					"key": "energy",
+					"name": "",
+					"ticks": 1,
+					"value": 1
+				}
+			]
+		}
+	]
+```
+The above conditions defines that the energy state changes:
+- when the health state value is less than 50 by deducting 1 from the energy state value
+- when the health state value is greater than 50 by adding 1 to the energy state value
