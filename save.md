@@ -33,6 +33,12 @@ The current collection is defined as shown below:
 			"value": 10000,
 			"max": 10000,
 			"min": 0
+		},
+		"energy":
+		{
+			"value": 10000,
+			"max": 10000,
+			"min": 0
 		}
 	},
 ```
@@ -86,7 +92,7 @@ The current collection is defined as shown below:
 			"key": "health",
 			"name": "poisoned",
 			"ticks": 100,
-			"change": -1,
+			"value": -1,
 		}
 	]
 ```
@@ -96,5 +102,10 @@ With the above effect on the health state as an example:
 - key - indicates that the health state is to be affected
 - name - name of the effect
 - ticks - how much time the effect is in effect. This is decreased for every tick. When reaching 0 (zero) the effect is ended
-- change - a value that is applied every tick to the health value while it is in effect
+- value - a value that is applied every tick to the health value while it is in effect
+
 The poison effect above will be active for 100 ticks and lower the health state by 1 every tick.
+
+For a single time effect, like eating food to raise the energy state, a tick of 1 would be used!
+
+Other effect ideas could be to have the max change, to allow for boosting a state.
