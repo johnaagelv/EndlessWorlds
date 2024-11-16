@@ -24,7 +24,7 @@ The current collection is defined as shown below:
 - colour - an rgb colour applied to the face symbol
 
 ## States collection
-The current collection is defined as shown below:
+The states collection is defined as shown below and every state is optional:
 ```
 	"states":
 	{
@@ -39,10 +39,12 @@ The current collection is defined as shown below:
 			"value": 10000,
 			"max": 10000,
 			"min": 0
-		}
+		},
+		...
 	},
 ```
 - health - defines the healt current value, the max and the min health value
+- energy - defines the energy current value, the max and the min energy value
 
 ## Location collection
 The current collection is defined as shown below:
@@ -83,7 +85,7 @@ The current collection is defined as shown below:
 ```
 
 ## Effects collection
-The current collection is defined as shown below:
+The effects collection is defined as shown below and can contain 0 (zero) to many effects:
 ```
 	"effects":
 	[
@@ -93,10 +95,10 @@ The current collection is defined as shown below:
 			"name": "poisoned",
 			"ticks": 100,
 			"value": -1,
-		}
+		},
+		...
 	]
 ```
-Each effect is short-lived, meaning that effects will terminate after some time.
 With the above effect on the health state as an example:
 - scope - indicates which collection the effect is to be applied to
 - key - indicates that the health state is to be affected
@@ -107,6 +109,7 @@ With the above effect on the health state as an example:
 The poison effect above will be active for 100 ticks and lower the health state by 1 every tick.
 
 For a single time effect, like eating food to raise the energy state, a tick of 1 would be used!
+Example below
 ```
 		{
 			"scope": "states",
@@ -117,3 +120,30 @@ For a single time effect, like eating food to raise the energy state, a tick of 
 		}
 ```
 Other effect ideas could be to have the max change, to allow for boosting a state.
+## Senses collection
+The senses collection is defined as shown below.
+```
+	"senses":
+	{
+		"vision": {
+			"range": 4.
+			"max": 4,
+			"min": 0
+		},
+		"hearing": {
+			"range": 4.
+			"max": 4,
+			"min": 0
+		},
+		"smelling": {
+			"range": 4.
+			"max": 4,
+			"min": 0
+		},
+		...
+	}
+	```
+	Currently a sense only has a range for which it is effective. The range is a radius of tiles from the character's location (x,y)
+	
+	The max and min properties are used in case an effect will be applied to a sense, so that the range later can
+	be returned to its max value when the effect ends.
