@@ -142,8 +142,8 @@ The senses collection is defined as shown below.
 		},
 		...
 	}
-	```
-	Currently a sense only has a range for which it is effective. The range is a radius of tiles from the character's location (x,y)
+```
+Currently a sense only has a range for which it is effective. The range is a radius of tiles from the character's location (x,y)
 	
-	The max and min properties are used in case an effect will be applied to a sense, so that the range later can
-	be returned to its max value when the effect ends.
+The max and min properties are used in case an effect will be applied to a sense, so that the range later can
+be returned to its max value when the effect ends.
