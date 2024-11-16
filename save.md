@@ -60,18 +60,25 @@ The current collection is defined as shown below:
 - x, y, z - defines the characters position in the map as x, y, z where x, y are the 2D location and z is the height
 
 ## Memories collection
+The current collection is defined as shown below:
+```
 	"memories":
 	{
 		"maps":
 		[
 			{
-				"name": "",
+				"name": "Landing camp",
 				"width": 80,
 				"height": 45,
 				"explored": null
 			}
 		]
 	},
+```
+
+## Effects collection
+The current collection is defined as shown below:
+```
 	"effects":
 	[
 		{
@@ -80,7 +87,14 @@ The current collection is defined as shown below:
 			"name": "poisoned",
 			"ticks": 100,
 			"change": -1,
-			"fixed": 0
 		}
 	]
-}
+```
+Each effect is short-lived, meaning that effects will terminate after some time.
+With the above effect on the health state as an example:
+- scope - indicates which collection the effect is to be applied to
+- key - indicates that the health state is to be affected
+- name - name of the effect
+- ticks - how much time the effect is in effect. This is decreased for every tick. When reaching 0 (zero) the effect is ended
+- change - a value that is applied every tick to the health value while it is in effect
+The poison effect above will be active for 100 ticks and lower the health state by 1 every tick.
