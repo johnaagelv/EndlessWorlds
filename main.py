@@ -1,56 +1,58 @@
-import json
+#!/usr/bin/env python3
+import copy
 
-def main():
+import tcod
 
-	data = {
-		"playing": True,
-		"character": {
-			"face": "@",
-			"colour": (255, 255, 255),
-		},
-		"states": {
-			"health": {
-				"value": 10000, # Value represents 100.00
-				"max": 10000,
-				"min": 0,
-			},
-		},
-		"location": {
-			"w": { # World information: server and name
-				"host": "192.168.1.104",
-				"port": 65432,
-				"name": "Ankt"
-			},
-			"m": 0, # Map number in the world
-			"x": 15, # X coordinate in the map
-			"y": 15, # Y coordinate in the map
-			"z": 0, # Height in the map
-		},
-		"memories": { # Player or NPC memories
-			"maps": [ # Map memories in the current world
-				{
-					"name": "",
-					"width": 80,
-					"height": 45,
-					"explored": None,
-				}
-			]
-		},
-		"effects": [ # Effects that changes states, a dynamic list
-			{ # This effect affects the health state by -1 for every tick in 100 ticks time, eq a -100 change over time
-				"scope": "states", # Scope identifies the affected area
-				"key": "health", # Key identifies the affected item
-				"name": "poisoned", # Name identifies the effect
-				"ticks": 100, # ticks is how many ticks this effect will be in force
-				"change": -1, # change is how much the item value is affected per tick
-				"fixed": 0, # fixed is how much the item value is changed during the time of ticks
-				# Usually only one of "change" or "fixed" is defined/used
-			},
-		],
-	}
+from engine import Engine
+import entity_factories
+from procgen import generate_dungeon
 
-	with open("client/save.sav","wt") as f:
-		f.write(json.dumps(data))
+
+def main() -> None:
+    screen_width = 80
+    screen_height = 50
+
+    map_width = 80
+    map_height = 45
+
+    room_max_size = 10
+    room_min_size = 6
+    max_rooms = 30
+
+    max_monsters_per_room = 2
+
+    tileset = tcod.tileset.load_tilesheet(
+        "dejavu10x10_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD
+    )
+
+    player = copy.deepcopy(entity_factories.player)
+
+    engine = Engine(player=player)
+
+    engine.game_map = generate_dungeon(
+        max_rooms=max_rooms,
+        room_min_size=room_min_size,
+        room_max_size=room_max_size,
+        map_width=map_width,
+        map_height=map_height,
+        max_monsters_per_room=max_monsters_per_room,
+        engine=engine,
+    )
+    engine.update_fov()
+
+    with tcod.context.new_terminal(
+        screen_width,
+        screen_height,
+        tileset=tileset,
+        title="Yet Another Roguelike Tutorial",
+        vsync=True,
+    ) as context:
+        root_console = tcod.Console(screen_width, screen_height, order="F")
+        while True:
+            engine.render(console=root_console, context=context)
+
+            engine.event_handler.handle_events()
+
 
 if __name__ == "__main__":
-	main()
+    main()
