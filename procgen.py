@@ -6,12 +6,12 @@ from typing import Iterator, List, Tuple, TYPE_CHECKING
 import tcod
 
 import entity_factories
-from game_map import GameMap
+from game_map import TGameMap
 import tile_types
 
 
 if TYPE_CHECKING:
-    from engine import Engine
+    from engine import TEngine
 
 
 class RectangularRoom:
@@ -44,7 +44,7 @@ class RectangularRoom:
 
 
 def place_entities(
-    room: RectangularRoom, dungeon: GameMap, maximum_monsters: int,
+    room: RectangularRoom, dungeon: TGameMap, maximum_monsters: int,
 ) -> None:
     number_of_monsters = random.randint(0, maximum_monsters)
 
@@ -86,11 +86,11 @@ def generate_dungeon(
     map_width: int,
     map_height: int,
     max_monsters_per_room: int,
-    engine: Engine,
-) -> GameMap:
+    engine: TEngine,
+) -> TGameMap:
     """Generate a new dungeon map."""
     player = engine.player
-    dungeon = GameMap(engine, map_width, map_height, entities=[player])
+    dungeon = TGameMap(engine, map_width, map_height, entities=[player])
 
     rooms: List[RectangularRoom] = []
 

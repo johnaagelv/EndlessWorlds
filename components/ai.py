@@ -5,15 +5,15 @@ from typing import List, Tuple, TYPE_CHECKING
 import numpy as np  # type: ignore
 import tcod
 
-from actions import Action, MeleeAction, MovementAction, WaitAction
+from actions import TAction, TMeleeAction, TMovementAction, TWaitAction
 from components.base_component import BaseComponent
 
 if TYPE_CHECKING:
-    from entity import Actor
+    from entity import TActor
 
 
-class BaseAI(Action, BaseComponent):
-    entity: Actor
+class TBaseAI(TAction, BaseComponent):
+    entity: TActor
 
     def perform(self) -> None:
         raise NotImplementedError()
@@ -48,8 +48,8 @@ class BaseAI(Action, BaseComponent):
         return [(index[0], index[1]) for index in path]
 
 
-class HostileEnemy(BaseAI):
-    def __init__(self, entity: Actor):
+class HostileEnemy(TBaseAI):
+    def __init__(self, entity: TActor):
         super().__init__(entity)
         self.path: List[Tuple[int, int]] = []
 
@@ -61,14 +61,14 @@ class HostileEnemy(BaseAI):
 
         if self.engine.game_map.visible[self.entity.x, self.entity.y]:
             if distance <= 1:
-                return MeleeAction(self.entity, dx, dy).perform()
+                return TMeleeAction(self.entity, dx, dy).perform()
 
             self.path = self.get_path_to(target.x, target.y)
 
         if self.path:
             dest_x, dest_y = self.path.pop(0)
-            return MovementAction(
+            return TMovementAction(
                 self.entity, dest_x - self.entity.x, dest_y - self.entity.y,
             ).perform()
 
-        return WaitAction(self.entity).perform()
+        return TWaitAction(self.entity).perform()

@@ -2,49 +2,48 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from tcod.context import Context
 from tcod.console import Console
 from tcod.map import compute_fov
 
-from input_handlers import MainGameEventHandler
+from input_handlers import TMainGameEventHandler
+from message_log import TMessageLog
+from renders import render_bar, render_names_at_mouse_location
 
 if TYPE_CHECKING:
-    from entity import Actor
-    from game_map import GameMap
-    from input_handlers import EventHandler
+	from entity import TActor
+	from game_map import TGameMap
+	from input_handlers import TEventHandler
 
 
-class Engine:
-    game_map: GameMap
+class TEngine:
+	game_map: TGameMap
 
-    def __init__(self, player: Actor):
-        self.event_handler: EventHandler = MainGameEventHandler(self)
-        self.player = player
+	def __init__(self, player: TActor):
+		self.event_handler: TEventHandler = TMainGameEventHandler(self)
+		self.message_log = TMessageLog()
+		self.mouse_location = (0, 0)
+		self.player = player
 
-    def handle_enemy_turns(self) -> None:
-        for entity in set(self.game_map.actors) - {self.player}:
-            if entity.ai:
-                entity.ai.perform()
+	def handle_enemy_turns(self) -> None:
+		for entity in set(self.game_map.actors) - {self.player}:
+			if entity.ai:
+				entity.ai.perform()
 
-    def update_fov(self) -> None:
-        """Recompute the visible area based on the players point of view."""
-        self.game_map.visible[:] = compute_fov(
-            self.game_map.tiles["transparent"],
-            (self.player.x, self.player.y),
-            radius=8,
-        )
-        # If a tile is "visible" it should be added to "explored".
-        self.game_map.explored |= self.game_map.visible
+	def update_fov(self) -> None:
+		"""Recompute the visible area based on the players point of view."""
+		self.game_map.visible[:] = compute_fov(
+			self.game_map.tiles["transparent"],
+			(self.player.x, self.player.y),
+			radius=8,
+		)
+		# If a tile is "visible" it should be added to "explored".
+		self.game_map.explored |= self.game_map.visible
 
-    def render(self, console: Console, context: Context) -> None:
-        self.game_map.render(console)
+	def render(self, console: Console) -> None:
+		self.game_map.render(console)
 
-        console.print(
-            x=1,
-            y=47,
-            string=f"HP: {self.player.fighter.hp}/{self.player.fighter.max_hp}",
-        )
+		self.message_log.render(console=console, x=21, y=45, width=40, height=5)
 
-        context.present(console)
+		render_bar(console=console, current_value=self.player.fighter.hp, maximum_value=self.player.fighter.max_hp, total_width=20)
 
-        console.clear()
+		render_names_at_mouse_location(console=console, x=21, y=44, engine=self)

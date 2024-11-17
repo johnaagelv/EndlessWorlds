@@ -6,23 +6,22 @@ from typing import Optional, Tuple, Type, TypeVar, TYPE_CHECKING
 from render_order import RenderOrder
 
 if TYPE_CHECKING:
-    from components.ai import BaseAI
-    from components.fighter import Fighter
-    from game_map import GameMap
+    from components.ai import TBaseAI
+    from components.fighter import TFighter
+    from game_map import TGameMap
 
-T = TypeVar("T", bound="Entity")
+T = TypeVar("T", bound="TEntity")
 
 
-class Entity:
+class TEntity:
     """
     A generic object to represent players, enemies, items, etc.
     """
-
-    gamemap: GameMap
+    gamemap: TGameMap
 
     def __init__(
         self,
-        gamemap: Optional[GameMap] = None,
+        gamemap: Optional[TGameMap] = None,
         x: int = 0,
         y: int = 0,
         char: str = "?",
@@ -43,7 +42,7 @@ class Entity:
             self.gamemap = gamemap
             gamemap.entities.add(self)
 
-    def spawn(self: T, gamemap: GameMap, x: int, y: int) -> T:
+    def spawn(self: T, gamemap: TGameMap, x: int, y: int) -> T:
         """Spawn a copy of this instance at the given location."""
         clone = copy.deepcopy(self)
         clone.x = x
@@ -52,7 +51,7 @@ class Entity:
         gamemap.entities.add(clone)
         return clone
 
-    def place(self, x: int, y: int, gamemap: Optional[GameMap] = None) -> None:
+    def place(self, x: int, y: int, gamemap: Optional[TGameMap] = None) -> None:
         """Place this entitiy at a new location.  Handles moving across GameMaps."""
         self.x = x
         self.y = y
@@ -68,7 +67,7 @@ class Entity:
         self.y += dy
 
 
-class Actor(Entity):
+class TActor(TEntity):
     def __init__(
         self,
         *,
@@ -77,8 +76,8 @@ class Actor(Entity):
         char: str = "?",
         color: Tuple[int, int, int] = (255, 255, 255),
         name: str = "<Unnamed>",
-        ai_cls: Type[BaseAI],
-        fighter: Fighter
+        ai_cls: Type[TBaseAI],
+        fighter: TFighter
     ):
         super().__init__(
             x=x,
@@ -90,7 +89,7 @@ class Actor(Entity):
             render_order=RenderOrder.ACTOR,
         )
 
-        self.ai: Optional[BaseAI] = ai_cls(self)
+        self.ai: Optional[TBaseAI] = ai_cls(self)
 
         self.fighter = fighter
         self.fighter.entity = self
