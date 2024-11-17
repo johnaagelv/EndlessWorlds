@@ -58,7 +58,8 @@ class TClientMessage(TMessage):
 			if data:
 				self._recv_buffer += data
 			else:
-				raise RuntimeError("Connection closed.")
+				print("Connection closed!")
+				#raise RuntimeError("Connection closed.")
 
 	def _write(self):
 		if self._send_buffer:

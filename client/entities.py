@@ -22,7 +22,7 @@ class TEntity:
 	def _process(self, scope):
 		if scope in self.data:
 			for item in self.data[scope]:
-				self.data[item["scope"]][item["key"]]["value"] += item["change"]
+				self.data[item["scope"]][item["key"]]["value"] += item["value"]
 				item["ticks"] -= 1
 
 				if item["ticks"] == 0:

@@ -48,13 +48,14 @@ def tunnel_between(
 def generate_dungeon(
 	map_width,
 	map_height,
+	player=None
 ) -> TGameMap:
 	dungeon = TGameMap(
 		map_width,
-		map_height,
+		map_height
 	)
-	room_1 = TRoom(x=20, y=15, width=10, height=15)
-	room_2 = TRoom(x=35, y=15, width=10, height=15)
+	room_1 = TRoom(x=10, y=5, width=15, height=25)
+	room_2 = TRoom(x=55, y=25, width=10, height=15)
 
 	dungeon.tiles[room_1.inner] = tile_types.floor
 	dungeon.tiles[room_2.inner] = tile_types.floor
@@ -62,4 +63,6 @@ def generate_dungeon(
 	for x, y in tunnel_between(room_2.center, room_1.center):
 		dungeon.tiles[x, y] = tile_types.floor
 
+	if player:
+		player.data["location"]["x"], player.data["location"]["y"] = room_2.center
 	return dungeon

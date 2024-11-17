@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import tcod
 import json
+import time
 
 from typing import Dict
 
@@ -9,6 +10,7 @@ from entities import TEntity
 from game_map import TGameMap
 from connectors import TConnector
 from input_handlers import TEventHandler
+from procgen import generate_dungeon
 
 SERVER_HOST = "192.168.1.104"
 SERVER_PORT = 65432
@@ -44,7 +46,7 @@ def main() -> None:
 
 	event_handler = TEventHandler()
 
-	game_map = TGameMap(map_width, map_height)
+	game_map = generate_dungeon(map_width, map_height, player)
 
 	engine = TClientEngine(player=player, event_handler=event_handler, game_map=game_map)
 
@@ -58,10 +60,9 @@ def main() -> None:
 		root_console = tcod.console.Console(screen_width, screen_height, order="F")
 		while player.data["playing"]:
 			engine.render(root_console, context)
-			events = tcod.event.wait(timeout=5.0)
-			print("Waiting finished")
+			events = tcod.event.wait(timeout=2.0)
+#			print(f"Waiting finished {tick}")
 			engine.handle_events(events)
 			
-
 if __name__ == "__main__":
 	main()

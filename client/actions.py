@@ -33,7 +33,7 @@ class TMoveAction(TAction):
 			"z": entity.data["location"]["z"],
 			"r": 4,
 		}
-		data = entity.client.execute(command)
+		#data = entity.client.execute(command)
 
 		if game_map.tiles["walkable"][entity.data["location"]["x"] + self.dx, entity.data["location"]["y"] + self.dy]:
 			entity.data["location"]["x"] += self.dx

@@ -3,7 +3,7 @@ from tcod.console import Console
 
 import tile_types
 
-class TGameMap:
+class xTGameMap:
 	def __init__(self, width: int, height: int):
 		self.width, self.height = width, height
 		self.tiles = np.full((width, height), fill_value=tile_types.floor, order="F")

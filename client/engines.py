@@ -7,6 +7,7 @@ from tcod.map import compute_fov
 from entities import TEntity
 from game_map import TGameMap
 from input_handlers import TEventHandler
+from renders import render_bar
 
 """
 Engine takes care of handling input and output
@@ -42,7 +43,7 @@ class TClientEngine:
 		self.game_map.visible[:] = compute_fov(
 			self.game_map.tiles["transparent"],
 			(self.actor.data["location"]["x"], self.actor.data["location"]['y']),
-			radius=8, # TODO! Take this from the player entity data
+			radius=self.actor.data["senses"]["vision"]["value"], # TODO! Take this from the player entity data
 		)
 		self.game_map.explored |= self.game_map.visible
 

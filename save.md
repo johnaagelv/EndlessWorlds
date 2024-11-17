@@ -24,7 +24,7 @@ The current collection is defined as shown below:
 	},
 ```
 - face - a symbol that represents the character
-- colour - an rgb colour applied to the face symbol
+- colour - an RGB colour applied to the face symbol
 
 ## States collection
 The states collection is defined as shown below and every state is optional:
