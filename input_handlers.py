@@ -6,6 +6,8 @@ import tcod.event
 import tcod.libtcodpy as tcodformat
 
 from actions import TAction, TBumpAction, TEscapeAction, TWaitAction
+import colours as colour
+import exceptions
 
 if TYPE_CHECKING:
 	from engine import TEngine
@@ -62,10 +64,24 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 	def __init__(self, engine: TEngine):
 		self.engine = engine
 
-	def handle_events(self, context: tcod.context.Context) -> None:
-		for event in tcod.event.wait(timeout=2.0):
-			context.convert_event(event)
-			self.dispatch(event)
+	def handle_events(self, event: tcod.event.Event) -> None:
+		self.handle_action(self.dispatch(event))
+
+	def handle_action(self, action: Optional[TAction]) -> bool:
+		"""
+		Handle actions returned from event methods
+		Returns True if the action will advance a turn
+		"""
+		if action is None:
+			return False
+		try:
+			action.perform()
+		except exceptions.Impossible as exc:
+			self.engine.message_log.add_message(exc.args[0], colour.impossible)
+			return False
+		self.engine.handle_enemy_turns()
+		self.engine.update_fov()
+		return True
 
 	def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
 		if self.engine.game_map.in_bounds(event.tile.x, event.tile.y):
@@ -78,20 +94,6 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 		self.engine.render(console)
 
 class TMainGameEventHandler(TEventHandler):
-	def handle_events(self, context: tcod.context.Context) -> None:
-		for event in tcod.event.wait(timeout=2.0):
-			context.convert_event(event)
-
-			action = self.dispatch(event)
-
-			if action is None:
-				continue
-
-			action.perform()
-
-			self.engine.handle_enemy_turns()
-			self.engine.update_fov()  # Update the FOV before the players next action.
-
 	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[TAction]:
 		action: Optional[TAction] = None
 
@@ -114,24 +116,9 @@ class TMainGameEventHandler(TEventHandler):
 		return action
 
 class TGameOverEventHandler(TEventHandler):
-	def handle_events(self, context: tcod.context.Context) -> None:
-		for event in tcod.event.wait(timeout=2.0):
-			action = self.dispatch(event)
-
-			if action is None:
-				continue
-
-			action.perform()
-
-	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[TAction]:
-		action: Optional[TAction] = None
-
-		key = event.sym
-
-		if key == tcod.event.KeySym.ESCAPE:
+	def ev_keydown(self, event: tcod.event.KeyDown) -> None:
+		if event.sym == tcod.event.KeySym.ESCAPE:
 			action = TEscapeAction(self.engine.player)
-
-		# No valid key was pressed
 		return action
 
 class THistoryViewer(TEventHandler):

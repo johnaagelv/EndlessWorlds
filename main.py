@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import copy
+import traceback
 
 import tcod
 
@@ -7,7 +8,6 @@ import colours as colour
 from engine import TEngine
 import entity_factories
 from procgen import generate_dungeon
-
 
 def main() -> None:
 	screen_width = 80
@@ -55,8 +55,13 @@ def main() -> None:
 			root_console.clear()
 			engine.event_handler.on_render(console=root_console)
 			context.present(root_console)
-
-			engine.event_handler.handle_events(context)
+			try:
+				for event in tcod.event.wait(timeout=2.0):
+					context.convert_event(event)
+					engine.event_handler.handle_events(event)
+			except Exception:
+				traceback.print_exc()
+				engine.message_log.add_message(traceback.format_exc(), colour.error)
 
 if __name__ == "__main__":
 	main()

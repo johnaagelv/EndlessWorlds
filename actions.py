@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Optional, Tuple, TYPE_CHECKING
 
 import colours as colour
+import exceptions
 
 if TYPE_CHECKING:
 	from engine import TEngine
@@ -66,7 +67,7 @@ class TMeleeAction(TActionWithDirection):
 	def perform(self) -> None:
 		target = self.target_actor
 		if not target:
-			return  # No entity to attack.
+			raise exceptions.Impossible("Nothing to attack!")
 
 		damage = self.entity.fighter.power - target.fighter.defense
 
@@ -87,11 +88,11 @@ class TMovementAction(TActionWithDirection):
 		dest_x, dest_y = self.dest_xy
 
 		if not self.engine.game_map.in_bounds(dest_x, dest_y):
-			return  # Destination is out of bounds.
+			raise exceptions.Impossible("The way is blocked!")
 		if not self.engine.game_map.tiles["walkable"][dest_x, dest_y]:
-			return  # Destination is blocked by a tile.
+			raise exceptions.Impossible("Ouch!")
 		if self.engine.game_map.get_blocking_entity_at_location(dest_x, dest_y):
-			return  # Destination is blocked by an entity.
+			raise exceptions.Impossible("Watch where you're going!")
 
 		self.entity.move(self.dx, self.dy)
 
