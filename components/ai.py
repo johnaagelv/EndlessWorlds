@@ -6,13 +6,11 @@ import numpy as np  # type: ignore
 import tcod
 
 from actions import TAction, TMeleeAction, TMovementAction, TWaitAction
-from components.base_component import BaseComponent
 
 if TYPE_CHECKING:
     from entity import TActor
 
-
-class TBaseAI(TAction, BaseComponent):
+class TBaseAI(TAction):
     entity: TActor
 
     def perform(self) -> None:
@@ -24,9 +22,9 @@ class TBaseAI(TAction, BaseComponent):
         If there is no valid path then returns an empty list.
         """
         # Copy the walkable array.
-        cost = np.array(self.entity.gamemap.tiles["walkable"], dtype=np.int8)
+        cost = np.array(self.entity.parent.tiles["walkable"], dtype=np.int8)
 
-        for entity in self.entity.gamemap.entities:
+        for entity in self.entity.parent.entities:
             # Check that an enitiy blocks movement and the cost isn't zero (blocking.)
             if entity.blocks_movement and cost[entity.x, entity.y]:
                 # Add to the cost of a blocked position.
