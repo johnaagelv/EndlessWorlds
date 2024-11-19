@@ -30,6 +30,32 @@ class TAction:
 		"""
 		raise NotImplementedError()
 
+class TPickupAction(TAction):
+	"""
+	Pickup an item and add it to the inventory
+	"""
+	def __init__(self, entity: TActor):
+		super().__init__(entity)
+	
+	def perform(self) -> None:
+		actor_location_x = self.entity.x
+		actor_location_y = self.entity.y
+		inventory =self.entity.inventory
+
+		for item in self.engine.game_map.items:
+			if actor_location_x == item.x and actor_location_y == item.y:
+				if len(inventory.items) >= inventory.capacity:
+					raise exceptions.Impossible("Your inventory is full!")
+				
+				self.engine.game_map.entities.remove(item)
+				item.parent = self.entity.inventory
+				inventory.items.append(item)
+
+				self.engine.message_log.add_message(f"You picked up the {item.name}!")
+				return
+
+		raise exceptions.Impossible("There is nothing here to pick up!")
+
 class TItemAction(TAction):
 	def __init__(self, entity: TActor, item: TItem, target_xy: Optional[Tuple[int, int]]=None):
 		super().__init__(entity)
@@ -54,6 +80,10 @@ class TItemAction(TAction):
 class TEscapeAction(TAction):
 	def perform(self) -> None:
 		raise SystemExit()
+
+class TDropItem(TItemAction):
+	def perform(self) -> None:
+		self.entity.inventory.drop(self.item)
 
 class TWaitAction(TAction):
 	def perform(self) -> None:

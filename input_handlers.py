@@ -5,12 +5,13 @@ from typing import Optional, TYPE_CHECKING
 import tcod.event
 import tcod.libtcodpy as tcodformat
 
-from actions import TAction, TBumpAction, TEscapeAction, TWaitAction
+from actions import TAction, TBumpAction, TDropAction, TEscapeAction, TPickupAction, TWaitAction
 import colours as colour
 import exceptions
 
 if TYPE_CHECKING:
 	from engine import TEngine
+	from entity import TItem
 
 MOVE_KEYS = {
 	# Arrow keys.
@@ -112,6 +113,16 @@ class TMainGameEventHandler(TEventHandler):
 		elif key in SWITCH_UI_KEYS:
 			self.engine.event_handler = THistoryViewer(self.engine)
 
+		# Item pickup
+		elif key == tcod.event.KeySym.g:
+			action = TPickupAction(player)
+
+		# Inventory
+		elif key == tcod.event.KeySym.i:
+			self.engine.event_handler = TInventoryActivateHandler(self.engine)
+		elif key == tcod.event.KeySym.d:
+			self.engine.event_handler = TInventoryDropHandler(self.engine)
+
 		# No valid key was pressed
 		return action
 
@@ -154,3 +165,112 @@ class THistoryViewer(TEventHandler):
 			self.cursor = self.log_length - 1
 		else:
 			self.engine.event_handler = TMainGameEventHandler(self.engine)
+
+class TAskUserEventHandler(TEventHandler):
+	"""
+	Handles user input for actions which require special input
+	"""
+	def handle_action(self, action: Optional[TAction]) -> bool:
+		if super().handle_action(action):
+			self.engine.event_handler = TMainGameEventHandler(self.engine)
+			return True
+		return False
+	
+	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[TAction]:
+		if event.sym in {
+			tcod.event.KeySym.LSHIFT,
+			tcod.event.KeySym.RSHIFT,
+			tcod.event.KeySym.LCTRL,
+			tcod.event.KeySym.RCTRL,
+			tcod.event.KeySym.LALT,
+			tcod.event.KeySym.RALT,
+		}:
+			return None
+		return self.on_exit()
+	
+	def on_exit(self) -> Optional[TAction]:
+		self.engine.event_handler = TMainGameEventHandler(self.engine)
+		return None
+	
+class TInventoryEventHandler(TAskUserEventHandler):
+	"""
+	This handler lets the user select an item
+	"""
+	TITLE = "<missing title>"
+
+	def on_render(self, console: tcod.console.Console) -> None:
+		"""
+		Render an inventory menu, which displays the items in the inventory, 
+		and the letter to select them. Will move to a different position based
+		on where the player is located, so the player can always see where
+		they are.
+		"""
+		super().on_render(console)
+		number_of_items_in_inventory = len(self.engine.player.inventory.items)
+
+		height = number_of_items_in_inventory + 2
+		if height <= 3:
+			height = 3
+		if self.engine.player.x <= 30:
+			x = 40
+		else:
+			x = 0
+		y = 0
+		width = len(self.TITLE) + 4
+
+		console.draw_frame(
+			x=x,
+			y=y,
+			width=width,
+			height=height,
+			title=self.TITLE,
+			clear=True,
+			fg=(255, 255, 255),
+			bg=(0, 0, 0),
+		)
+		if number_of_items_in_inventory > 0:
+			for i, item in enumerate(self.engine.player.inventory.items):
+				item_key = chr(ord("a") + i)
+				console.print(x + 1, y + i + 1, f"({item_key}) {item.name}")
+		else:
+			console.print(x + 1, y + 1, "(Empty)")
+
+	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[TAction]:
+		player = self.engine.player
+		key = event.sym
+		index = key - tcod.event.KeySym.a
+		# 01234567890123456789012345
+		# abcdefghijklmnopqrstuvwxyz
+		if 0 <= index < 26:
+			try:
+				selected_item = player.inventory.items[index]
+			except IndexError:
+				self.engine.message_log.add_message("Uh??", colour.invalid)
+				return None
+			return self.on_item_selected(selected_item)
+		return super().ev_keydown(event)
+	
+	def on_item_selected(self, item: TItem) -> Optional[TAction]:
+		"""
+		Called when the user selects a valid item
+		"""
+		raise NotImplementedError()
+
+class TInventoryActivateHandler(TInventoryEventHandler):
+	"""
+	Handle using an inventory item
+	"""
+	TITLE = "Select an item to use"
+
+	def on_item_selected(self, item: TItem) -> Optional[TAction]:
+		return item.consumable.get_action(self.engine.player)
+	
+class TInventoryDropHandler(TInventoryEventHandler):
+	"""
+	Handle dropping an inventory item
+	"""
+	TITLE = "Select an item to drop"
+
+	def on_item_selected(self, item: TItem) -> Optional[TAction]:
+		return TDropAction(self.engine.player, item)
+	
