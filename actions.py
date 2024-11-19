@@ -77,10 +77,6 @@ class TItemAction(TAction):
 		"""
 		self.item.consumable.activate(self)
 
-class TEscapeAction(TAction):
-	def perform(self) -> None:
-		raise SystemExit()
-
 class TDropItem(TItemAction):
 	def perform(self) -> None:
 		self.entity.inventory.drop(self.item)

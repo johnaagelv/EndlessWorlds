@@ -5,7 +5,7 @@ from typing import Optional, TYPE_CHECKING
 import tcod.event
 import tcod.libtcodpy as tcodformat
 
-from actions import TAction, TBumpAction, TDropItem, TEscapeAction, TPickupAction, TWaitAction
+from actions import TAction, TBumpAction, TDropItem, TPickupAction, TWaitAction
 import colours as colour
 import exceptions
 
@@ -109,7 +109,7 @@ class TMainGameEventHandler(TEventHandler):
 			action = TWaitAction(player)
 
 		elif key == tcod.event.KeySym.ESCAPE:
-			action = TEscapeAction(player)
+			raise SystemExit()
 		elif key in SWITCH_UI_KEYS:
 			self.engine.event_handler = THistoryViewer(self.engine)
 
@@ -129,8 +129,7 @@ class TMainGameEventHandler(TEventHandler):
 class TGameOverEventHandler(TEventHandler):
 	def ev_keydown(self, event: tcod.event.KeyDown) -> None:
 		if event.sym == tcod.event.KeySym.ESCAPE:
-			action = TEscapeAction(self.engine.player)
-		return action
+			raise SystemExit()
 
 class THistoryViewer(TEventHandler):
 	""" print the history on a larger window with up/down scrolling """
