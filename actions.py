@@ -7,7 +7,7 @@ import exceptions
 
 if TYPE_CHECKING:
 	from engine import TEngine
-	from entity import TActor, TEntity
+	from entity import TActor, TEntity, TItem
 
 class TAction:
 	def __init__(self, entity: TActor) -> None:
@@ -29,6 +29,27 @@ class TAction:
 		This method must be overridden by Action subclasses.
 		"""
 		raise NotImplementedError()
+
+class TItemAction(TAction):
+	def __init__(self, entity: TActor, item: TItem, target_xy: Optional[Tuple[int, int]]=None):
+		super().__init__(entity)
+		self.item = item
+		if not target_xy:
+			target_xy = entity.x, entity.y
+		self.target_xy = target_xy
+	
+	@property
+	def target_actor(self) -> Optional[TActor]:
+		"""
+		Return the actor at this actions destination
+		"""
+		return self.engine.game_map.get_actor_at_location(*self.target_xy)
+	
+	def perform(self) -> None:
+		"""
+		Invoke the items ability, this action will be given to provide context
+		"""
+		self.item.consumable.activate(self)
 
 class TEscapeAction(TAction):
 	def perform(self) -> None:
