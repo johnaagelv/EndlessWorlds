@@ -1,4 +1,4 @@
-from components.ai import HostileEnemy
+from components.ai import THostileEnemy
 from components import consumable
 from components.fighter import TFighter
 from components.inventory import TInventory
@@ -8,7 +8,7 @@ player = TActor(
     char="@",
     colour=(255, 255, 255),
     name="Player",
-    ai_cls=HostileEnemy,
+    ai_cls=THostileEnemy,
     fighter=TFighter(hp=30, defense=2, power=5),
 	inventory=TInventory(capacity=12),
 )
@@ -17,7 +17,7 @@ orc = TActor(
     char="o",
     colour=(63, 127, 63),
     name="Orc",
-    ai_cls=HostileEnemy,
+    ai_cls=THostileEnemy,
     fighter=TFighter(hp=10, defense=0, power=3),
 	inventory=TInventory(capacity=12),
 )
@@ -26,9 +26,16 @@ troll = TActor(
     char="T",
     colour=(0, 127, 0),
     name="Troll",
-    ai_cls=HostileEnemy,
+    ai_cls=THostileEnemy,
     fighter=TFighter(hp=16, defense=1, power=4),
 	inventory=TInventory(capacity=8),
+)
+
+confusion_scroll = TItem(
+	char="~",
+	colour=(207, 63, 255),
+	name="Confusion potion",
+	consumable=consumable.TConfusionConsumable(number_of_turns=10)
 )
 
 health_potion = TItem(

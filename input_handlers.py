@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import Callable, Optional, Tuple, TYPE_CHECKING
 
 import tcod.event
 import tcod.libtcodpy as tcodformat
@@ -59,6 +59,11 @@ CURSOR_Y_KEYS = {
 
 SWITCH_UI_KEYS = {
 	tcod.event.KeySym.v: 0,
+}
+
+CONFIRM_KEYS = {
+	tcod.event.KeySym.RETURN,
+	tcod.event.KeySym.KP_ENTER,
 }
 
 class TEventHandler(tcod.event.EventDispatch[TAction]):
@@ -122,6 +127,8 @@ class TMainGameEventHandler(TEventHandler):
 			self.engine.event_handler = TInventoryActivateHandler(self.engine)
 		elif key == tcod.event.KeySym.d:
 			self.engine.event_handler = TInventoryDropHandler(self.engine)
+		elif key == tcod.event.KeySym.SLASH:
+			self.engine.event_handler = TLookHandler(self.engine)
 
 		# No valid key was pressed
 		return action
@@ -272,4 +279,81 @@ class TInventoryDropHandler(TInventoryEventHandler):
 
 	def on_item_selected(self, item: TItem) -> Optional[TAction]:
 		return TDropItem(self.engine.player, item)
+
+class TSelectIndexHandler(TAskUserEventHandler):
+	"""
+	Handles asking the user for an index on the map
+	"""
+	def __init__(self, engine: TEngine):
+		"""
+		Sets the cursor to the player when instantiated
+		"""
+		super().__init__(engine)
+		player = self.engine.player
+		engine.mouse_location = player.x, player.y
+
+	def on_render(self, console: tcod.console.Console) -> None:
+		"""
+		Highlight the tile under the cursor
+		"""
+		super().on_render(console)
+		x, y = self.engine.mouse_location
+		console.rgb["bg"][x, y] = colour.white
+		console.rgb["fg"][x, y] = colour.black
+
+	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[TAction]:
+		"""
+		Check for key movement or confirmation keys
+		"""
+		key = event.sym
+		if key in MOVE_KEYS:
+			modifier = 1
+			if event.mod & (tcod.event.Modifier.LSHIFT | tcod.event.Modifier.RSHIFT):
+				modifier = 5
+			if event.mod & (tcod.event.Modifier.LCTRL | tcod.event.Modifier.RCTRL):
+				modifier = 10
+			if event.mod & (tcod.event.Modifier.LALT | tcod.event.Modifier.RALT):
+				modifier = 20
+
+			x, y = self.engine.mouse_location
+			dx, dy = MOVE_KEYS[key]
+			x += dx * modifier
+			y += dy * modifier
+			# Keep the cursor index within the map
+			x = max(0, min(x, self.engine.game_map.width - 1))
+			y = max(0, min(y, self.engine.game_map.height - 1))
+			self.engine.mouse_location = x, y
+			return None
+		elif key in CONFIRM_KEYS:
+			return self.on_index_selected(*self.engine.mouse_location)
+		return super().ev_keydown(event)
 	
+	def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> Optional[TAction]:
+		"""
+		Left click confirms a selection
+		"""
+		if self.engine.game_map.in_bounds(*event.tile):
+			if event.button == 1:
+				return self.on_index_selected(*event.tile)
+		return super().ev_mousebuttondown(event)
+	
+	def on_index_selected(self, x: int, y: int) -> Optional[TAction]:
+		raise NotImplementedError()
+	
+class TLookHandler(TSelectIndexHandler):
+	"""
+	Lets the player look around using the keyboard
+	"""
+	def on_index_selected(self, x: int, y: int) -> None:
+		self.engine.event_handler = TMainGameEventHandler(self.engine)
+
+class TSingleRangedAttackHandler(TSelectIndexHandler):
+	"""
+	Handles targeting a single enemy
+	"""
+	def __init__(self, engine: TEngine, callback: Callable[[Tuple[int, int]], Optional[TAction]]):
+		super().__init__(engine)
+		self.callback = callback
+
+	def on_index_selected(self, x: int, y: int) -> Optional[TAction]:
+		return self.callback((x, y))
