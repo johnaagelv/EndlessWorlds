@@ -1,5 +1,5 @@
 from components.ai import HostileEnemy
-from components.consumable import THealingConsumable
+from components import consumable
 from components.fighter import TFighter
 from components.inventory import TInventory
 from entity import TActor, TItem
@@ -35,5 +35,12 @@ health_potion = TItem(
 	char="!",
 	colour=(127, 0, 255),
 	name="Health potion",
-	consumable=THealingConsumable(amount=4)
+	consumable=consumable.THealingConsumable(amount=4)
+)
+
+lightning_scroll = TItem(
+	char="~",
+	colour=(255, 255, 0),
+	name="Lightning scroll",
+	consumable=consumable.TLightningDamageConsumable(damage=20, maximum_range=5),
 )
