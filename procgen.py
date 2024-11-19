@@ -42,11 +42,10 @@ class TRectangularRoom:
 			and self.y2 >= other.y1
 		)
 
-def place_entities(
-	room: TRectangularRoom, dungeon: TGameMap, maximum_monsters: int, maximum_items: int
+def place_npcs(
+	room: TRectangularRoom, dungeon: TGameMap, maximum_monsters: int
 ) -> None:
 	number_of_monsters = random.randint(0, maximum_monsters)
-	number_of_items = random.randint(0, maximum_items)
 
 	for i in range(number_of_monsters):
 		x = random.randint(room.x1 + 1, room.x2 - 1)
@@ -58,17 +57,30 @@ def place_entities(
 			else:
 				entity_factories.troll.spawn(dungeon, x, y)
 	
+def place_items(
+	room: TRectangularRoom, dungeon: TGameMap, maximum_items: int, engine: TEngine
+) -> None:
+	number_of_items = random.randint(0, maximum_items)
+
 	for i in range(number_of_items):
-			x = random.randint(room.x1 + 1, room.x2 - 1)
-			y = random.randint(room.y1 + 1, room.y2 - 1)
-			if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
+		x = random.randint(room.x1 + 1, room.x2 - 1)
+		y = random.randint(room.y1 + 1, room.y2 - 1)
+		if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
+			item_chance = random.random()
+			if item_chance < 0.7:
+				item = entity_factories.health_potion.spawn(dungeon, x, y)
+			elif item_chance < 0.8:
+				item = entity_factories.fireball_scroll.spawn(dungeon, x, y)
+			elif item_chance < 0.9:
+				item = entity_factories.confusion_scroll.spawn(dungeon, x, y)
+			else:
+				item = entity_factories.lightning_scroll.spawn(dungeon, x, y)
+
+			if len(engine.player.inventory.items) < engine.player.inventory.capacity:
 				item_chance = random.random()
-				if item_chance < 0.7:
-					entity_factories.health_potion.spawn(dungeon, x, y)
-				elif item_chance < 0.9:
-					entity_factories.confusion_scroll.spawn(dungeon, x, y)
-				else:
-					entity_factories.lightning_scroll.spawn(dungeon, x, y)
+				if item_chance < 0.5:
+					item.parent = engine.player.inventory
+					engine.player.inventory.items.append(item)
 
 def tunnel_between(
 	start: Tuple[int, int], end: Tuple[int, int]
@@ -89,17 +101,16 @@ def tunnel_between(
 	for x, y in tcod.los.bresenham((corner_x, corner_y), (x2, y2)).tolist():
 		yield x, y
 
-
 def generate_dungeon(
-	max_rooms: int,
-	room_min_size: int,
-	room_max_size: int,
 	map_width: int,
 	map_height: int,
-	max_monsters_per_room: int,
-	max_items_per_room: int,
 	engine: TEngine,
 ) -> TGameMap:
+	max_rooms: int = random.randint(1, int(map_width * map_height / 9))
+	room_min_size: int = random.randint(3, 6)
+	room_max_size: int = random.randint(6, int(map_width / 2))
+	max_monsters_per_room: int = random.randint(0, max_rooms)
+	max_items_per_room: int = random.randint(0, max_rooms * 2)
 	"""Generate a new dungeon map."""
 	player = engine.player
 	dungeon = TGameMap(engine, map_width, map_height, entities=[player])
@@ -127,12 +138,14 @@ def generate_dungeon(
 		if len(rooms) == 0:
 			# The first room, where the player starts.
 			player.place(*new_room.center, dungeon)
+
 		else:  # All rooms after the first.
 			# Dig out a tunnel between this room and the previous one.
 			for x, y in tunnel_between(rooms[-1].center, new_room.center):
 				dungeon.tiles[x, y] = tile_types.floor
 
-		place_entities(new_room, dungeon, max_monsters_per_room, max_items_per_room)
+			place_npcs(new_room, dungeon, max_monsters_per_room)
+			place_items(new_room, dungeon, max_items_per_room, engine)
 
 		# Finally, append the new room to the list.
 		rooms.append(new_room)

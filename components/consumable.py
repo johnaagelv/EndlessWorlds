@@ -8,7 +8,7 @@ import components.ai
 from components.inventory import TInventory
 from components.base_component import TBaseComponent
 from exceptions import Impossible
-from input_handlers import TSingleRangedAttackHandler
+from input_handlers import TAreaRangedAttachHandler, TSingleRangedAttackHandler
 
 if TYPE_CHECKING:
 	from entity import TActor, TItem
@@ -105,3 +105,36 @@ class TLightningDamageConsumable(TConsumable):
 			self.consume()
 		else:
 			raise Impossible("None in range!")
+
+class TFireballDamageConsumable(TConsumable):
+	def __init__(self, damage: int, radius: int):
+		self.damage = damage
+		self.radius = radius
+	
+	def get_action(self, consumer: TActor) -> Optional[actions.TAction]:
+		self.engine.message_log.add_message("Select target location", colour.needs_target)
+		self.engine.event_handler = TAreaRangedAttachHandler(
+			self.engine,
+			radius=self.radius,
+			callback=lambda xy: actions.TItemAction(consumer, self.parent, xy)
+		)
+		return None
+
+	def activate(self, action: actions.TItemAction) -> None:
+		target_xy = action.target_xy
+
+		if not self.engine.game_map.visible[target_xy]:
+			raise Impossible("Out of range!")
+		
+		targets_hit = False
+		for actor in self.engine.game_map.actors:
+			if actor.distance(*target_xy) <= self.radius:
+				self.engine.message_log.add_message(
+					f"Fire engulfs {actor.name}!"
+				)
+				actor.fighter.take_damage(self.damage)
+				targets_hit = True
+		
+		if not targets_hit:
+			raise Impossible("No targets hit!")
+		self.consume()

@@ -357,3 +357,27 @@ class TSingleRangedAttackHandler(TSelectIndexHandler):
 
 	def on_index_selected(self, x: int, y: int) -> Optional[TAction]:
 		return self.callback((x, y))
+	
+class TAreaRangedAttachHandler(TSelectIndexHandler):
+	"""
+	Handles targeting an area within a given radius
+	"""
+	def __init__(self, engine: TEngine, radius: int, callback: Callable[[Tuple[int, int]], Optional[TAction]]):
+		super().__init__(engine)
+		self.radius = radius
+		self.callback = callback
+	
+	def on_render(self, console: tcod.console.Console) -> None:
+		super().on_render(console)
+		x, y = self.engine.mouse_location
+		console.draw_frame(
+			x=x - self.radius - 1,
+			y=y - self.radius - 1,
+			width=self.radius ** 2,
+			height=self.radius ** 2,
+			fg=colour.red,
+			clear=False,
+		)
+	
+	def on_index_selected(self, x: int, y: int) -> Optional[TAction]:
+		return self.callback((x, y))

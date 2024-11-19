@@ -34,7 +34,7 @@ troll = TActor(
 confusion_scroll = TItem(
 	char="~",
 	colour=(207, 63, 255),
-	name="Confusion potion",
+	name="Confusion scroll",
 	consumable=consumable.TConfusionConsumable(number_of_turns=10)
 )
 
@@ -50,4 +50,11 @@ lightning_scroll = TItem(
 	colour=(255, 255, 0),
 	name="Lightning scroll",
 	consumable=consumable.TLightningDamageConsumable(damage=20, maximum_range=5),
+)
+
+fireball_scroll = TItem(
+	char="~",
+	colour=(255, 0, 0),
+	name="Fireball scroll",
+	consumable=consumable.TFireballDamageConsumable(damage=12, radius=3),
 )
