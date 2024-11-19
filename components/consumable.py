@@ -4,6 +4,7 @@ from typing import Optional, TYPE_CHECKING
 
 import actions
 import colours as colour
+from components.inventory import TInventory
 from components.base_component import TBaseComponent
 from exceptions import Impossible
 
@@ -19,6 +20,15 @@ class TConsumable(TBaseComponent):
 	def activate(self, action: actions.TItemAction) -> None:
 		raise NotImplementedError()
 	
+	def consume(self) -> None:
+		"""
+		Remove the consumed item from its containing inventory
+		"""
+		entity = self.parent
+		inventory = entity.parent
+		if isinstance(inventory, TInventory):
+			inventory.items.remove(entity)
+	
 class THealingConsumable(TConsumable):
 	def __init__(self, amount: int):
 		self.amount = amount
@@ -32,5 +42,6 @@ class THealingConsumable(TConsumable):
 				f"You consume the {self.parent.name}, and recover {amount_recovered} HP!",
 				colour.health_recovered
 			)
+			self.consume()
 		else:
 			raise Impossible(f"You health is already at max!")

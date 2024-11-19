@@ -5,7 +5,7 @@ from typing import Optional, TYPE_CHECKING
 import tcod.event
 import tcod.libtcodpy as tcodformat
 
-from actions import TAction, TBumpAction, TDropAction, TEscapeAction, TPickupAction, TWaitAction
+from actions import TAction, TBumpAction, TDropItem, TEscapeAction, TPickupAction, TWaitAction
 import colours as colour
 import exceptions
 
@@ -272,5 +272,5 @@ class TInventoryDropHandler(TInventoryEventHandler):
 	TITLE = "Select an item to drop"
 
 	def on_item_selected(self, item: TItem) -> Optional[TAction]:
-		return TDropAction(self.engine.player, item)
+		return TDropItem(self.engine.player, item)
 	

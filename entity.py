@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Optional, Tuple, Type, TypeVar, TYPE_CHECKING
+from typing import Optional, Tuple, Type, TypeVar, TYPE_CHECKING, Union
 
 from render_order import RenderOrder
 
@@ -19,7 +19,7 @@ class TEntity:
 	"""
 	A generic object to represent players, enemies, items, etc.
 	"""
-	parent: TGameMap
+	parent: Union[TGameMap, TInventory]
 
 	def __init__(
 		self,
