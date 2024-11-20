@@ -6,21 +6,18 @@ from tcod.console import Console
 from tcod.map import compute_fov
 
 import exceptions
-from input_handlers import TMainGameEventHandler
 from message_log import TMessageLog
 from renders import render_bar, render_names_at_mouse_location
 
 if TYPE_CHECKING:
 	from entity import TActor
 	from game_map import TGameMap
-	from input_handlers import TEventHandler
 
 
 class TEngine:
 	game_map: TGameMap
 
 	def __init__(self, player: TActor):
-		self.event_handler: TEventHandler = TMainGameEventHandler(self)
 		self.message_log = TMessageLog()
 		self.mouse_location = (0, 0)
 		self.player = player

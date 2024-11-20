@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 import colours as colour
 
 from components.base_component import TBaseComponent
-from input_handlers import TGameOverEventHandler
 from render_order import RenderOrder
 
 if TYPE_CHECKING:
@@ -35,7 +34,6 @@ class TFighter(TBaseComponent):
 		if self.engine.player is self.parent:
 			death_message = "You died!"
 			death_message_colour = colour.player_die
-			self.engine.event_handler = TGameOverEventHandler(self.engine)
 		else:
 			death_message = f"{self.parent.name} is dead!"
 			death_message_colour = colour.enemy_die

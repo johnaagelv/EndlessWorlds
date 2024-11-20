@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Optional, Tuple, TYPE_CHECKING
+from typing import Callable, Optional, Tuple, TYPE_CHECKING, Union
 
 import tcod.event
 import tcod.libtcodpy as tcodformat
@@ -66,12 +66,42 @@ CONFIRM_KEYS = {
 	tcod.event.KeySym.KP_ENTER,
 }
 
-class TEventHandler(tcod.event.EventDispatch[TAction]):
+ActionOrHandler = Union[TAction, "TBaseEventHandler"]
+"""
+An event handler return value which can trigger an action or switch active handler
+If a handler is returned then it will become the active handler
+If an action is returned it will be attempted
+"""
+class TBaseEventHandler(tcod.event.EventDispatch[ActionOrHandler]):
+	def handle_events(self, event: tcod.event.Event) -> TBaseEventHandler:
+		"""
+		Handle an event and return the next active event handler
+		"""
+		state = self.dispatch(event)
+		if isinstance(state, TBaseEventHandler):
+			return state
+		assert not isinstance(state, TAction), f"{self!r} can not handle actions"
+		return self
+
+	def on_render(self, console: tcod.console.Console) -> None:
+		raise NotImplementedError()
+
+	def ev_quit(self, event: tcod.event.Quit) -> Optional[TAction]:
+		raise SystemExit()
+
+class TEventHandler(TBaseEventHandler):
 	def __init__(self, engine: TEngine):
 		self.engine = engine
 
-	def handle_events(self, event: tcod.event.Event) -> None:
-		self.handle_action(self.dispatch(event))
+	def handle_events(self, event: tcod.event.Event) -> TBaseEventHandler:
+		action_or_state = self.dispatch(event)
+		if isinstance(action_or_state, TBaseEventHandler):
+			return action_or_state
+		if self.handle_action(action_or_state):
+			if not self.engine.player.is_alive:
+				return TGameOverEventHandler(self.engine)
+			return TMainGameEventHandler(self.engine)
+		return self
 
 	def handle_action(self, action: Optional[TAction]) -> bool:
 		"""
@@ -93,14 +123,11 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 		if self.engine.game_map.in_bounds(event.tile.x, event.tile.y):
 			self.engine.mouse_location = event.tile.x, event.tile.y
 
-	def ev_quit(self, event: tcod.event.Quit) -> Optional[TAction]:
-		raise SystemExit()
-	
 	def on_render(self, console: tcod.console.Console) -> None:
 		self.engine.render(console)
 
 class TMainGameEventHandler(TEventHandler):
-	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[TAction]:
+	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
 		action: Optional[TAction] = None
 
 		key = event.sym
@@ -116,7 +143,7 @@ class TMainGameEventHandler(TEventHandler):
 		elif key == tcod.event.KeySym.ESCAPE:
 			raise SystemExit()
 		elif key in SWITCH_UI_KEYS:
-			self.engine.event_handler = THistoryViewer(self.engine)
+			return THistoryViewer(self.engine)
 
 		# Item pickup
 		elif key == tcod.event.KeySym.g:
@@ -124,11 +151,11 @@ class TMainGameEventHandler(TEventHandler):
 
 		# Inventory
 		elif key == tcod.event.KeySym.i:
-			self.engine.event_handler = TInventoryActivateHandler(self.engine)
+			return TInventoryActivateHandler(self.engine)
 		elif key == tcod.event.KeySym.d:
-			self.engine.event_handler = TInventoryDropHandler(self.engine)
+			return TInventoryDropHandler(self.engine)
 		elif key == tcod.event.KeySym.SLASH:
-			self.engine.event_handler = TLookHandler(self.engine)
+			return TLookHandler(self.engine)
 
 		# No valid key was pressed
 		return action
@@ -155,8 +182,8 @@ class THistoryViewer(TEventHandler):
 
 		self.engine.message_log.render_messages(log_console, 1, 1, log_console.width - 2, log_console.height - 2, self.engine.message_log.messages[: self.cursor + 1])
 		log_console.blit(console, 3, 3)
-	
-	def ev_keydown(self, event: tcod.event.KeyDown) -> None:
+
+	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
 		if event.sym in CURSOR_Y_KEYS:
 			adjust = CURSOR_Y_KEYS[event.sym]
 			if adjust < 0 and self.cursor == 0:
@@ -170,19 +197,14 @@ class THistoryViewer(TEventHandler):
 		elif event.sym == tcod.event.KeySym.END:
 			self.cursor = self.log_length - 1
 		else:
-			self.engine.event_handler = TMainGameEventHandler(self.engine)
+			return TMainGameEventHandler(self.engine)
+		return None
 
 class TAskUserEventHandler(TEventHandler):
 	"""
 	Handles user input for actions which require special input
 	"""
-	def handle_action(self, action: Optional[TAction]) -> bool:
-		if super().handle_action(action):
-			self.engine.event_handler = TMainGameEventHandler(self.engine)
-			return True
-		return False
-	
-	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[TAction]:
+	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
 		if event.sym in {
 			tcod.event.KeySym.LSHIFT,
 			tcod.event.KeySym.RSHIFT,
@@ -193,11 +215,13 @@ class TAskUserEventHandler(TEventHandler):
 		}:
 			return None
 		return self.on_exit()
+
+	def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> Optional[ActionOrHandler]:
+		return self.on_exit()
 	
-	def on_exit(self) -> Optional[TAction]:
-		self.engine.event_handler = TMainGameEventHandler(self.engine)
-		return None
-	
+	def on_exit(self) -> Optional[ActionOrHandler]:
+		return TMainGameEventHandler(self.engine)
+
 class TInventoryEventHandler(TAskUserEventHandler):
 	"""
 	This handler lets the user select an item
@@ -241,7 +265,7 @@ class TInventoryEventHandler(TAskUserEventHandler):
 		else:
 			console.print(x + 1, y + 1, "(Empty)")
 
-	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[TAction]:
+	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
 		player = self.engine.player
 		key = event.sym
 		index = key - tcod.event.KeySym.a
@@ -256,7 +280,7 @@ class TInventoryEventHandler(TAskUserEventHandler):
 			return self.on_item_selected(selected_item)
 		return super().ev_keydown(event)
 	
-	def on_item_selected(self, item: TItem) -> Optional[TAction]:
+	def on_item_selected(self, item: TItem) -> Optional[ActionOrHandler]:
 		"""
 		Called when the user selects a valid item
 		"""
@@ -268,7 +292,7 @@ class TInventoryActivateHandler(TInventoryEventHandler):
 	"""
 	TITLE = "Select an item to use"
 
-	def on_item_selected(self, item: TItem) -> Optional[TAction]:
+	def on_item_selected(self, item: TItem) -> Optional[ActionOrHandler]:
 		return item.consumable.get_action(self.engine.player)
 	
 class TInventoryDropHandler(TInventoryEventHandler):
@@ -277,7 +301,7 @@ class TInventoryDropHandler(TInventoryEventHandler):
 	"""
 	TITLE = "Select an item to drop"
 
-	def on_item_selected(self, item: TItem) -> Optional[TAction]:
+	def on_item_selected(self, item: TItem) -> Optional[ActionOrHandler]:
 		return TDropItem(self.engine.player, item)
 
 class TSelectIndexHandler(TAskUserEventHandler):
@@ -301,7 +325,7 @@ class TSelectIndexHandler(TAskUserEventHandler):
 		console.rgb["bg"][x, y] = colour.white
 		console.rgb["fg"][x, y] = colour.black
 
-	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[TAction]:
+	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[ActionOrHandler]:
 		"""
 		Check for key movement or confirmation keys
 		"""
@@ -327,8 +351,8 @@ class TSelectIndexHandler(TAskUserEventHandler):
 		elif key in CONFIRM_KEYS:
 			return self.on_index_selected(*self.engine.mouse_location)
 		return super().ev_keydown(event)
-	
-	def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> Optional[TAction]:
+
+	def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> Optional[ActionOrHandler]:
 		"""
 		Left click confirms a selection
 		"""
@@ -336,16 +360,16 @@ class TSelectIndexHandler(TAskUserEventHandler):
 			if event.button == 1:
 				return self.on_index_selected(*event.tile)
 		return super().ev_mousebuttondown(event)
-	
-	def on_index_selected(self, x: int, y: int) -> Optional[TAction]:
+
+	def on_index_selected(self, x: int, y: int) -> Optional[ActionOrHandler]:
 		raise NotImplementedError()
-	
+
 class TLookHandler(TSelectIndexHandler):
 	"""
 	Lets the player look around using the keyboard
 	"""
-	def on_index_selected(self, x: int, y: int) -> None:
-		self.engine.event_handler = TMainGameEventHandler(self.engine)
+	def on_index_selected(self, x: int, y: int) -> Optional[ActionOrHandler]:
+		return TMainGameEventHandler(self.engine)
 
 class TSingleRangedAttackHandler(TSelectIndexHandler):
 	"""
@@ -357,7 +381,7 @@ class TSingleRangedAttackHandler(TSelectIndexHandler):
 
 	def on_index_selected(self, x: int, y: int) -> Optional[TAction]:
 		return self.callback((x, y))
-	
+
 class TAreaRangedAttachHandler(TSelectIndexHandler):
 	"""
 	Handles targeting an area within a given radius

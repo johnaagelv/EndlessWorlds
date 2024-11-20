@@ -8,7 +8,7 @@ import components.ai
 from components.inventory import TInventory
 from components.base_component import TBaseComponent
 from exceptions import Impossible
-from input_handlers import TAreaRangedAttachHandler, TSingleRangedAttackHandler
+from input_handlers import ActionOrHandler, TAreaRangedAttachHandler, TSingleRangedAttackHandler
 
 if TYPE_CHECKING:
 	from entity import TActor, TItem
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class TConsumable(TBaseComponent):
 	parent: TItem
 
-	def get_action(self, consumer: TActor) -> Optional[actions.TAction]:
+	def get_action(self, consumer: TActor) -> Optional[ActionOrHandler]:
 		return actions.TItemAction(consumer, self.parent)
 	
 	def activate(self, action: actions.TItemAction) -> None:
@@ -35,13 +35,12 @@ class TConfusionConsumable(TConsumable):
 	def __init__(self, number_of_turns: int):
 		self.number_of_turns = number_of_turns
 
-	def get_action(self, consumer: TActor) -> Optional[actions.TAction]:
+	def get_action(self, consumer: TActor) -> Optional[ActionOrHandler]:
 		self.engine.message_log.add_message("Select a target location!", colour.needs_target)
-		self.engine.event_handler = TSingleRangedAttackHandler(
+		return TSingleRangedAttackHandler(
 			self.engine,
 			callback=lambda xy: actions.TItemAction(consumer, self.parent, xy),
 		)
-		return None
 	
 	def activate(self, action: actions.TItemAction) -> None:
 		consumer = action.entity
@@ -111,14 +110,13 @@ class TFireballDamageConsumable(TConsumable):
 		self.damage = damage
 		self.radius = radius
 	
-	def get_action(self, consumer: TActor) -> Optional[actions.TAction]:
+	def get_action(self, consumer: TActor) -> Optional[ActionOrHandler]:
 		self.engine.message_log.add_message("Select target location", colour.needs_target)
-		self.engine.event_handler = TAreaRangedAttachHandler(
+		return TAreaRangedAttachHandler(
 			self.engine,
 			radius=self.radius,
 			callback=lambda xy: actions.TItemAction(consumer, self.parent, xy)
 		)
-		return None
 
 	def activate(self, action: actions.TItemAction) -> None:
 		target_xy = action.target_xy
