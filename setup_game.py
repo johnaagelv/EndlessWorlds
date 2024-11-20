@@ -42,13 +42,17 @@ class TMainMenu(input_handlers.TBaseEventHandler):
 		Render the main menu on a background image
 		"""
 		console.draw_semigraphics(background_image, 0, 0)
-		console.print(
-			console.width // 2,
-			console.height // 2 - 4, 
-			"Ankt, Landing Camp, a part of Endless Worlds",
-			fg=colour.menu_title,
-			alignment=tcodformat.CENTER,
-		)
+		for i, text in enumerate(
+			["ENDLESS WORLDS", "Planet Ankt, Camp Landing"]
+		):
+			console.print(
+				console.width // 2,
+				console.height // 2 - 5 + i, 
+				text,
+				fg=colour.menu_title,
+				alignment=tcodformat.CENTER,
+			)
+
 		console.print(
 			console.width // 2,
 			console.height - 2,
