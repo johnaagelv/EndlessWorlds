@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+import os
 from typing import Callable, Optional, Tuple, TYPE_CHECKING, Union
 
 import tcod.event
@@ -188,9 +188,23 @@ class TMainGameEventHandler(TEventHandler):
 		return action
 
 class TGameOverEventHandler(TEventHandler):
+	def on_quit(self) -> None:
+		if os.path.exists("savegame.sav"):
+			os.remove("savegame.sav")
+		raise exceptions.QuitWithoutSaving()
+
+	def ev_quit(self, event: tcod.event.Quit) -> None:
+		"""
+		Handle when closing the window
+		"""
+		self.on_quit()
+
 	def ev_keydown(self, event: tcod.event.KeyDown) -> None:
+		"""
+		Handle when using Escape to end the game
+		"""
 		if event.sym == tcod.event.KeySym.ESCAPE:
-			raise SystemExit()
+			self.on_quit()
 
 class THistoryViewer(TEventHandler):
 	""" print the history on a larger window with up/down scrolling """
