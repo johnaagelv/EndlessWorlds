@@ -109,13 +109,15 @@ def generate_dungeon(
 	max_rooms: int = random.randint(1, int(map_width * map_height / 9))
 	room_min_size: int = random.randint(3, 6)
 	room_max_size: int = random.randint(6, int(map_width / 2))
-	max_monsters_per_room: int = random.randint(0, max_rooms)
-	max_items_per_room: int = random.randint(0, max_rooms * 2)
+	max_monsters_per_room: int = random.randint(0, max_rooms // 2)
+	max_items_per_room: int = random.randint(0, max_rooms)
 	"""Generate a new dungeon map."""
 	player = engine.player
 	dungeon = TGameMap(engine, map_width, map_height, entities=[player])
 
 	rooms: List[TRectangularRoom] = []
+
+	center_of_last_room = (0, 0)
 
 	for r in range(max_rooms):
 		room_width = random.randint(room_min_size, room_max_size)
@@ -138,14 +140,24 @@ def generate_dungeon(
 		if len(rooms) == 0:
 			# The first room, where the player starts.
 			player.place(*new_room.center, dungeon)
+			print(f"Floor: {engine.game_world.current_floor} at {new_room.center!r}")
+			if engine.game_world.current_floor > 0:
+				dungeon.tiles[(player.x - 1, player.y)] = tile_types.stairs_up
+				dungeon.upstairs_location = (player.x - 1, player.y)
 
 		else:  # All rooms after the first.
 			# Dig out a tunnel between this room and the previous one.
 			for x, y in tunnel_between(rooms[-1].center, new_room.center):
 				dungeon.tiles[x, y] = tile_types.floor
+			
+			center_of_last_room = new_room.center
 
 			place_npcs(new_room, dungeon, max_monsters_per_room)
 			place_items(new_room, dungeon, max_items_per_room, engine)
+
+		center_of_last_room = (player.x + 1, player.y)
+		dungeon.tiles[center_of_last_room] = tile_types.stairs_down
+		dungeon.downstairs_location = center_of_last_room
 
 		# Finally, append the new room to the list.
 		rooms.append(new_room)

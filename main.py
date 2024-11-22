@@ -15,7 +15,7 @@ def save_game(handler: input_handlers.TBaseEventHandler, filename: str) -> None:
 	"""
 	if isinstance(handler, input_handlers.TEventHandler):
 		handler.engine.save_as(filename)
-		print("Game saved")
+		print(f"Game '{filename}' saved")
 
 def main() -> None:
 	screen_width = 80
@@ -52,10 +52,11 @@ def main() -> None:
 		except exceptions.QuitWithoutSaving:
 			raise
 		except SystemExit: # Save and quit
-			save_game(handler, "savegame.sav")
+			if handler.engine:
+				save_game(handler, handler.engine.game_name + ".sav")
 			raise
 		except BaseException: # Save on any other unexpected exception
-			save_game(handler, "savegame.sav")
+			save_game(handler, handler.engine.game_name + ".sav")
 			raise
 
 if __name__ == "__main__":

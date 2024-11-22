@@ -5,7 +5,7 @@ from typing import Callable, Optional, Tuple, TYPE_CHECKING, Union
 import tcod.event
 import tcod.libtcodpy as tcodformat
 
-from actions import TAction, TBumpAction, TDropItem, TPickupAction, TWaitAction
+from actions import TAction, TBumpAction, TDropItem, TPickupAction, TWaitAction, TTakeDownStairsAction, TTakeUpStairsAction
 import colours as colour
 import exceptions
 
@@ -158,8 +158,15 @@ class TMainGameEventHandler(TEventHandler):
 		action: Optional[TAction] = None
 
 		key = event.sym
+		modifier = event.mod
 
 		player = self.engine.player
+
+		if key == tcod.event.KeySym.PERIOD and modifier & (tcod.event.Modifier.LSHIFT | tcod.event.Modifier.RSHIFT):
+			return TTakeDownStairsAction(player)
+
+		if key == tcod.event.KeySym.COMMA and modifier & (tcod.event.Modifier.LSHIFT | tcod.event.Modifier.RSHIFT):
+			return TTakeUpStairsAction(player)
 
 		if key in MOVE_KEYS:
 			dx, dy = MOVE_KEYS[key]

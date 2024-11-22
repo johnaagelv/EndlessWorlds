@@ -19,7 +19,7 @@ class TGameMap:
 	):
 		self.engine = engine
 		self.width, self.height = width, height
-		self.entities = set(entities)
+		self.entities = list(entities)
 		self.tiles = np.full((width, height), fill_value=tile_types.wall, order="F")
 
 		self.visible = np.full(
@@ -28,6 +28,9 @@ class TGameMap:
 		self.explored = np.full(
 			(width, height), fill_value=False, order="F"
 		)  # Tiles the player has seen before
+
+		self.downstairs_location = (0, 0)
+		self.upstairs_location = (0, 0)
 
 	@property
 	def gamemap(self) -> TGameMap:
@@ -93,3 +96,55 @@ class TGameMap:
 				console.print(
 					x=entity.x, y=entity.y, string=entity.char, fg=entity.colour
 				)
+
+class TWorld:
+	"""
+	Holds the settings for the gamemap and generates new maps when
+	moving down/up the stairs
+	"""
+	def __init__(
+			self,
+			*,
+			engine: TEngine,
+			map_width: int,
+			map_height: int,
+			current_floor: int = 0,
+	):
+		self.engine = engine
+		self.map_width = map_width
+		self.map_height = map_height
+		self.current_floor = current_floor
+
+		self.maps = []
+	
+	def generate_floor(self) -> None:
+		from procgen import generate_dungeon
+		self.maps.append(
+			generate_dungeon(
+				map_width = self.map_width,
+				map_height = self.map_height,
+				engine = self.engine,
+			)
+		)
+		self.engine.game_map = self.maps[len(self.maps) - 1]
+
+	def descend_floor(self) -> None:
+		# Ensure the current map is updated with what has happened
+		self.maps[self.current_floor] = self.engine.game_map
+#		print(f"1 Floor: {self.current_floor}, map count: {len(self.maps)}")
+		self.current_floor += 1
+		if self.current_floor == len(self.maps):
+			self.generate_floor()
+#		print(f"2 Floor: {self.current_floor}, map count: {len(self.maps)}")
+		self.engine.game_map = self.maps[self.current_floor]
+		self.engine.player.x, self.engine.player.y = self.engine.game_map.upstairs_location
+		self.engine.game_map.entities[0] = self.engine.player
+
+	def ascend_floor(self) -> None:
+		if self.current_floor > 0:
+		# Ensure the current map is updated with what has happened
+			self.maps[self.current_floor] = self.engine.game_map
+			self.current_floor -= 1
+		self.engine.game_map = self.maps[self.current_floor]
+		self.engine.player.x, self.engine.player.y = self.engine.game_map.downstairs_location
+		self.engine.game_map.entities[0] = self.engine.player

@@ -55,7 +55,8 @@ class TEntity:
 		clone.x = x
 		clone.y = y
 		clone.parent = gamemap
-		gamemap.entities.add(clone)
+		#gamemap.entities.add(clone)
+		gamemap.entities.append(clone)
 		return clone
 
 	def place(self, x: int, y: int, gamemap: Optional[TGameMap] = None) -> None:
@@ -67,7 +68,8 @@ class TEntity:
 				if self.parent is self.gamemap:
 					self.gamemap.entities.remove(self)
 			self.parent = gamemap
-			gamemap.entities.add(self)
+			#gamemap.entities.add(self)
+			gamemap.entities.append(self)
 
 	def distance(self, x: int, y: int, gamemap: Optional[TGameMap] = None) -> None:
 		"""

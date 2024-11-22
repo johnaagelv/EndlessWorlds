@@ -85,6 +85,28 @@ class TWaitAction(TAction):
 	def perform(self) -> None:
 		pass
 
+class TTakeDownStairsAction(TAction):
+	def perform(self) -> None:
+		"""
+		Take the stairs
+		"""
+		if (self.entity.x, self.entity.y) == self.engine.game_map.downstairs_location:
+			self.engine.game_world.descend_floor()
+			self.engine.message_log.add_message(f"You go down! {self.engine.game_world.current_floor}", colour.descend)
+		else:
+			raise exceptions.Impossible("Doh!")
+
+class TTakeUpStairsAction(TAction):
+	def perform(self) -> None:
+		"""
+		Take the stairs
+		"""
+		if (self.entity.x, self.entity.y) == self.engine.game_map.upstairs_location:
+			self.engine.game_world.ascend_floor()
+			self.engine.message_log.add_message(f"You go up! {self.engine.game_world.current_floor}", colour.descend)
+		else:
+			raise exceptions.Impossible("Doh!")
+
 class TActionWithDirection(TAction):
 	def __init__(self, entity: TActor, dx: int, dy: int):
 		super().__init__(entity)
