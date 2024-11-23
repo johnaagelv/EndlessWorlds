@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 import math
-from typing import Optional, Tuple, Type, TypeVar, TYPE_CHECKING, Union
+from typing import Dict, Optional, Tuple, Type, TypeVar, TYPE_CHECKING, Union
 
 from render_order import RenderOrder
 
@@ -11,7 +11,8 @@ if TYPE_CHECKING:
 	from components.consumable import TConsumable
 	from components.fighter import TFighter
 	from components.inventory import TInventory
-	from game_map import TGameMap
+	from game_map import TWorld
+	from tcod.console import Console
 
 T = TypeVar("T", bound="TEntity")
 
@@ -20,11 +21,11 @@ class TEntity:
 	"""
 	A generic object to represent players, enemies, items, etc.
 	"""
-	parent: Union[TGameMap, TInventory]
+	parent: Union[TWorld, TInventory]
 
 	def __init__(
 		self,
-		parent: Optional[TGameMap] = None,
+		parent: TWorld = None,
 		x: int = 0,
 		y: int = 0,
 		char: str = "?",
@@ -43,35 +44,28 @@ class TEntity:
 		if parent:
 			# If parent isn't provided now then it will be set later.
 			self.parent = parent
-			parent.entities.add(self)
+			parent.maps[parent.current_floor]["entities"].add(self)
 		
-	@property
-	def gamemap(self) -> TGameMap:
-		return self.parent.gamemap
+#	@property
+#	def gamemap(self) -> TWorld:
+#		return self.parent
 
-	def spawn(self: T, gamemap: TGameMap, x: int, y: int) -> T:
+	def spawn(self: T, dungeon: Dict, x: int, y: int) -> T:
 		"""Spawn a copy of this instance at the given location."""
 		clone = copy.deepcopy(self)
 		clone.x = x
 		clone.y = y
-		clone.parent = gamemap
-		#gamemap.entities.add(clone)
-		gamemap.entities.append(clone)
+		dungeon["entities"].append(clone)
 		return clone
 
-	def place(self, x: int, y: int, gamemap: Optional[TGameMap] = None) -> None:
+	def place(self, x: int, y: int, dungeon: Optional[Dict] = None) -> None:
 		"""Place this entitiy at a new location.  Handles moving across GameMaps."""
 		self.x = x
 		self.y = y
-		if gamemap:
-			if hasattr(self, "parent"):  # Possibly uninitialized.
-				if self.parent is self.gamemap:
-					self.gamemap.entities.remove(self)
-			self.parent = gamemap
-			#gamemap.entities.add(self)
-			gamemap.entities.append(self)
+		if dungeon:
+			dungeon["entities"].append(self)
 
-	def distance(self, x: int, y: int, gamemap: Optional[TGameMap] = None) -> None:
+	def distance(self, x: int, y: int) -> None:
 		"""
 		Return the distance between the current entity and the given (x, y)
 		"""
@@ -113,6 +107,12 @@ class TActor(TEntity):
 
 		self.inventory = inventory
 		self.inventory.parent = self
+
+	def render(self, console: Console):
+		console.print(
+			x=self.x, y=self.y, string=self.char, fg=self.colour
+		)
+
 
 	@property
 	def is_alive(self) -> bool:

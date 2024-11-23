@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-import uuid
+
 from tcod.console import Console
-from tcod.map import compute_fov
 
 import exceptions
 from message_log import TMessageLog
@@ -14,11 +13,9 @@ import pickle
 
 if TYPE_CHECKING:
 	from entity import TActor
-	from game_map import TGameMap, TWorld
-
+	from game_map import TWorld
 
 class TEngine:
-	game_map: TGameMap
 	game_world: TWorld
 	game_name: str = "<Unknown>"
 
@@ -26,9 +23,10 @@ class TEngine:
 		self.message_log = TMessageLog()
 		self.mouse_location = (0, 0)
 		self.player = player
+		player.parent = self
 
 	def handle_enemy_turns(self) -> None:
-		for entity in set(self.game_world.maps[self.game_world.current_floor].actors) - {self.player}:
+		for entity in set(self.game_world.actors): # - {self.player}:
 			if entity.ai:
 				try:
 					entity.ai.perform()
@@ -36,19 +34,11 @@ class TEngine:
 					pass
 
 	def update_fov(self) -> None:
-		"""
-		Recompute the visible area based on the players point of view
-		"""
-		self.game_world.maps[self.game_world.current_floor].visible[:] = compute_fov(
-			self.game_world.maps[self.game_world.current_floor].tiles["transparent"],
-			(self.player.x, self.player.y),
-			radius=7,
-		)
-		# If a tile is "visible" it should be added to "explored".
-		self.game_world.maps[self.game_world.current_floor].explored |= self.game_world.maps[self.game_world.current_floor].visible
+		self.game_world.update_fov()
 
 	def render(self, console: Console) -> None:
-		self.game_world.maps[self.game_world.current_floor].render(console)
+		self.game_world.render(console)
+		self.player.render(console)
 
 		self.message_log.render(console=console, x=21, y=45, width=40, height=5)
 

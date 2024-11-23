@@ -1,19 +1,19 @@
 from __future__ import annotations
 
-from typing import Tuple, TYPE_CHECKING
+from typing import Dict, Tuple, TYPE_CHECKING
 
 import colours as colour
 
 if TYPE_CHECKING:
 	from tcod import console
 	from engine import TEngine
-	from game_map import TGameMap
+	from game_map import TWorld
 
-def get_names_at_location(x: int, y: int, game_map: TGameMap) -> str:
-	if not game_map.in_bounds(x, y) or not game_map.visible[x, y]:
+def get_names_at_location(x: int, y: int, game_world: TWorld) -> str:
+	if not game_world.in_bounds(x, y) or not game_world.maps[game_world.current_floor]["visible"][x, y]:
 		return ""
 	
-	names = ", ".join(entity.name for entity in game_map.entities if entity.x == x and entity.y == y)
+	names = ", ".join(entity.name for entity in game_world.maps[game_world.current_floor]["entities"] if entity.x == x and entity.y == y)
 	return names.capitalize()
 
 def render_bar(console: console.Console, current_value: int, maximum_value: int, total_width: int) -> None:
@@ -32,10 +32,10 @@ def render_dungeon_level(console: console.Console, dungeon_level: int, location:
 
 def render_names_at_mouse_location(console: console.Console, x: int, y: int, engine: TEngine) -> None:
 	mouse_x, mouse_y = engine.mouse_location
-	names_at_mouse_location = get_names_at_location(x=mouse_x, y=mouse_y, game_map=engine.game_world.maps[engine.game_world.current_floor])
+	names_at_mouse_location = get_names_at_location(x=mouse_x, y=mouse_y, game_world=engine.game_world)
 	console.print(x=x, y=y, string=names_at_mouse_location)
 
 def render_stairs(console: console.Console, location: Tuple[int, int], engine: TEngine) -> None:
 	x, y = location
-	stair_locations = f"D({engine.game_world.maps[engine.game_world.current_floor].downstairs_location[0]},{engine.game_world.maps[engine.game_world.current_floor].downstairs_location[1]}), U({engine.game_world.maps[engine.game_world.current_floor].upstairs_location[0]},{engine.game_world.maps[engine.game_world.current_floor].upstairs_location[1]})"
-	console.print(x=x, y=y, string=stair_locations)
+#	stair_locations = f"D({engine.game_world.maps[engine.game_world.current_floor].downstairs_location[0]},{engine.game_world.maps[engine.game_world.current_floor].downstairs_location[1]}), U({engine.game_world.maps[engine.game_world.current_floor].upstairs_location[0]},{engine.game_world.maps[engine.game_world.current_floor].upstairs_location[1]})"
+#	console.print(x=x, y=y, string=stair_locations)

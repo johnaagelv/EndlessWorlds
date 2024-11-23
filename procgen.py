@@ -1,18 +1,16 @@
 from __future__ import annotations
 
 import random
-from typing import Iterator, List, Tuple, TYPE_CHECKING
+from typing import Dict, Iterator, List, Tuple, TYPE_CHECKING
 
+import numpy as np
 import tcod
 
 import entity_factories
-from game_map import TGameMap
 import tile_types
-
 
 if TYPE_CHECKING:
 	from engine import TEngine
-
 
 class TRectangularRoom:
 	def __init__(self, x: int, y: int, width: int, height: int):
@@ -43,7 +41,7 @@ class TRectangularRoom:
 		)
 
 def place_npcs(
-	room: TRectangularRoom, dungeon: TGameMap, maximum_monsters: int
+	room: TRectangularRoom, dungeon: Dict, maximum_monsters: int
 ) -> None:
 	number_of_monsters = random.randint(0, maximum_monsters)
 
@@ -51,21 +49,21 @@ def place_npcs(
 		x = random.randint(room.x1 + 1, room.x2 - 1)
 		y = random.randint(room.y1 + 1, room.y2 - 1)
 
-		if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
+		if not any(entity.x == x and entity.y == y for entity in dungeon["entities"]):
 			if random.random() < 0.8:
 				entity_factories.orc.spawn(dungeon, x, y)
 			else:
 				entity_factories.troll.spawn(dungeon, x, y)
 	
 def place_items(
-	room: TRectangularRoom, dungeon: TGameMap, maximum_items: int, engine: TEngine
+	room: TRectangularRoom, dungeon: Dict, maximum_items: int, engine: TEngine
 ) -> None:
 	number_of_items = random.randint(0, maximum_items)
 
 	for i in range(number_of_items):
 		x = random.randint(room.x1 + 1, room.x2 - 1)
 		y = random.randint(room.y1 + 1, room.y2 - 1)
-		if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
+		if not any(entity.x == x and entity.y == y for entity in dungeon["entities"]):
 			item_chance = random.random()
 			if item_chance < 0.7:
 				item = entity_factories.health_potion.spawn(dungeon, x, y)
@@ -105,7 +103,7 @@ def generate_dungeon(
 	map_width: int,
 	map_height: int,
 	engine: TEngine,
-) -> TGameMap:
+) -> Dict:
 	max_rooms: int = random.randint(2, int(map_width * map_height / 9))
 	room_min_size: int = random.randint(3, 21)
 	temp_limit = int(map_width / 2)
@@ -114,7 +112,17 @@ def generate_dungeon(
 	max_items_per_room: int = random.randint(1, 5)
 	"""Generate a new dungeon map."""
 	player = engine.player
-	dungeon = TGameMap(engine, map_width, map_height, entities=[player])
+
+	dungeon = {
+		"width": map_width,
+		"height": map_height,
+		"tiles": np.full((map_width, map_height), fill_value=tile_types.wall, order="F"),
+		"visible": np.full((map_width, map_height), fill_value=False, order="F"),
+		"explored": np.full((map_width, map_height), fill_value=False, order="F"),
+		"stair_up": (0, 0),
+		"stair_down": (0, 0),
+		"entities": [],
+	}
 
 	rooms: List[TRectangularRoom] = []
 
@@ -124,8 +132,8 @@ def generate_dungeon(
 		room_width = random.randint(room_min_size, room_max_size)
 		room_height = random.randint(room_min_size, room_max_size)
 
-		x = random.randint(0, dungeon.width - room_width - 1)
-		y = random.randint(0, dungeon.height - room_height - 1)
+		x = random.randint(0, map_width - room_width - 1)
+		y = random.randint(0, map_height - room_height - 1)
 
 		# "RectangularRoom" class makes rectangles easier to work with
 		new_room = TRectangularRoom(x, y, room_width, room_height)
@@ -136,34 +144,35 @@ def generate_dungeon(
 		# If there are no intersections then the room is valid.
 
 		# Dig out this rooms inner area.
-		dungeon.tiles[new_room.inner] = tile_types.floor
+		#dungeon.tiles[new_room.inner] = tile_types.floor
+		dungeon["tiles"][new_room.inner] = tile_types.floor
 
 		if len(rooms) == 0:
 			# The first room, where the player starts.
-			player.place(*new_room.center, dungeon)
+			player.place(*new_room.center)
 			print(f"Floor: {engine.game_world.current_floor} at {new_room.center!r}")
 			if engine.game_world.current_floor > 0:
-				dungeon.tiles[(player.x - 1, player.y)] = tile_types.stairs_up
-				dungeon.upstairs_location = (player.x - 1, player.y)
+				dungeon["tiles"][(player.x - 1, player.y)] = tile_types.stairs_up
+				dungeon["stair_up"] = (player.x - 1, player.y)
 
 		else:  # All rooms after the first.
 			# Dig out a tunnel between this room and the previous one.
 			for x, y in tunnel_between(rooms[-1].center, new_room.center):
-				dungeon.tiles[x, y] = tile_types.floor
+				dungeon["tiles"][x, y] = tile_types.floor
 			
-			if random.random() < 0.2:
-				room_no = random.randint(0, len(rooms) - 1)
-				for x, y in tunnel_between(rooms[room_no].center, new_room.center):
-					dungeon.tiles[x, y] = tile_types.floor
+#			if random.random() < 0.2:
+#				room_no = random.randint(0, len(rooms) - 1)
+#				for x, y in tunnel_between(rooms[room_no].center, new_room.center):
+#					dungeon["tiles"][x, y] = tile_types.floor
 			
 			center_of_last_room = new_room.center
 
-			place_npcs(new_room, dungeon, max_monsters_per_room)
-			place_items(new_room, dungeon, max_items_per_room, engine)
+#			place_npcs(new_room, dungeon, max_monsters_per_room)
+#			place_items(new_room, dungeon, max_items_per_room, engine)
 
-		center_of_last_room = (player.x + 1, player.y)
-		dungeon.tiles[center_of_last_room] = tile_types.stairs_down
-		dungeon.downstairs_location = center_of_last_room
+		#center_of_last_room = (player.x + 1, player.y)
+		dungeon["tiles"][center_of_last_room] = tile_types.stairs_down
+		dungeon["stair_down"] = center_of_last_room
 
 		# Finally, append the new room to the list.
 		rooms.append(new_room)

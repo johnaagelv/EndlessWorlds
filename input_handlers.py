@@ -147,7 +147,7 @@ class TEventHandler(TBaseEventHandler):
 		return True
 
 	def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
-		if self.engine.game_world.maps[self.engine.game_world.current_floor].in_bounds(event.tile.x, event.tile.y):
+		if self.engine.game_world.in_bounds(event.tile.x, event.tile.y):
 			self.engine.mouse_location = event.tile.x, event.tile.y
 
 	def on_render(self, console: tcod.console.Console) -> None:

@@ -33,7 +33,7 @@ def new_game() -> TEngine:
 		map_height=map_height,
 	)
 	engine.game_world.generate_floor()
-	engine.update_fov()
+	engine.game_world.update_fov()
 
 	engine.message_log.add_message(
 		"Hello and welcome, Adventurer, to Endless Worlds!", colour.welcome_text

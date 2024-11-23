@@ -3,10 +3,11 @@ from components import consumable
 from components.fighter import TFighter
 from components.inventory import TInventory
 from entity import TActor, TItem
+import colours as colour
 
 player = TActor(
     char="@",
-    colour=(255, 255, 255),
+    colour=colour.white,
     name="Player",
     ai_cls=THostileEnemy,
     fighter=TFighter(hp=30, defense=2, power=5),
@@ -15,7 +16,7 @@ player = TActor(
 
 orc = TActor(
     char="o",
-    colour=(63, 127, 63),
+    colour=colour.white,
     name="Orc",
     ai_cls=THostileEnemy,
     fighter=TFighter(hp=10, defense=0, power=3),
@@ -24,7 +25,7 @@ orc = TActor(
 
 troll = TActor(
     char="T",
-    colour=(0, 127, 0),
+    colour=colour.white,
     name="Troll",
     ai_cls=THostileEnemy,
     fighter=TFighter(hp=16, defense=1, power=4),
@@ -33,7 +34,7 @@ troll = TActor(
 
 confusion_scroll = TItem(
 	char="~",
-	colour=(207, 63, 255),
+	colour=colour.blue,
 	name="Confusion scroll",
 	consumable=consumable.TConfusionConsumable(number_of_turns=10)
 )
@@ -47,14 +48,14 @@ health_potion = TItem(
 
 lightning_scroll = TItem(
 	char="~",
-	colour=(255, 255, 0),
+	colour=colour.blue,
 	name="Lightning scroll",
 	consumable=consumable.TLightningDamageConsumable(damage=20, maximum_range=5),
 )
 
 fireball_scroll = TItem(
 	char="~",
-	colour=(255, 0, 0),
+	colour=colour.blue,
 	name="Fireball scroll",
 	consumable=consumable.TFireballDamageConsumable(damage=12, radius=3),
 )
