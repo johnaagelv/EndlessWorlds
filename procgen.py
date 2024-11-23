@@ -106,11 +106,12 @@ def generate_dungeon(
 	map_height: int,
 	engine: TEngine,
 ) -> TGameMap:
-	max_rooms: int = random.randint(1, int(map_width * map_height / 9))
-	room_min_size: int = random.randint(3, 6)
-	room_max_size: int = random.randint(6, int(map_width / 2))
-	max_monsters_per_room: int = random.randint(0, max_rooms // 2)
-	max_items_per_room: int = random.randint(0, max_rooms)
+	max_rooms: int = random.randint(2, int(map_width * map_height / 9))
+	room_min_size: int = random.randint(3, 21)
+	temp_limit = int(map_width / 2)
+	room_max_size: int = random.randint(min(room_min_size, temp_limit), max(room_min_size, temp_limit))
+	max_monsters_per_room: int = random.randint(1, 4)
+	max_items_per_room: int = random.randint(1, 5)
 	"""Generate a new dungeon map."""
 	player = engine.player
 	dungeon = TGameMap(engine, map_width, map_height, entities=[player])
@@ -149,6 +150,11 @@ def generate_dungeon(
 			# Dig out a tunnel between this room and the previous one.
 			for x, y in tunnel_between(rooms[-1].center, new_room.center):
 				dungeon.tiles[x, y] = tile_types.floor
+			
+			if random.random() < 0.2:
+				room_no = random.randint(0, len(rooms) - 1)
+				for x, y in tunnel_between(rooms[room_no].center, new_room.center):
+					dungeon.tiles[x, y] = tile_types.floor
 			
 			center_of_last_room = new_room.center
 

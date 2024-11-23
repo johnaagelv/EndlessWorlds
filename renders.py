@@ -34,3 +34,8 @@ def render_names_at_mouse_location(console: console.Console, x: int, y: int, eng
 	mouse_x, mouse_y = engine.mouse_location
 	names_at_mouse_location = get_names_at_location(x=mouse_x, y=mouse_y, game_map=engine.game_map)
 	console.print(x=x, y=y, string=names_at_mouse_location)
+
+def render_stairs(console: console.Console, location: Tuple[int, int], engine: TEngine) -> None:
+	x, y = location
+	stair_locations = f"D({engine.game_map.downstairs_location[0]},{engine.game_map.downstairs_location[1]}), U({engine.game_map.upstairs_location[0]},{engine.game_map.upstairs_location[1]})"
+	console.print(x=x, y=y, string=stair_locations)

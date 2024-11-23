@@ -55,6 +55,7 @@ class TEngine:
 		renders.render_bar(console=console, current_value=self.player.fighter.hp, maximum_value=self.player.fighter.max_hp, total_width=20)
 		renders.render_dungeon_level(console=console, dungeon_level=self.game_world.current_floor, location=(0, 47))
 		renders.render_names_at_mouse_location(console=console, x=21, y=44, engine=self)
+		renders.render_stairs(console=console, location=(0,48), engine=self)
 
 	def save_as(self, filename: str) -> None:
 		"""
