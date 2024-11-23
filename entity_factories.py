@@ -40,7 +40,7 @@ confusion_scroll = TItem(
 
 health_potion = TItem(
 	char="!",
-	colour=(127, 0, 255),
+	colour=(160, 192, 160),
 	name="Health potion",
 	consumable=consumable.THealingConsumable(amount=4)
 )

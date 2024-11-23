@@ -147,7 +147,7 @@ class TEventHandler(TBaseEventHandler):
 		return True
 
 	def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
-		if self.engine.game_map.in_bounds(event.tile.x, event.tile.y):
+		if self.engine.game_world.maps[self.engine.game_world.current_floor].in_bounds(event.tile.x, event.tile.y):
 			self.engine.mouse_location = event.tile.x, event.tile.y
 
 	def on_render(self, console: tcod.console.Console) -> None:
@@ -392,8 +392,8 @@ class TSelectIndexHandler(TAskUserEventHandler):
 			x += dx * modifier
 			y += dy * modifier
 			# Keep the cursor index within the map
-			x = max(0, min(x, self.engine.game_map.width - 1))
-			y = max(0, min(y, self.engine.game_map.height - 1))
+			x = max(0, min(x, self.engine.game_world.maps[self.engine.game_world.current_floor].width - 1))
+			y = max(0, min(y, self.engine.game_world.maps[self.engine.game_world.current_floor].height - 1))
 			self.engine.mouse_location = x, y
 			return None
 		elif key in CONFIRM_KEYS:
@@ -404,7 +404,7 @@ class TSelectIndexHandler(TAskUserEventHandler):
 		"""
 		Left click confirms a selection
 		"""
-		if self.engine.game_map.in_bounds(*event.tile):
+		if self.engine.game_world.maps[self.engine.game_world.current_floor].in_bounds(*event.tile):
 			if event.button == 1:
 				return self.on_index_selected(*event.tile)
 		return super().ev_mousebuttondown(event)

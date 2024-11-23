@@ -45,7 +45,7 @@ class TConfusionConsumable(TConsumable):
 	def activate(self, action: actions.TItemAction) -> None:
 		consumer = action.entity
 		target = action.target_actor
-		if not self.engine.game_map.visible[action.target_xy]:
+		if not self.engine.game_world.maps[self.engine.game_world.current_floor].visible[action.target_xy]:
 			raise Impossible("You cannot target this area!")
 		if not target:
 			raise Impossible("You must select a target!")
@@ -88,7 +88,7 @@ class TLightningDamageConsumable(TConsumable):
 		target = None
 		closest_distance = self.maximum_range + 1.0
 	
-		for actor in self.engine.game_map.actors:
+		for actor in self.engine.game_world.maps[self.engine.game_world.current_floor].actors:
 			if actor is not consumer and self.parent.gamemap.visible[actor.x, actor.y]:
 				distance = consumer.distance(actor.x, actor.y)
 
@@ -121,11 +121,11 @@ class TFireballDamageConsumable(TConsumable):
 	def activate(self, action: actions.TItemAction) -> None:
 		target_xy = action.target_xy
 
-		if not self.engine.game_map.visible[target_xy]:
+		if not self.engine.game_world.maps[self.engine.game_world.current_floor].visible[target_xy]:
 			raise Impossible("Out of range!")
 		
 		targets_hit = False
-		for actor in self.engine.game_map.actors:
+		for actor in self.engine.game_world.maps[self.engine.game_world.current_floor].actors:
 			if actor.distance(*target_xy) <= self.radius:
 				self.engine.message_log.add_message(
 					f"Fire engulfs {actor.name}!"

@@ -57,19 +57,22 @@ class THostileEnemy(TBaseAI):
 		dx = target.x - self.entity.x
 		dy = target.y - self.entity.y
 		distance = max(abs(dx), abs(dy))  # Chebyshev distance.
-
-		if self.engine.game_map.visible[self.entity.x, self.entity.y]:
+		move_chance = random.random() < 0.1
+		if self.engine.game_world.maps[self.engine.game_world.current_floor].visible[self.entity.x, self.entity.y] or move_chance:
 			if distance <= 1:
 				return TMeleeAction(self.entity, dx, dy).perform()
 
 			self.path = self.get_path_to(target.x, target.y)
 
 		if self.path:
+			path_steps = len(self.path)
+			if move_chance and path_steps > 8 and path_steps < 32:
+				self.engine.message_log.add_message(f"You hear movement!", (255, 0, 0))
 			dest_x, dest_y = self.path.pop(0)
 			return TMovementAction(
 				self.entity, dest_x - self.entity.x, dest_y - self.entity.y,
 			).perform()
-
+		
 		return TWaitAction(self.entity).perform()
 
 class TConfusedEnemy(TBaseAI):

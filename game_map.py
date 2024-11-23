@@ -126,25 +126,25 @@ class TWorld:
 				engine = self.engine,
 			)
 		)
-		self.engine.game_map = self.maps[len(self.maps) - 1]
+		#self.engine.game_map = self.maps[len(self.maps) - 1]
 
 	def descend_floor(self) -> None:
 		# Ensure the current map is updated with what has happened
-		self.maps[self.current_floor] = self.engine.game_map
+		#self.maps[self.current_floor] = self.engine.game_map
 #		print(f"1 Floor: {self.current_floor}, map count: {len(self.maps)}")
 		self.current_floor += 1
 		if self.current_floor == len(self.maps):
 			self.generate_floor()
 #		print(f"2 Floor: {self.current_floor}, map count: {len(self.maps)}")
-		self.engine.game_map = self.maps[self.current_floor]
-		self.engine.player.x, self.engine.player.y = self.engine.game_map.upstairs_location
-		self.engine.game_map.entities[0] = self.engine.player
+		#self.engine.game_map = self.maps[self.current_floor]
+		self.engine.player.x, self.engine.player.y = self.maps[self.current_floor].upstairs_location
+		self.maps[self.current_floor].entities[0] = self.engine.player
 
 	def ascend_floor(self) -> None:
 		if self.current_floor > 0:
 		# Ensure the current map is updated with what has happened
-			self.maps[self.current_floor] = self.engine.game_map
+			#self.maps[self.current_floor] = self.engine.game_map
 			self.current_floor -= 1
-		self.engine.game_map = self.maps[self.current_floor]
-		self.engine.player.x, self.engine.player.y = self.engine.game_map.downstairs_location
-		self.engine.game_map.entities[0] = self.engine.player
+		#self.engine.game_map = self.maps[self.current_floor]
+		self.engine.player.x, self.engine.player.y = self.maps[self.current_floor].downstairs_location
+		self.maps[self.current_floor].entities[0] = self.engine.player

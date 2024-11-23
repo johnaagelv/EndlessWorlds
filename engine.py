@@ -28,7 +28,7 @@ class TEngine:
 		self.player = player
 
 	def handle_enemy_turns(self) -> None:
-		for entity in set(self.game_map.actors) - {self.player}:
+		for entity in set(self.game_world.maps[self.game_world.current_floor].actors) - {self.player}:
 			if entity.ai:
 				try:
 					entity.ai.perform()
@@ -39,16 +39,16 @@ class TEngine:
 		"""
 		Recompute the visible area based on the players point of view
 		"""
-		self.game_map.visible[:] = compute_fov(
-			self.game_map.tiles["transparent"],
+		self.game_world.maps[self.game_world.current_floor].visible[:] = compute_fov(
+			self.game_world.maps[self.game_world.current_floor].tiles["transparent"],
 			(self.player.x, self.player.y),
-			radius=8,
+			radius=7,
 		)
 		# If a tile is "visible" it should be added to "explored".
-		self.game_map.explored |= self.game_map.visible
+		self.game_world.maps[self.game_world.current_floor].explored |= self.game_world.maps[self.game_world.current_floor].visible
 
 	def render(self, console: Console) -> None:
-		self.game_map.render(console)
+		self.game_world.maps[self.game_world.current_floor].render(console)
 
 		self.message_log.render(console=console, x=21, y=45, width=40, height=5)
 

@@ -42,12 +42,12 @@ class TPickupAction(TAction):
 		actor_location_y = self.entity.y
 		inventory =self.entity.inventory
 
-		for item in self.engine.game_map.items:
+		for item in self.engine.game_world.maps[self.engine.game_world.current_floor].items:
 			if actor_location_x == item.x and actor_location_y == item.y:
 				if len(inventory.items) >= inventory.capacity:
 					raise exceptions.Impossible("Your inventory is full!")
 				
-				self.engine.game_map.entities.remove(item)
+				self.engine.game_world.maps[self.engine.game_world.current_floor].entities.remove(item)
 				item.parent = self.entity.inventory
 				inventory.items.append(item)
 
@@ -69,7 +69,7 @@ class TItemAction(TAction):
 		"""
 		Return the actor at this actions destination
 		"""
-		return self.engine.game_map.get_actor_at_location(*self.target_xy)
+		return self.engine.game_world.maps[self.engine.game_world.current_floor].get_actor_at_location(*self.target_xy)
 	
 	def perform(self) -> None:
 		"""
@@ -90,7 +90,7 @@ class TTakeDownStairsAction(TAction):
 		"""
 		Take the stairs
 		"""
-		if (self.entity.x, self.entity.y) == self.engine.game_map.downstairs_location:
+		if (self.entity.x, self.entity.y) == self.engine.game_world.maps[self.engine.game_world.current_floor].downstairs_location:
 			self.engine.game_world.descend_floor()
 			self.engine.message_log.add_message(f"You go down! {self.engine.game_world.current_floor}", colour.descend)
 		else:
@@ -101,7 +101,7 @@ class TTakeUpStairsAction(TAction):
 		"""
 		Take the stairs
 		"""
-		if (self.entity.x, self.entity.y) == self.engine.game_map.upstairs_location:
+		if (self.entity.x, self.entity.y) == self.engine.game_world.maps[self.engine.game_world.current_floor].upstairs_location:
 			self.engine.game_world.ascend_floor()
 			self.engine.message_log.add_message(f"You go up! {self.engine.game_world.current_floor}", colour.descend)
 		else:
@@ -122,12 +122,12 @@ class TActionWithDirection(TAction):
 	@property
 	def blocking_entity(self) -> Optional[TEntity]:
 		"""Return the blocking entity at this actions destination.."""
-		return self.engine.game_map.get_blocking_entity_at_location(*self.dest_xy)
+		return self.engine.game_world.maps[self.engine.game_world.current_floor].get_blocking_entity_at_location(*self.dest_xy)
 
 	@property
 	def target_actor(self) -> Optional[TActor]:
 		"""Return the actor at this actions destination."""
-		return self.engine.game_map.get_actor_at_location(*self.dest_xy)
+		return self.engine.game_world.maps[self.engine.game_world.current_floor].get_actor_at_location(*self.dest_xy)
 
 	def perform(self) -> None:
 		raise NotImplementedError()
@@ -156,11 +156,11 @@ class TMovementAction(TActionWithDirection):
 	def perform(self) -> None:
 		dest_x, dest_y = self.dest_xy
 
-		if not self.engine.game_map.in_bounds(dest_x, dest_y):
+		if not self.engine.game_world.maps[self.engine.game_world.current_floor].in_bounds(dest_x, dest_y):
 			raise exceptions.Impossible("The way is blocked!")
-		if not self.engine.game_map.tiles["walkable"][dest_x, dest_y]:
+		if not self.engine.game_world.maps[self.engine.game_world.current_floor].tiles["walkable"][dest_x, dest_y]:
 			raise exceptions.Impossible("Ouch!")
-		if self.engine.game_map.get_blocking_entity_at_location(dest_x, dest_y):
+		if self.engine.game_world.maps[self.engine.game_world.current_floor].get_blocking_entity_at_location(dest_x, dest_y):
 			raise exceptions.Impossible("Watch where you're going!")
 
 		self.entity.move(self.dx, self.dy)

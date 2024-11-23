@@ -25,7 +25,7 @@ bar_empty = (0x40, 0x10, 0x10)
 menu_title = (0xFF, 0xFF, 0x3F)
 menu_text = white
 
-wall_dark = (32, 32, 32)
+wall_dark = (48, 48, 48)
 wall_light = (64, 64, 64)
-floor_dark = (64, 64, 64)
+floor_dark = (51, 26, 0)
 floor_light = (102, 51, 0)
