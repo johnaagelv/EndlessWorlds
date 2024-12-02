@@ -2,8 +2,6 @@ from typing import Tuple
 
 import numpy as np  # type: ignore
 
-import colours as colour
-
 # Tile graphics structured type compatible with Console.tiles_rgb.
 graphic_dt = np.dtype(
     [
@@ -41,25 +39,18 @@ SHROUD = np.array((ord(" "), (255, 255, 255), (0, 0, 0)), dtype=graphic_dt)
 floor = new_tile(
     walkable=True,
     transparent=True,
-    dark=(ord(" "), colour.floor_dark, colour.floor_dark),
-    light=(ord(" "), colour.floor_light, colour.floor_light),
+    dark=(ord(" "), (255, 255, 255), (50, 50, 150)),
+    light=(ord(" "), (255, 255, 255), (200, 180, 50)),
 )
 wall = new_tile(
     walkable=False,
     transparent=False,
-    dark=(ord("#"), colour.black, colour.wall_dark),
-    light=(ord("#"), colour.black, colour.wall_light),
+    dark=(ord(" "), (255, 255, 255), (0, 0, 100)),
+    light=(ord(" "), (255, 255, 255), (130, 110, 50)),
 )
-stairs_down = new_tile(
+down_stairs = new_tile(
     walkable=True,
     transparent=True,
-    dark=(ord(">"), colour.black, colour.floor_dark),
-    light=(ord(">"), colour.black, colour.floor_light),
-)
-
-stairs_up = new_tile(
-    walkable=True,
-    transparent=True,
-    dark=(ord("<"), colour.black, colour.floor_dark),
-    light=(ord("<"), colour.black, colour.floor_light),
+    dark=(ord(">"), (0, 0, 100), (50, 50, 150)),
+    light=(ord(">"), (255, 255, 255), (200, 180, 50)),
 )

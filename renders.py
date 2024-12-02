@@ -9,11 +9,11 @@ if TYPE_CHECKING:
 	from engine import TEngine
 	from game_map import TWorld
 
-def get_names_at_location(x: int, y: int, game_world: TWorld) -> str:
-	if not game_world.in_bounds(x, y) or not game_world.maps[game_world.current_floor]["visible"][x, y]:
+def get_names_at_location(x: int, y: int, game_map: TWorld) -> str:
+	if not game_map.in_bounds(x, y) or not game_map.maps[game_map.current_floor]["visible"][x, y]:
 		return ""
 	
-	names = ", ".join(entity.name for entity in game_world.maps[game_world.current_floor]["entities"] if entity.x == x and entity.y == y)
+	names = ", ".join(entity.name for entity in game_map.maps[game_map.current_floor]["entities"] if entity.x == x and entity.y == y)
 	return names.capitalize()
 
 def render_bar(console: console.Console, current_value: int, maximum_value: int, total_width: int) -> None:
@@ -32,10 +32,11 @@ def render_dungeon_level(console: console.Console, dungeon_level: int, location:
 
 def render_names_at_mouse_location(console: console.Console, x: int, y: int, engine: TEngine) -> None:
 	mouse_x, mouse_y = engine.mouse_location
-	names_at_mouse_location = get_names_at_location(x=mouse_x, y=mouse_y, game_world=engine.game_world)
+	names_at_mouse_location = get_names_at_location(x=mouse_x, y=mouse_y, game_map=engine.game_map)
 	console.print(x=x, y=y, string=names_at_mouse_location)
 
 def render_stairs(console: console.Console, location: Tuple[int, int], engine: TEngine) -> None:
 	x, y = location
-#	stair_locations = f"D({engine.game_world.maps[engine.game_world.current_floor].downstairs_location[0]},{engine.game_world.maps[engine.game_world.current_floor].downstairs_location[1]}), U({engine.game_world.maps[engine.game_world.current_floor].upstairs_location[0]},{engine.game_world.maps[engine.game_world.current_floor].upstairs_location[1]})"
+#	map = engine.game_map.maps[engine.game_map.current_floor]
+#	stair_locations = f"D{map['stair_down']!r}, U{map['stair_up']!r}"
 #	console.print(x=x, y=y, string=stair_locations)
