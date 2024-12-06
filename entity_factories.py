@@ -4,11 +4,11 @@ from components.fighter import Fighter
 from components.inventory import Inventory
 from components.level import Level
 from entity import Actor, Item
-
+import color as colour
 
 player = Actor(
     char="@",
-    color=(255, 255, 255),
+    color=colour.white,
     name="Player",
     ai_cls=HostileEnemy,
     fighter=Fighter(hp=30, defense=2, power=5),
@@ -18,7 +18,7 @@ player = Actor(
 
 orc = Actor(
     char="o",
-    color=(63, 127, 63),
+    color=colour.white,
     name="Orc",
     ai_cls=HostileEnemy,
     fighter=Fighter(hp=10, defense=0, power=3),
@@ -27,7 +27,7 @@ orc = Actor(
 )
 troll = Actor(
     char="T",
-    color=(0, 127, 0),
+    color=colour.white,
     name="Troll",
     ai_cls=HostileEnemy,
     fighter=Fighter(hp=16, defense=1, power=4),
@@ -37,25 +37,25 @@ troll = Actor(
 
 confusion_scroll = Item(
     char="~",
-    color=(207, 63, 255),
+    color=colour.grey,
     name="Confusion Scroll",
     consumable=consumable.ConfusionConsumable(number_of_turns=10),
 )
 fireball_scroll = Item(
     char="~",
-    color=(255, 0, 0),
+    color=colour.green,
     name="Fireball Scroll",
     consumable=consumable.FireballDamageConsumable(damage=12, radius=3),
 )
 health_potion = Item(
     char="!",
-    color=(127, 0, 255),
+    color=colour.blue,
     name="Health Potion",
     consumable=consumable.HealingConsumable(amount=4),
 )
 lightning_scroll = Item(
     char="~",
-    color=(255, 255, 0),
+    color=colour.green,
     name="Lightning Scroll",
     consumable=consumable.LightningDamageConsumable(damage=20, maximum_range=5),
 )
