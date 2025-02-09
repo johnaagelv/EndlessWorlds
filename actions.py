@@ -4,6 +4,7 @@ from typing import Optional, Tuple, TYPE_CHECKING
 
 import color
 import exceptions
+from entity import Actor
 
 if TYPE_CHECKING:
 	from engine import Engine
@@ -86,6 +87,8 @@ class DropItem(ItemAction):
 class WaitAction(Action):
 	def perform(self) -> None:
 		pass
+#		self.entity.char = chr(ord(self.entity.char)+1)
+#		print(f"{ord(self.entity.char)}='{self.entity.char}'")
 
 
 class TakeStairsAction(Action):
@@ -94,19 +97,34 @@ class TakeStairsAction(Action):
 		Take the stairs, if any exist at the entity's location.
 		"""
 		if (self.entity.x, self.entity.y) == self.engine.game_map.downstairs_location:
+			# Move to the next floor down
 			self.engine.game_world.current_floor += 1
 			self.engine.game_world.generate_floor()
 			self.engine.player.x, self.engine.player.y = self.engine.game_map.upstairs_location
+			# Ensure actor has the current map
+			self.entity.parent = self.engine.game_map
+#			for entity in self.engine.game_map.entities:
+#				if isinstance(entity, Actor):
+#					entity = self.entity
+
 			self.engine.message_log.add_message(
 				"Down I go!", color.descend
 			)
 		elif (self.entity.x, self.entity.y) == self.engine.game_map.upstairs_location:
+			# Move to the previous floor up
 			self.engine.game_world.current_floor = max(0, self.engine.game_world.current_floor - 1)
 			self.engine.game_world.generate_floor()
 			self.engine.player.x, self.engine.player.y = self.engine.game_map.downstairs_location
+			# Ensure actor has the current map
+			self.entity.parent = self.engine.game_map
+#			for entity in self.engine.game_map.entities:
+#				if isinstance(entity, Actor):
+#					entity = self.entity
 			self.engine.message_log.add_message(
 				"Up I go!", color.descend
 			)
+		else:
+			print(f"Tile {self.engine.game_map.tiles[self.entity.x, self.entity.y]!r}")
 
 class ActionWithDirection(Action):
 	def __init__(self, entity: Actor, dx: int, dy: int):
@@ -174,6 +192,7 @@ class MovementAction(ActionWithDirection):
 			raise exceptions.Impossible("That way is blocked.")
 
 		self.entity.move(self.dx, self.dy)
+
 
 
 class BumpAction(ActionWithDirection):

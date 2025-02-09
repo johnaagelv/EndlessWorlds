@@ -34,7 +34,7 @@ def render_bar(
 		)
 
 	console.print(
-		x=1, y=45, string=f"HP: {current_value}/{maximum_value}", fg=color.bar_text
+		x=1, y=45, string=f"HP: {current_value}:{maximum_value}", fg=color.bar_text
 	)
 
 

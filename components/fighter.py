@@ -37,7 +37,7 @@ class Fighter(BaseComponent):
             death_message = f"{self.parent.name} is dead!"
             death_message_color = color.enemy_die
 
-        self.parent.char = "%"
+        self.parent.char = chr(253) #"%"
         self.parent.color = (191, 0, 0)
         self.parent.blocks_movement = False
         self.parent.ai = None

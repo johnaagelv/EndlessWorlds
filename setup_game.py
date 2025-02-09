@@ -70,21 +70,21 @@ class MainMenu(input_handlers.BaseEventHandler):
 		console.print(
 			console.width // 2,
 			console.height // 2 - 4,
-			"TOMBS OF THE ANCIENT KINGS",
+			"Spaceship Surveyor One",
 			fg=color.menu_title,
 			alignment=libtcodpy.CENTER,
 		)
 		console.print(
 			console.width // 2,
 			console.height - 2,
-			"By (Your name here)",
+			"By John Aage Andersen",
 			fg=color.menu_title,
 			alignment=libtcodpy.CENTER,
 		)
 
 		menu_width = 24
 		for i, text in enumerate(
-			["[N] Play a new game", "[C] Continue last game", "[Q] Quit"]
+			["(N)ew game", "(C)ontinue last game", "(Q)uit"]
 		):
 			console.print(
 				console.width // 2,

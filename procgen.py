@@ -15,9 +15,14 @@ if TYPE_CHECKING:
 
 # Floor no., Room count, Item count, NPC count, Min size, Max size
 build_data = [
-	(0, 6, 2, 2, 5, 32),
+	(0, 6, 64, 0, 5, 16),
+	(1, 64, 6, 2, 5, 12),
 	(4, 32, 3, 4, 9, 11),
 	(7, 8, 5, 4, 5, 9),
+	(11, 4, 11, 11, 9, 11),
+	(12, 99, 2, 2, 3, 19),
+	(13, 32, 0, 0, 3, 21),
+	(14, 32, 2, 2, 3, 21),
 ]
 
 def get_value_for_floor(floor: int = 0) -> Tuple[int, int, int, int, int, int]:
@@ -60,8 +65,8 @@ class RectangularRoom:
 def place_entities(
 	room: RectangularRoom, dungeon: GameMap, maximum_monsters: int, maximum_items: int
 ) -> None:
-	number_of_monsters = random.randint(0, maximum_monsters)
-	number_of_items = random.randint(0, maximum_items)
+	number_of_monsters = 0 #random.randint(0, maximum_monsters)
+	number_of_items = 0 #random.randint(0, maximum_items)
 
 	for i in range(number_of_monsters):
 		x = random.randint(room.x1 + 1, room.x2 - 1)
@@ -114,6 +119,7 @@ def generate_dungeon(
 	map_width: int,
 	map_height: int,
 	engine: Engine,
+	floor: int,
 ) -> GameMap:
 	"""Generate a new dungeon map."""
 	# Floor no., Room count, Item count, NPC count, Min size, Max size
@@ -124,7 +130,7 @@ def generate_dungeon(
 	room_min_size = floor_value[4]
 	room_max_size = floor_value[5]
 	player = engine.player
-	dungeon = GameMap(engine, map_width, map_height, entities=[player])
+	dungeon = GameMap(engine, map_width, map_height, entities=[player], floor=floor)
 
 	rooms: List[RectangularRoom] = []
 
@@ -147,16 +153,21 @@ def generate_dungeon(
 
 		# Dig out this rooms inner area.
 		dungeon.tiles[new_room.inner] = tile_types.floor
+		for inner_x in range(new_room.x1+1,new_room.x2):
+			for inner_y in range(new_room.y1+1,new_room.y2):
+				dungeon.tiles[inner_x, inner_y] = tile_types.floors[random.randint(0,len(tile_types.floors)-1)]
 
 		if len(rooms) == 0:
 			# The first room, where the player starts.
 			player.place(*new_room.center, dungeon)
 			center_of_first_room = new_room.center
+			# REMOVE BELOW
+			place_entities(new_room, dungeon, max_monsters_per_room, max_items_per_room)
 
 		else:  # All rooms after the first.
 			# Dig out a tunnel between this room and the previous one.
 			for x, y in tunnel_between(rooms[-1].center, new_room.center):
-				dungeon.tiles[x, y] = tile_types.floor
+				dungeon.tiles[x, y] = tile_types.floors[random.randint(0,len(tile_types.floors)-1)]
 
 			center_of_last_room = new_room.center
 

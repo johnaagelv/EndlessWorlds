@@ -5,6 +5,7 @@ import math
 from typing import Optional, Tuple, Type, TypeVar, TYPE_CHECKING, Union
 
 from tcod.console import Console
+from tcod import tileset
 
 from render_order import RenderOrder
 
@@ -51,6 +52,8 @@ class Entity:
 
 	@property
 	def gamemap(self) -> GameMap:
+#		print("Entity->gamemap()")
+#		print(f"- on floor {self.parent.gamemap.floor}")
 		return self.parent.gamemap
 
 	def spawn(self: T, gamemap: GameMap, x: int, y: int) -> T:
@@ -109,6 +112,8 @@ class Actor(Entity):
 			render_order=RenderOrder.ACTOR,
 		)
 
+		self.vision_range = 4
+
 		self.ai: Optional[BaseAI] = ai_cls(self)
 
 		self.fighter = fighter
@@ -124,7 +129,6 @@ class Actor(Entity):
 		console.print(
 			x=self.x, y=self.y, string=self.char, fg=self.color
 		)
-
 
 	@property
 	def is_alive(self) -> bool:

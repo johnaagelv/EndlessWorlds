@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+import random
 from typing import Iterable, Iterator, List, Optional, TYPE_CHECKING
 
 import numpy as np  # type: ignore
@@ -15,12 +15,21 @@ if TYPE_CHECKING:
 
 class GameMap:
 	def __init__(
-		self, engine: Engine, width: int, height: int, entities: Iterable[Entity] = ()
+		self,
+		engine: Engine,
+		width: int,
+		height: int,
+		entities: Iterable[Entity] = (),
+		floor: int = 0,
 	):
 		self.engine = engine
 		self.width, self.height = width, height
 		self.entities = set(entities)
+		self.floor = floor
 		self.tiles = np.full((width, height), fill_value=tile_types.wall, order="F")
+		for map_x in range(0, self.width):
+			for map_y in range(0, self.height):
+				self.tiles[map_x, map_y] = tile_types.walls[random.randint(0, len(tile_types.walls)-1)]
 
 		self.visible = np.full(
 			(width, height), fill_value=False, order="F"
@@ -128,6 +137,7 @@ class GameWorld:
 				map_width=self.map_width,
 				map_height=self.map_height,
 				engine=self.engine,
+				floor=self.current_floor,
 			))
 		
 		self.engine.game_map = self.maps[self.current_floor]
