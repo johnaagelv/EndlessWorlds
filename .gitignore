@@ -15,3 +15,5 @@ venv
 
 # Saved games
 *.sav
+*.dat
+*.map
