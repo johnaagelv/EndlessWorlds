@@ -12,6 +12,7 @@ class TEntity:
 class TActor(TEntity):
 	def __init__(self, data):
 		super().__init__(data)
+		self.fos = None
 
 	@property
 	def world(self) -> TWorld:

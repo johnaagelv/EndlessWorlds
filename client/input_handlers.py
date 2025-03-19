@@ -4,7 +4,7 @@ from actions import TAction, TEscapeAction, TMoveAction
 
 class TEventHandler(tcod.event.EventDispatch[TAction]):
 	def ev_quit(self, event: tcod.event.Quit) -> Optional[TAction]:
-		raise SystemExit()
+		return TEscapeAction()
 	
 	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[TAction]:
 		action: Optional[TAction] = None

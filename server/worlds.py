@@ -1,15 +1,8 @@
 from typing import Dict, List
 
 import numpy as np
-import json
 
 import tile_types
-
-class numpy_array_encoder(json.JSONEncoder):
-	def default(self, obj):
-		if isinstance(obj, np.ndarray):
-			return obj.tolist()
-		return json.JSONEncoder.default(self, obj)
 
 class TWorld:
 	maps: List = []
@@ -100,11 +93,37 @@ class TWorld:
 			}
 		)
 
-	def field_of_sense(self, x: int, y: int, z: int, m: int, r: int):
-		map = self.maps[m]
-		x1 = max(x - r, 0)
-		x2 = min(x + r + 1, map["width"])
-		y1 = max(y - r, 0)
-		y2 = min(y + r + 1, map["height"])
-		fos = map["tiles"][x1:x2,y1:y2]
+	"""
+	# Get and return the field of sense
+	"""
+	def field_of_sense(self, fos_request: Dict) -> Dict:
+		# Extract the fos parameters m, x, y, z, r
+		try:
+			m = fos_request.get("m") # Map number
+			x = fos_request.get("x") # x coordinate on map m
+			y = fos_request.get("y") # y coordinate on map m
+			# z = fos_request.get("z") # z coordinate = height on map m (not yet used)
+			r = fos_request.get("r") # r radius
+
+			x_min = max(x - r, 0)
+			x_max = min(x + r + 1, self.maps[m]["width"])
+			y_min = max(y - r, 0)
+			y_max = min(y + r + 1, self.maps[m]["height"])
+
+			fos = {
+				"x_min": x_min,
+				"x_max": x_max,
+				"y_min": y_min,
+				"y_max": y_max,
+				"view": self.maps[m]["tiles"][x_min:x_max, y_min:y_max],
+			}
+		except Exception:
+			fos = {
+				"x_min": 0,
+				"x_max": 0,
+				"y_min": 0,
+				"y_max": 0,
+				"view": [],
+			}
+
 		return fos

@@ -47,53 +47,12 @@ wall = new_tile(
 	light=(ord("#"), (255, 255, 255), (64, 64, 64)),
 )
 
-def box(self, x: int, y: int, w: int, h: int):
-	x1 = x + 1
-	x2 = x + w - 2
-	y1 = y + 1
-	y2 = y + h - 2
-	build = np.full((w, h), fill_value="#", order="F")
-	build[x1:x2, y1:y2] = " "
-	return build
-
-maps = []
-map = np.full((40, 40), fill_value=" ", order="F")
-x=5
-y=5
-w=20
-h=20
-map[x:x+w-1,y:y+h-1] = box(x, y, w, h)
-maps.append(map)
-
-map = np.full((80, 45), fill_value=" ", order="F")
-x=5
-y=5
-w=10
-h=10
-map[x:x+w-1,y:y+h-1] = box(x, y, w, h)
-maps.append(map)
-
-map = np.full((140, 140), fill_value=" ", order="F")
-x=5
-y=5
-w=10
-h=10
-map[x:x+w-1,y:y+h-1] = box(x, y, w, h)
-x=35
-y=5
-w=20
-h=10
-map[x:x+w-1,y:y+h-1] = box(x, y, w, h)
-maps.append(map)
-
-
-
 HOST = "192.168.1.104"  # The server's hostname or IP address
 PORT = 12345  # The port used by the server
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 	s.connect((HOST, PORT))
-	command = {"action":"fos", "x":4, "y": 5, "z": 2, "m": 3, "r": 4}
+	command = {"cmd":"fos", "x":4, "y": 5, "z": 2, "m": 0, "r": 4}
 	data = json.dumps(command, ensure_ascii=False).encode('utf-8')
 
 	jsonheader = {
@@ -107,7 +66,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 	message = message_hdr + jsonheader_bytes + data
 
 	s.sendall(message)
-	data = s.recv(1024)
+	data = s.recv(2024)
 	s.close()
 
 print(f"Received {data!r}")
