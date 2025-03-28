@@ -1,4 +1,6 @@
 from typing import Dict, List
+import logging
+logger = logging.getLogger("EWlogger")
 
 import numpy as np
 
@@ -7,7 +9,8 @@ import tile_types
 class TWorld:
 	maps: List = []
 
-	def __init__(self):
+	def __init__(self, world_name: str = 'world'):
+		logger.debug("TWorld->init()")
 		self.maps.append(
 			{
 				"name": "Survey base",
@@ -31,7 +34,7 @@ class TWorld:
 		self.maps[0]["tiles"][79, 0:45] = tile_types.wall
 		self.maps[0]["tiles"][0:80, 0] = tile_types.wall
 		self.maps[0]["tiles"][0:80, 44] = tile_types.wall
-		self.maps[0]["tiles"][20:22, 0:45] = tile_types.wall
+		self.maps[0]["tiles"][20:22, 10:45] = tile_types.wall
 
 		self.maps[0]["tiles"][8:12, 10:13] = tile_types.wall
 		self.maps[0]["tiles"][10, 10]["gateway"] = True
@@ -97,33 +100,26 @@ class TWorld:
 	# Get and return the field of sense
 	"""
 	def field_of_sense(self, fos_request: Dict) -> Dict:
+		logger.debug(f"TWorld->field_of_sense({fos_request!r})")
 		# Extract the fos parameters m, x, y, z, r
-		try:
-			m = fos_request.get("m") # Map number
-			x = fos_request.get("x") # x coordinate on map m
-			y = fos_request.get("y") # y coordinate on map m
-			# z = fos_request.get("z") # z coordinate = height on map m (not yet used)
-			r = fos_request.get("r") # r radius
+		m = fos_request.get("m") # Map number
+		x = fos_request.get("x") # x coordinate on map m
+		y = fos_request.get("y") # y coordinate on map m
+		# z = fos_request.get("z") # z coordinate = height on map m (not yet used)
+		r = fos_request.get("r") # r radius
 
-			x_min = max(x - r, 0)
-			x_max = min(x + r + 1, self.maps[m]["width"])
-			y_min = max(y - r, 0)
-			y_max = min(y + r + 1, self.maps[m]["height"])
+		x_min = max(x - r, 0)
+		x_max = min(x + r + 1, self.maps[m]["width"])
+		y_min = max(y - r, 0)
+		y_max = min(y + r + 1, self.maps[m]["height"])
 
-			fos = {
-				"x_min": x_min,
-				"x_max": x_max,
-				"y_min": y_min,
-				"y_max": y_max,
-				"view": self.maps[m]["tiles"][x_min:x_max, y_min:y_max],
-			}
-		except Exception:
-			fos = {
-				"x_min": 0,
-				"x_max": 0,
-				"y_min": 0,
-				"y_max": 0,
-				"view": [],
-			}
+		fos = {
+			"x_min": x_min,
+			"x_max": x_max,
+			"y_min": y_min,
+			"y_max": y_max,
+			"view": self.maps[m]["tiles"][x_min:x_max, y_min:y_max],
+			"gateways": self.maps[m]["gateways"]
+		}
 
 		return fos

@@ -31,6 +31,8 @@ def new_tile(
 ) -> np.array:
 	return np.array((walkable, transparent, dark, light, gateway), dtype=tile_dt)
 
+SHROUD = np.array((ord(" "), (255, 255, 255), (0, 0, 0)), dtype=graphic_dt)
+
 # Predefined symbol and colours for out of FOV
 floor_dark = (ord(" "), colours.white, colours.black)
 # Predefined symbol and colours for inside of FOV 

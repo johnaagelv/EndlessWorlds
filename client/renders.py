@@ -1,5 +1,7 @@
 import tcod
-
+import numpy as np
+import tile_types
+from entities import TActor
 
 class TRender:
 	def __init__(self, config):
@@ -23,10 +25,21 @@ class TRender:
 	Render the map on the console from the map data
 	{width, height, tiles}
 	"""
-	def render_world(self, map):
+	def render_world(self, actor: TActor):
+		map = actor.map
+		visible_tiles = map['visible']
+		explored_tiles = map['explored']
+		light_tiles = map['tiles']['light']
+		dark_tiles = map['tiles']['dark']
+
 		width = map["width"]
 		height = map["height"]
-		self.root_console.rgb[0:width, 0:height] = map["tiles"]["dark"]
+#		self.root_console.rgb[0:width, 0:height] = map["tiles"]["dark"]
+		self.root_console.rgb[0:width, 0:height] = np.select(
+			condlist=[visible_tiles, explored_tiles],
+			choicelist=[light_tiles, dark_tiles],
+			default=tile_types.SHROUD
+		)
 
 	"""
 	Render the actor on the console from the actor data:

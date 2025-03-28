@@ -8,7 +8,7 @@ from renders import TRender
 from entities import TActor
 from worlds import TWorld
 from input_handlers import TEventHandler
-
+import tile_types
 from clients import TClient
 
 SCREEN_WIDTH = 80
@@ -30,8 +30,9 @@ def keyboard_input(player: TActor):
 
 	while player.is_playing == True:
 		# Render the player view to console
-		render.render_world(player.map)
-		render.render_actor(player.me)
+#		render.render_world(player.data["world"].maps[player.data["m"]])
+		render.render_world(player)
+		render.render_actor(player)
 		render.render()
 
 		# Get user input
@@ -88,17 +89,19 @@ def main() -> None:
 			cmd = player.fos
 			action = cmd.get("cmd")
 			if action == "fos":
-				x_min = cmd.get("x_min")
-				x_max = cmd.get("x_max")
-				y_min = cmd.get("y_min")
-				y_max = cmd.get("y_max")
+				fos = cmd.get("fos")
+				x_min = fos.get("x_min")
+				x_max = fos.get("x_max")
+				y_min = fos.get("y_min")
+				y_max = fos.get("y_max")
+				view = fos.get("view")
+				gateways = fos.get("gateways")
+				temp = np.array(view)
 
-				#player.data["world"].maps[m]["tiles"][max(0, x - r):min(x + r, x_max), max(0, y - r):min(y + r, y_max)] = fos
+				player.data["world"].maps[player.data["m"]]["tiles"][x_min:x_max, y_min:y_max] = temp
+				player.data["world"].maps[player.data["m"]]["gateways"] = gateways
 
 			player.fos = None
-
-		time.sleep(10)
-
 
 if __name__ == "__main__":
 	main()

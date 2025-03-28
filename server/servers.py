@@ -5,12 +5,15 @@ import traceback
 from server_messages import TMessage
 from worlds import TWorld
 
+import logging
+logger = logging.getLogger("EWlogger")
+
 """
 Server 
 """
 class TServer:
 	def __init__(self, host: str, port: int, world: TWorld):
-		print(f"TServer->init(host={host}, port={port})")
+		logger.debug(f"TServer->init(host={host}, port={port})")
 		self.host = host
 		self.port = port
 		self.world = world
@@ -25,29 +28,33 @@ class TServer:
 
 	def accept_wrapper(self, sock: socket.socket):
 		conn, addr = sock.accept()
-		print(f"TServer->accept_wrapper(addr={addr})")
+		logger.debug(f"TServer->accept_wrapper(addr={addr})")
 		conn.setblocking(False)
 		message = TMessage(self.sel, conn, addr, self.world)
 		self.sel.register(conn, selectors.EVENT_READ, data=message)
 
 	def run(self):
-		print(f"TServer->run()")
+		logger.debug("TServer->run()")
 		events = self.sel.select(timeout=None)
 		for key, mask in events:
+			logger.debug(f"-> {mask}")
 			if key.data is None:
 				self.accept_wrapper(key.fileobj)
 			else:
 				# Client connection established, so get and process the message
 				message: TMessage = key.data
 				try:
-					message.dispatch(mask)
+					ready = message.dispatch(mask)
+#					logger.debug(f"Message is ready {ready}")
+#					if ready:
+#						message._set_selector_events_mask("w")
 				except Exception:
-					print(
+					logger.warning(
 						f"Main: Error: Exception for {message.addr}:\n"
 						f"{traceback.format_exc()}"
 					)
 					message.close()
 
 	def close(self):
-		print(f"TServer->close()")
+		logger.debug("TServer->close()")
 		self.sel.close()
