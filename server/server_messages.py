@@ -7,6 +7,7 @@ import sys
 import lzma
 import pickle
 import logging
+import random
 logger = logging.getLogger("EWlogger")
 
 from worlds import TWorld
@@ -215,23 +216,21 @@ class TMessage:
 #		return True
 #		"""
 		request_cmd = request.get("cmd")
-		if request_cmd == "client":
-			client_action = request.get(request_cmd)
-			if client_action == "new": # Connect a new client to the server
-				cid = f"CID#{self.addr}"
+		if request_cmd == "new":
+			# Gather the NEW GAME information and return it
+			cid = f"CID#{self.addr}"
 
-				self.request = {
-					"cmd": request_cmd,
-					request_cmd: client_action,
-					"cid": cid,
-					"x": request.get("x"),
-					"y": request.get("y"),
-				}
-		elif request_cmd == "fos":
-			view = self.world.field_of_sense(fos_request=request)
 			self.request = {
 				"cmd": request_cmd,
-				"fos": view,
+				"cid": cid,
+				"entry_point": self.world.entry_point(), # One entry point of the world
+				"map_sizes" : self.world.map_sizes(), # All map sizes to ensure the client is prepared
+			}
+		elif request_cmd == "fos":
+			# Gather the FOS view and return it
+			self.request = {
+				"cmd": request_cmd,
+				"fos": self.world.field_of_sense(fos_request=request),
 			}
 		# Set selector to listen for write events, we're done reading.
 		self._set_selector_events_mask("w")

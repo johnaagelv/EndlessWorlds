@@ -1,4 +1,5 @@
 from typing import Dict, List
+import random
 import logging
 logger = logging.getLogger("EWlogger")
 
@@ -11,6 +12,12 @@ class TWorld:
 
 	def __init__(self, world_name: str = 'world'):
 		logger.debug("TWorld->init()")
+		self.entry_points = [
+			{"x": 2, "y": 2, "z": 0, "m": 0},
+			{"x": 3, "y": 2, "z": 0, "m": 0},
+			{"x": 2, "y": 3, "z": 0, "m": 0},
+			{"x": 3, "y": 3, "z": 0, "m": 0},
+		]
 		self.maps.append(
 			{
 				"name": "Survey base",
@@ -123,3 +130,23 @@ class TWorld:
 		}
 
 		return fos
+
+	"""
+	Get and return the map sizes for a new player
+	"""
+	def map_sizes(self) -> List:
+		map_sizes = []
+		for m in self.maps:
+			map_sizes.append(
+				{
+					"width": m["width"],
+					"height": m["height"],
+				}
+			)
+		return map_sizes
+	
+	"""
+	Get one random entry point of the world for new player
+	"""
+	def entry_point(self) -> Dict:
+		return self.entry_points[random.randint(0, len(self.entry_points))]
