@@ -30,17 +30,19 @@ class TWorld:
 		self.maps.append(
 			{
 				"name": "Underground",
-				"width": 80,
+				"width": 480,
 				"height": 45,
-				"tiles": np.full((80, 45), fill_value=tile_types.floor, order="F"),
+				"tiles": np.full((480, 45), fill_value=tile_types.floor, order="F"),
 				"gateways": [],
 			}
 		)
 
-		self.maps[0]["tiles"][0, 0:45] = tile_types.wall
-		self.maps[0]["tiles"][79, 0:45] = tile_types.wall
-		self.maps[0]["tiles"][0:80, 0] = tile_types.wall
-		self.maps[0]["tiles"][0:80, 44] = tile_types.wall
+		for map in self.maps:
+			map['tiles'][0, 0:map['height']] = tile_types.wall
+			map['tiles'][map['width']-1, 0:map['height']] = tile_types.wall
+			map['tiles'][0:map['width'], 0] = tile_types.wall
+			map['tiles'][0:map['width'], map['height']-1] = tile_types.wall
+
 		self.maps[0]["tiles"][20:22, 10:45] = tile_types.wall
 
 		self.maps[0]["tiles"][8:12, 10:13] = tile_types.wall

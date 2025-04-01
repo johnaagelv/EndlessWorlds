@@ -52,7 +52,7 @@ PORT = 12345  # The port used by the server
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 	s.connect((HOST, PORT))
-	command = {"cmd":"fos", "x":4, "y": 5, "z": 2, "m": 0, "r": 4}
+	command = {"cmd":"new"}
 	data = json.dumps(command, ensure_ascii=False).encode('utf-8')
 
 	jsonheader = {

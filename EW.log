@@ -1,7 +1,0 @@
-2025-03-26 22:35:19,760 INFO     World server started
-2025-03-26 22:35:19,760 DEBUG    get_config(server)
-2025-03-26 22:35:19,760 DEBUG    get_config(world)
-2025-03-26 22:35:19,760 DEBUG    TWorld->init()
-2025-03-26 22:35:19,760 DEBUG    TServer->init(host=192.168.1.104, port=12345)
-2025-03-26 22:35:19,760 DEBUG    TServer->run()
-2025-03-26 22:35:24,192 INFO     World server stopped

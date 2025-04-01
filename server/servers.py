@@ -35,9 +35,10 @@ class TServer:
 
 	def run(self):
 		logger.debug("TServer->run()")
+		loggerEventTypes = ['EVENT_UNKNOWN','EVENT_READ','EVENT_WRITE']
 		events = self.sel.select(timeout=None)
 		for key, mask in events:
-			logger.debug(f"-> {mask}")
+			logger.debug(f"-> {loggerEventTypes[mask]}")
 			if key.data is None:
 				self.accept_wrapper(key.fileobj)
 			else:
