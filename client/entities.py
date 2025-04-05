@@ -1,7 +1,5 @@
 from typing import Dict
 
-from tcod.console import Console
-
 from worlds import TWorld
 
 class TEntity:
@@ -21,7 +19,11 @@ class TActor(TEntity):
 	@property
 	def map(self):
 		return self.world.maps[self.data["m"]]
-	
+
+	@property
+	def map_idx(self) -> int:
+		return self.data["m"]
+
 	@property
 	def me(self):
 		return self.data

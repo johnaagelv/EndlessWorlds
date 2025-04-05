@@ -4,6 +4,7 @@ import numpy as np
 import json
 
 from tcod.console import Console
+from entities import TActor
 
 import tile_types
 
@@ -16,7 +17,8 @@ class numpy_array_encoder(json.JSONEncoder):
 class TWorld:
 	maps: List = []
 
-	def __init__(self):
+	def __init__(self, actor: TActor):
+		self.actor = actor
 		pass
 
 	def in_bounds(self, x: int, y: int, m: int) -> bool:
@@ -30,22 +32,8 @@ class TWorld:
 		return gateway["gateway"]
 	
 	def render(self, console: Console, m: int) -> None:
-		console.rgb[0:self.maps[m]["width"], 0:self.maps[m]["height"]] = self.maps[0]["tiles"]["dark"]
-
-	def save(self):
-		world = []
-
-		for map in self.maps:
-			world.append(map["name"])
-			with open(map["name"]+".map", "wt") as fmap:
-				data = {
-					"name": map["name"],
-					"width": map["width"],
-					"height": map["height"],
-					"tiles": map["tiles"],
-					"gateways": map["gateways"],
-				}
-				fmap.write(json.dumps(data, cls=numpy_array_encoder))
-
-		with open("World.map", "wt") as fworld:
-			fworld.write(json.dumps(world))
+		console.rgb[0:self.maps[m]["width"], 0:self.maps[m]["height"]] = np.select(
+			condlist=[self.maps[m]['visible'], self.maps[m]['explored']],
+			choicelist=[self.maps[m]['tiles']['light'], self.maps[m]['tiles']['dark']],
+			default=tile_types.SHROUD,
+		)
