@@ -21,6 +21,17 @@ class TWorld:
 		self.actor = actor
 		pass
 
+	def add_map(self, map_definition: Dict):
+		self.maps.append(
+			{
+				"width": map_definition["width"],
+				"height": map_definition["height"],
+				"tiles": np.full((map_definition["width"],map_definition["height"]), fill_value=tile_types.SHROUD, order="F"),
+				"visible": np.full((map_definition["width"],map_definition["height"]), fill_value=False, order="F"),
+				"explored": np.full((map_definition["width"],map_definition["height"]), fill_value=False, order="F"),
+			}
+		)
+
 	def in_bounds(self, x: int, y: int, m: int) -> bool:
 		return 0 <= x < self.maps[m]["width"] and 0 <= y < self.maps[m]["height"]
 
@@ -35,5 +46,5 @@ class TWorld:
 		console.rgb[0:self.maps[m]["width"], 0:self.maps[m]["height"]] = np.select(
 			condlist=[self.maps[m]['visible'], self.maps[m]['explored']],
 			choicelist=[self.maps[m]['tiles']['light'], self.maps[m]['tiles']['dark']],
-			default=tile_types.SHROUD,
+			default=tile_types.SHROUD["dark"],
 		)

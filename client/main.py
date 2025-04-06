@@ -51,7 +51,7 @@ def main() -> None:
 		"y": 2, # Y coordinate in map m
 		"z": 0, # Z coordinate in map m
 		"r": 4, # Vision sense radius
-		"m": 0, # Map number
+		"m": -1, # Map number
 		"face": "@", # How I look like
 		"colour": (255, 255, 255),
 		"playing": True, # Am I playing or not
@@ -71,37 +71,31 @@ def main() -> None:
 
 	# Run the game loop
 	while player.is_playing == True:
-		request = {
-			"cmd": "fos",
-			"x": player.data["x"],
-			"y": player.data["y"],
-			"z": player.data["z"],
-			"m": player.data["m"],
-			"r": player.data["r"],
-		}
-		
-		client.start_connection(config["host"], config["port"], request)
-		
-		while client.run(player):
-			pass
+		request = player.run()
 
-		if player.fos is not None:
-			cmd = player.fos
-			action = cmd.get("cmd")
-			if action == "fos":
-				fos = cmd.get("fos")
-				x_min = fos.get("x_min")
-				x_max = fos.get("x_max")
-				y_min = fos.get("y_min")
-				y_max = fos.get("y_max")
-				view = fos.get("view")
-				gateways = fos.get("gateways")
-				temp = np.array(view)
+		if request is not None:
+			client.start_connection(config["host"], config["port"], request)
+			
+			while client.run(player):
+				pass
 
-				player.data["world"].maps[player.data["m"]]["tiles"][x_min:x_max, y_min:y_max] = temp
-				player.data["world"].maps[player.data["m"]]["gateways"] = gateways
+			if player.fos is not None:
+				cmd = player.fos
+				action = cmd.get("cmd")
+				if action == "fos":
+					fos = cmd.get("fos")
+					x_min = fos.get("x_min")
+					x_max = fos.get("x_max")
+					y_min = fos.get("y_min")
+					y_max = fos.get("y_max")
+					view = fos.get("view")
+					gateways = fos.get("gateways")
+					temp = np.array(view)
 
-			player.fos = None
+					player.data["world"].maps[player.data["m"]]["tiles"][x_min:x_max, y_min:y_max] = temp
+					player.data["world"].maps[player.data["m"]]["gateways"] = gateways
+
+				player.fos = None
 
 if __name__ == "__main__":
 	main()

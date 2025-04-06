@@ -1,4 +1,5 @@
 from typing import Optional
+import uuid
 import selectors
 import json
 import io
@@ -218,7 +219,8 @@ class TMessage:
 		request_cmd = request.get("cmd")
 		if request_cmd == "new":
 			# Gather the NEW GAME information and return it
-			cid = f"CID#{self.addr}"
+			cid = f"CID#{uuid.uuid4()}"
+#			self.world.add_actor(cid, self.addr)
 
 			self.request = {
 				"cmd": request_cmd,

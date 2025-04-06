@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from worlds import TWorld
 
@@ -31,3 +31,17 @@ class TActor(TEntity):
 	@property
 	def is_playing(self) -> bool:
 		return self.data["playing"]
+
+	def run(self) -> Optional[Dict]:
+		request = None
+		
+		if self.map_idx() >= 0:
+			request = {
+				"cmd": "fos",
+				"x": self.data["x"],
+				"y": self.data["y"],
+				"z": self.data["z"],
+				"m": self.data["m"],
+				"r": self.data["r"],
+			}
+		return request
