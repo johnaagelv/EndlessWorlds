@@ -1,1 +1,3 @@
-# What is this about?
+# 1. Endless Worlds 2025
+You are invited to join the surveyor team for planet Ankt in the HR 8799 system located 133 light-years away from Earth in the constellation of Pegasus.
+# 2. ...
