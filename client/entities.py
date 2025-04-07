@@ -35,6 +35,7 @@ class TActor(TEntity):
 	def run(self) -> Optional[Dict]:
 		request = None
 		
+		# When the actor is on a map, the default command is Field Of Sense (FOS)
 		if self.map_idx() >= 0:
 			request = {
 				"cmd": "fos",
@@ -43,5 +44,9 @@ class TActor(TEntity):
 				"z": self.data["z"],
 				"m": self.data["m"],
 				"r": self.data["r"],
+			}
+		else:
+			request = {
+				"cmd": "new",
 			}
 		return request
