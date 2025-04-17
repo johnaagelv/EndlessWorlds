@@ -33,13 +33,13 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 		
 		key = event.sym
 		if key == tcod.event.KeySym.UP:
-			action = TMoveAction(dx=0, dy=-1)
+			action = TMoveAction(self.actor, dx=0, dy=-1)
 		elif key == tcod.event.KeySym.DOWN:
-			action = TMoveAction(dx=0, dy=1)
+			action = TMoveAction(self.actor, dx=0, dy=1)
 		elif key == tcod.event.KeySym.LEFT:
-			action = TMoveAction(dx=-1, dy=0)
+			action = TMoveAction(self.actor, dx=-1, dy=0)
 		elif key == tcod.event.KeySym.RIGHT:
-			action = TMoveAction(dx=1, dy=0)
+			action = TMoveAction(self.actor, dx=1, dy=0)
 		elif key == tcod.event.KeySym.ESCAPE:
 			action = TEscapeAction(self.actor)
 
