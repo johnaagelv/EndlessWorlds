@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger("EWClient")
+
 import tcod
 import numpy as np
 import tile_types
@@ -5,15 +8,20 @@ from entities import TActor
 
 class TRender:
 	def __init__(self, config):
+		logging.debug(f"TRender->__init__( config )")
+		logging.debug(f"- tileset setup")
 		self.tileset = tcod.tileset.load_tilesheet(
 			config["tileset"], 32, 8, tcod.tileset.CHARMAP_CP437
 		)
 
+		logging.debug(f"- root_console setup")
 		self.root_console = tcod.console.Console(
-			config["screen_width"],
-			config["screen_height"],
-			order="F",
+			width = config["screen_width"],
+			height = config["screen_height"],
+			order = "F",
 		)
+
+		logging.debug(f"- context setup")
 		self.context = 	tcod.context.new(
 			console = self.root_console,
 			tileset = self.tileset,
@@ -26,6 +34,7 @@ class TRender:
 	{width, height, tiles}
 	"""
 	def render_world(self, actor: TActor):
+		logging.debug(f"TRender->render_world( actor )")
 		map = actor.map
 		visible_tiles = map['visible']
 		explored_tiles = map['explored']
@@ -45,18 +54,20 @@ class TRender:
 	Render the actor on the console from the actor data:
 	{x, y, face, colour}
 	"""
-	def render_actor(self, actor):
+	def render_actor(self, actor: TActor):
+		logging.debug(f"TRender->render_actor( actor )")
 		self.root_console.print(
-			x = actor["x"], 
-			y = actor["y"],
-			string = actor["face"],
-			fg=actor["colour"],
+			x = actor.data["x"], 
+			y = actor.data["y"],
+			string = actor.data["face"],
+			fg=actor.data["colour"],
 		)
 	
 	"""
 	Render the console
 	"""
 	def render(self):
+		logging.debug(f"TRender->render()")
 		# Present the console
 		self.context.present(self.root_console)
 		# Clear the console for a new presentation

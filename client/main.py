@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
+import sys
 import tcod
-import threading
-import time
 import numpy as np
 
 from renders import TRender
@@ -10,6 +9,11 @@ from worlds import TWorld
 from input_handlers import TEventHandler
 import tile_types
 from clients import TClient
+
+import logging
+logger = logging.getLogger("EWClient")
+LOG_FILENAME = "EWclient.log"
+LOG_FORMAT = "%(asctime)s %(levelname)-8s %(message)s"
 
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
@@ -22,30 +26,11 @@ config = {
 	"host": "192.168.1.104",
 	"port": 12345,
 }
-
-def keyboard_input(player: TActor):
-	event_handler = TEventHandler()
-	# Establish a render for presenting the game UI
-	render = TRender(config)
-
-	while player.is_playing == True:
-		# Render the player view to console
-#		render.render_world(player.data["world"].maps[player.data["m"]])
-		render.render_world(player)
-		render.render_actor(player)
-		render.render()
-
-		# Get user input
-		for event in tcod.event.wait(timeout=5):
-			action = event_handler.dispatch(event)
-
-			if action is None:
-				continue
-		
-			action.run(player)
-
 	
-def main() -> None:
+def main(log_level) -> None:
+	logging.basicConfig(filename=LOG_FILENAME, format=LOG_FORMAT, filemode="w", level=log_level)
+	logging.info('World client started')
+
 	player_template = {
 		"x": 2, # X coordinate in map m
 		"y": 2, # Y coordinate in map m
@@ -55,22 +40,33 @@ def main() -> None:
 		"face": "@", # How I look like
 		"colour": (255, 255, 255),
 		"playing": True, # Am I playing or not
-		"world": TWorld,
+		"world": None,
 	}
 
 	player = TActor(data=player_template)
 
-	player.data["world"] = TWorld()
-
-	keyboard_thread = threading.Thread(target=keyboard_input, args=[player])
-	keyboard_thread.daemon = True # Allows program to exit if main thread exits.
-	keyboard_thread.start()
-
-	# Ready the communicator
+	event_handler = TEventHandler(player)
+	# Establish a render for presenting the game UI
+	render = TRender(config)
 	client = TClient()
 
-	# Run the game loop
 	while player.is_playing == True:
+		# Render the player view to console
+		if player.data['world'] is not None:
+			render.render_world(player)
+			render.render_actor(player)
+			render.render()
+
+		# Get user input
+		for event in tcod.event.wait(timeout=5):
+			action = event_handler.dispatch(event)
+
+			if action is None:
+				continue
+		
+			action.run()
+
+		# Ready the communicator
 		request = player.run()
 
 		if request is not None:
@@ -97,5 +93,18 @@ def main() -> None:
 
 				player.fos = None
 
+	logging.info('World client stopped')
+
 if __name__ == "__main__":
-	main()
+	log_level = logging.INFO
+	try:
+		if len(sys.argv) >= 2:
+			log_level = logging.DEBUG
+		if len(sys.argv) > 2:
+			raise SystemError()
+	except:
+		print(f"Usage: {sys.argv[0]} <log_level>")
+		print(f"  <log_level> may be DEBUG")
+		sys.exit(1)
+
+	main(log_level)

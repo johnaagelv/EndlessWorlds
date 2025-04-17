@@ -1,4 +1,7 @@
 from typing import Any
+import logging
+logger = logging.getLogger("EWClient")
+
 import sys
 import selectors
 import socket
@@ -9,14 +12,16 @@ import struct
 import pickle
 
 from entities import TActor
+from worlds import TWorld
 
 class TClient:
 	def __init__(self):
+		logger.debug(f"TClient->__init__()")
 		self.sel = selectors.DefaultSelector()
 
 	""" Start connection to the specified server with the provided request """
 	def start_connection(self, host, port, request):
-		print(f"TClient->start_connection({host}, {port}, {request!r})")
+		logger.debug(f"TClient->start_connection( host, port, request )")
 		addr = (host, port)
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		sock.setblocking(False)
@@ -26,16 +31,24 @@ class TClient:
 		self.sel.register(sock, events, data=message)
 
 	def run(self, player: TActor) -> Any:
-		print("TClient->run()")
+		logger.debug(f"TClient->run( actor )")
 		events = self.sel.select(timeout=5.0)
 		for key, mask in events:
 			message: TMessage = key.data
 			try:
 				message.process_events(mask)
 				if message.sock is None:
-					player.fos = message.response
+
+					if message.response['cmd'] == 'new':
+						logger.info(f"TClient initializing new world")
+						player.data['x'] = message.response['entry_point']['x']
+						player.data['y'] = message.response['entry_point']['y']
+						player.data['z'] = message.response['entry_point']['z']
+						player.data['m'] = message.response['entry_point']['m']
+						player.data['world'] = TWorld(player, message.response['map_sizes'])
+
 			except Exception:
-				print(
+				logger.warning(
 					f"TClient: Error: Exception for {message.addr}:\n"
 					f"{traceback.format_exc()}"
 				)
@@ -46,6 +59,7 @@ class TClient:
 		
 class TMessage:
 	def __init__(self, selector, sock, addr, request):
+		logger.debug(f"TMessage->__init__( selector, sock, addr, request )")
 		self.selector = selector
 		self.sock = sock
 		self.addr = addr
@@ -58,6 +72,7 @@ class TMessage:
 		self.response = None
 
 	def _set_selector_events_mask(self, mode):
+		logger.debug(f"TMessage->_set_selector_events_mask( mode )")
 		"""Set selector to listen for events: mode is 'r', 'w', or 'rw'."""
 		if mode == "r":
 			events = selectors.EVENT_READ
@@ -70,6 +85,7 @@ class TMessage:
 		self.selector.modify(self.sock, events, data=self)
 
 	def _read(self):
+		logger.debug(f"TMessage->_read()")
 		try:
 			# Should be ready to read
 			data = self.sock.recv(4096)
@@ -83,6 +99,7 @@ class TMessage:
 				raise RuntimeError("Peer closed.")
 
 	def _write(self):
+		logger.debug(f"TMessage->_write()")
 		if self._send_buffer:
 #			print(f"Sending {self._send_buffer!r} to {self.addr}")
 			try:
@@ -95,9 +112,11 @@ class TMessage:
 				self._send_buffer = self._send_buffer[sent:]
 
 	def _json_encode(self, obj, encoding):
+		logger.debug(f"TMessage->_json_encode( obj, encoding )")
 		return json.dumps(obj, ensure_ascii=False).encode(encoding)
 
 	def _json_decode(self, json_bytes, encoding):
+		logger.debug(f"TMessage->_json_decode( json_bytes, encoding )")
 		tiow = io.TextIOWrapper(
 			io.BytesIO(json_bytes), encoding=encoding, newline=""
 		)
@@ -108,6 +127,7 @@ class TMessage:
 	def _create_message(
 		self, *, content_bytes, content_type, content_encoding
 	):
+		logger.debug(f"TMessage->_create_message( content_bytes, content_type, content_encoding )")
 		jsonheader = {
 			"byteorder": sys.byteorder,
 			"content-type": content_type,
@@ -120,22 +140,23 @@ class TMessage:
 		return message
 
 	def _process_response_json_content(self):
+		logger.debug(f"TMessage->_process_response_json_content()")
 		content = self.response
 		result = content.get("result")
-#		print(f"Got result: {result}")
 
 	def _process_response_binary_content(self):
+		logger.debug(f"TMessage->_process_response_binary_content()")
 		content = self.response
-#		print(f"Got response: {content!r}")
 
 	def process_events(self, mask):
-		print("TMessage->process_events(mask)")
+		logger.debug(f"TMessage->process_events( mask )")
 		if mask & selectors.EVENT_READ:
 			self.read()
 		if mask & selectors.EVENT_WRITE:
 			self.write()
 
 	def read(self):
+		logger.debug(f"TMessage->read()")
 		self._read()
 
 		if self._jsonheader_len is None:
@@ -150,6 +171,7 @@ class TMessage:
 				self.process_response()
 
 	def write(self):
+		logger.debug(f"TMessage->write()")
 		if not self._request_queued:
 			self.queue_request()
 
@@ -161,11 +183,11 @@ class TMessage:
 				self._set_selector_events_mask("r")
 
 	def close(self):
-		print(f"Closing connection to {self.addr}")
+		logger.debug(f"TMessage->close()")
 		try:
 			self.selector.unregister(self.sock)
 		except Exception as e:
-			print(
+			logger.debug(
 				f"Error: selector.unregister() exception for "
 				f"{self.addr}: {e!r}"
 			)
@@ -173,12 +195,13 @@ class TMessage:
 		try:
 			self.sock.close()
 		except OSError as e:
-			print(f"Error: socket.close() exception for {self.addr}: {e!r}")
+			logger.debug(f"Error: socket.close() exception for {self.addr}: {e!r}")
 		finally:
 			# Delete reference to socket object for garbage collection
 			self.sock = None
 
 	def queue_request(self):
+		logger.debug(f"TMessage->queue_request()")
 		content = self.request
 		content_type = "binary/custom-server-binary-type"
 		content_encoding = "binary"
@@ -199,6 +222,7 @@ class TMessage:
 		self._request_queued = True
 
 	def process_protoheader(self):
+		logger.debug(f"TMessage->process_protoheader()")
 		hdrlen = 2
 		if len(self._recv_buffer) >= hdrlen:
 			self._jsonheader_len = struct.unpack(
@@ -207,6 +231,7 @@ class TMessage:
 			self._recv_buffer = self._recv_buffer[hdrlen:]
 
 	def process_jsonheader(self):
+		logger.debug(f"TMessage->process_jsonheader()")
 		hdrlen = self._jsonheader_len
 		if len(self._recv_buffer) >= hdrlen:
 			self.jsonheader = self._json_decode(
@@ -220,9 +245,10 @@ class TMessage:
 				"content-encoding",
 			):
 				if reqhdr not in self.jsonheader:
-					raise ValueError(f"Missing required header '{reqhdr}'.")
+					logger.error(f"Missing required header '{reqhdr}'.")
 
 	def process_response(self):
+		logger.debug(f"TMessage->process_response()")
 		content_len = self.jsonheader["content-length"]
 		if len(self._recv_buffer) < content_len:
 			return
@@ -231,15 +257,15 @@ class TMessage:
 		if self.jsonheader["content-type"] == "text/json":
 			encoding = self.jsonheader["content-encoding"]
 			self.response = self._json_decode(data, encoding)
-#			print(f"Received response {self.response!r} from {self.addr}")
 			self._process_response_json_content()
 		else:
 			# Binary or unknown content-type
 			self.response = pickle.loads(data)
-			print(
-				f"Received {self.jsonheader['content-type']} "
+			logger.debug(
+				f"- Received {self.jsonheader['content-type']} "
 				f"response from {self.addr}"
 			)
+			logger.debug(f"- content {self.response!r}")
 			# self._process_response_binary_content()
 		# Close when response has been processed
 		self.close()
