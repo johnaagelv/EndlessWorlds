@@ -30,9 +30,9 @@ class TWorld:
 		self.maps.append(
 			{
 				"name": "Underground",
-				"width": 480,
+				"width": 80,
 				"height": 45,
-				"tiles": np.full((480, 45), fill_value=tile_types.floor, order="F"),
+				"tiles": np.full((80, 45), fill_value=tile_types.floor, order="F"),
 				"gateways": [],
 			}
 		)
@@ -137,6 +137,7 @@ class TWorld:
 	Get and return the map sizes for a new player
 	"""
 	def map_sizes(self) -> List:
+		logger.debug(f"TWorld->map_sizes()")
 		map_sizes = []
 		for m in self.maps:
 			map_sizes.append(
@@ -151,4 +152,6 @@ class TWorld:
 	Get one random entry point of the world for new player
 	"""
 	def entry_point(self) -> Dict:
-		return self.entry_points[random.randint(0, len(self.entry_points))]
+		logger.debug(f"TWorld->entry_point()")
+		# Random randint() method https://www.w3schools.com/python/ref_random_randint.asp
+		return self.entry_points[random.randint(0, len(self.entry_points)-1)] # Randint includes both start and stop values
