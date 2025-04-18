@@ -9,3 +9,4 @@ Each map can not only be interconnected to other maps on the same server, but ca
 a map on another server.
 
 With this archictecture, the game may become endless!
+# 2. ...
