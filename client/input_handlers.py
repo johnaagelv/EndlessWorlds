@@ -25,7 +25,7 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 
 	def ev_quit(self, event: tcod.event.Quit) -> Optional[TAction]:
 		logger.debug(f"TEventHandler->ev_quit( event )")
-		return TEscapeAction()
+		return TEscapeAction(self.actor)
 	
 	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[TAction]:
 		logger.debug(f"TEventHandler->ev_keydown( event )")

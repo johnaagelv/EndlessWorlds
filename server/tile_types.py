@@ -67,8 +67,8 @@ floor = new_tile(
 wall = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(ord(" "), (255, 255, 255), colours.darkbrown),
-	light=(ord(" "), (255, 255, 255), colours.darkbrown),
+	dark=(43, (255, 255, 255), colours.darkbrown),
+	light=(43, (255, 255, 255), colours.darkbrown),
 	gateway=False,
 )
 

@@ -43,12 +43,12 @@ class TRender:
 
 		width = map["width"]
 		height = map["height"]
-#		self.root_console.rgb[0:width, 0:height] = map["tiles"]["dark"]
-		self.root_console.rgb[0:width, 0:height] = np.select(
-			condlist=[visible_tiles, explored_tiles],
-			choicelist=[light_tiles, dark_tiles],
-			default=tile_types.SHROUD
-		)
+		self.root_console.rgb[0:width, 0:height] = map["tiles"]["dark"]
+#		self.root_console.rgb[0:width, 0:height] = np.select(
+#			condlist=[visible_tiles, explored_tiles],
+#			choicelist=[light_tiles, dark_tiles],
+#			default=tile_types.SHROUD
+#		)
 
 	"""
 	Render the actor on the console from the actor data:

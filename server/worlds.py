@@ -13,17 +13,17 @@ class TWorld:
 	def __init__(self, world_name: str = 'world'):
 		logger.debug("TWorld->init()")
 		self.entry_points = [
-			{"x": 2, "y": 2, "z": 0, "m": 0},
-			{"x": 3, "y": 2, "z": 0, "m": 0},
-			{"x": 2, "y": 3, "z": 0, "m": 0},
 			{"x": 3, "y": 3, "z": 0, "m": 0},
+			{"x": 4, "y": 3, "z": 0, "m": 0},
+			{"x": 3, "y": 4, "z": 0, "m": 0},
+			{"x": 4, "y": 4, "z": 0, "m": 0},
 		]
 		self.maps.append(
 			{
 				"name": "Survey base",
-				"width": 80,
-				"height": 45,
-				"tiles": np.full((80, 45), fill_value=tile_types.floor, order="F"),
+				"width": 20,
+				"height": 20,
+				"tiles": np.full((20, 20), fill_value=tile_types.floor, order="F"),
 				"gateways": [],
 			}
 		)
@@ -31,8 +31,8 @@ class TWorld:
 			{
 				"name": "Underground",
 				"width": 80,
-				"height": 45,
-				"tiles": np.full((80, 45), fill_value=tile_types.floor, order="F"),
+				"height": 20,
+				"tiles": np.full((80, 20), fill_value=tile_types.floor, order="F"),
 				"gateways": [],
 			}
 		)
@@ -43,7 +43,7 @@ class TWorld:
 			map['tiles'][0:map['width'], 0] = tile_types.wall
 			map['tiles'][0:map['width'], map['height']-1] = tile_types.wall
 
-		self.maps[0]["tiles"][20:22, 10:45] = tile_types.wall
+#		self.maps[0]["tiles"][20:22, 10:45] = tile_types.wall
 
 		self.maps[0]["tiles"][8:12, 10:13] = tile_types.wall
 		self.maps[0]["tiles"][10, 10]["gateway"] = True
@@ -60,30 +60,30 @@ class TWorld:
 			}
 		)
 
-		self.maps[0]["tiles"][44:47, 9:11] = tile_types.wall
-		self.maps[0]["tiles"][45, 10]["gateway"] = True
-		self.maps[0]["tiles"][45, 10] = tile_types.gate
+#		self.maps[0]["tiles"][44:47, 9:11] = tile_types.wall
+		self.maps[0]["tiles"][15, 10]["gateway"] = True
+		self.maps[0]["tiles"][15, 10] = tile_types.gate
 		self.maps[0]["gateways"].append(
 			{
-				"x": 45,
+				"x": 15,
 				"y": 10,
 				"gateway": {
-					"x": 45,
+					"x": 15,
 					"y": 10,
 					"m": 1
 				}
 			}
 		)
 
-		self.maps[1]["tiles"][44:47, 10:12] = tile_types.wall
-		self.maps[1]["tiles"][45, 10]["gateway"] = True
-		self.maps[1]["tiles"][45, 10] = tile_types.gate
+#		self.maps[1]["tiles"][44:47, 10:12] = tile_types.wall
+		self.maps[1]["tiles"][15, 10]["gateway"] = True
+		self.maps[1]["tiles"][15, 10] = tile_types.gate
 		self.maps[1]["gateways"].append(
 			{
-				"x": 45,
+				"x": 15,
 				"y": 10,
 				"gateway": {
-					"x": 45,
+					"x": 15,
 					"y": 10,
 					"m": 0
 				}
