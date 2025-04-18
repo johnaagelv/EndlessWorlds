@@ -2,6 +2,8 @@ from typing import Dict, Optional
 import logging
 logger = logging.getLogger("EWClient")
 
+from tcod.map import compute_fov
+
 from worlds import TWorld
 
 
@@ -63,3 +65,11 @@ class TActor(TEntity):
 			}
 		logger.debug(f"- request: {request!r}")
 		return request
+
+	def update_fos(self) -> None:
+		self.map['visible'][:] = compute_fov(
+			self.map['tiles']['transparent'],
+			(self.data['x'], self.data['y']),
+			radius = self.data['r']
+		)
+		self.map['explored'] |= self.map['visible']

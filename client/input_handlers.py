@@ -47,4 +47,4 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 
 	def on_render(self, console: tcod.console.Console) -> None:
 		logger.debug(f"TEventHandler->on_render( console )")
-		self.engine.render(console)
+		#self.engine.render(console)
