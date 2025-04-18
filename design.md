@@ -1,48 +1,11 @@
-# 1. Architecture
+# 1. Introduction
+A Roguelike game running a client and connecting to one or more servers.
 
-1. Input/Output layer
-   - Keyboard input
-   - Console output
+Each server provides the client with a set of interconnected maps. A server can represent
+a world, a continent, a country, an area, a city, a vehicle, a cave tunnel system, a spaceship ... 
+you name it!
 
-2. Game layer
-   - Get game
-     - New game
-     - Existing game
-   - Run game
-     - Player action
-	 - Network action
-   - End game
-     - Save game
+Each map can not only be interconnected to other maps on the same server, but can also connect to
+a map on another server.
 
-3. Network layer
-   - Message
-
-# Input/Output layer
-Allows the game to receive input from the player and present output to the player
-## Keyboard input
-The player uses a keyboard to send input to the game.
-## Console output
-The game present output to the player using a console
-# Game layer
-
-## Get game
-
-### New game
-
-### Existing game
-
-## Run game
-
-### Player action
-
-### Network action
-
-## End game
-
-### Save game
-
-### Quit game
-
-# Network layer
-
-## Message
+With this archictecture, the game may become endless!

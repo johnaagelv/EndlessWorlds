@@ -11,6 +11,8 @@ import io
 import struct
 import pickle
 
+import numpy as np
+
 from entities import TActor
 from worlds import TWorld
 
@@ -46,6 +48,18 @@ class TClient:
 						player.data['z'] = message.response['entry_point']['z']
 						player.data['m'] = message.response['entry_point']['m']
 						player.data['world'] = TWorld(player, message.response['map_sizes'])
+					elif message.response['cmd'] == 'fos':
+						logger.info(f"TClient applying FOS data")
+						fos = message.response['fos']
+						x_min = fos.get("x_min")
+						x_max = fos.get("x_max")
+						y_min = fos.get("y_min")
+						y_max = fos.get("y_max")
+						view = fos.get("view")
+						gateways = fos.get("gateways")
+						temp = np.array(view)
+						player.data["world"].maps[player.data["m"]]["tiles"][x_min:x_max, y_min:y_max] = temp
+						player.data["world"].maps[player.data["m"]]["gateways"] = gateways
 
 			except Exception:
 				logger.warning(

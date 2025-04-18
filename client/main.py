@@ -75,6 +75,7 @@ def main(log_level) -> None:
 			while client.run(player):
 				pass
 
+			"""
 			if player.fos is not None:
 				cmd = player.fos
 				action = cmd.get("cmd")
@@ -90,8 +91,8 @@ def main(log_level) -> None:
 
 					player.data["world"].maps[player.data["m"]]["tiles"][x_min:x_max, y_min:y_max] = temp
 					player.data["world"].maps[player.data["m"]]["gateways"] = gateways
-
-				player.fos = None
+			"""
+			player.fos = None
 
 	logging.info('World client stopped')
 

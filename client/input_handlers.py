@@ -25,7 +25,7 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 
 	def ev_quit(self, event: tcod.event.Quit) -> Optional[TAction]:
 		logger.debug(f"TEventHandler->ev_quit( event )")
-		return TEscapeAction()
+		return TEscapeAction(self.actor)
 	
 	def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[TAction]:
 		logger.debug(f"TEventHandler->ev_keydown( event )")
@@ -33,13 +33,13 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 		
 		key = event.sym
 		if key == tcod.event.KeySym.UP:
-			action = TMoveAction(dx=0, dy=-1)
+			action = TMoveAction(self.actor, dx=0, dy=-1)
 		elif key == tcod.event.KeySym.DOWN:
-			action = TMoveAction(dx=0, dy=1)
+			action = TMoveAction(self.actor, dx=0, dy=1)
 		elif key == tcod.event.KeySym.LEFT:
-			action = TMoveAction(dx=-1, dy=0)
+			action = TMoveAction(self.actor, dx=-1, dy=0)
 		elif key == tcod.event.KeySym.RIGHT:
-			action = TMoveAction(dx=1, dy=0)
+			action = TMoveAction(self.actor, dx=1, dy=0)
 		elif key == tcod.event.KeySym.ESCAPE:
 			action = TEscapeAction(self.actor)
 
@@ -47,4 +47,4 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 
 	def on_render(self, console: tcod.console.Console) -> None:
 		logger.debug(f"TEventHandler->on_render( console )")
-		self.engine.render(console)
+		#self.engine.render(console)

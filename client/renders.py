@@ -35,6 +35,7 @@ class TRender:
 	"""
 	def render_world(self, actor: TActor):
 		logging.debug(f"TRender->render_world( actor )")
+		actor.update_fos()
 		map = actor.map
 		visible_tiles = map['visible']
 		explored_tiles = map['explored']
@@ -43,7 +44,7 @@ class TRender:
 
 		width = map["width"]
 		height = map["height"]
-#		self.root_console.rgb[0:width, 0:height] = map["tiles"]["dark"]
+
 		self.root_console.rgb[0:width, 0:height] = np.select(
 			condlist=[visible_tiles, explored_tiles],
 			choicelist=[light_tiles, dark_tiles],
