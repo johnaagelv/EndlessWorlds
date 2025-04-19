@@ -13,3 +13,11 @@ With this archictecture, the game may become endless!
 An actor, being a player or an NPC (Non-Player Character), must be constructed in such a way that
 the actor can be easily transferred between servers, even if a server does not support the full
 definition of an actor.
+## 2.1 Actor data structures
+Data structures will be used to define all the properties, capabilities, and so on, of the actor.
+
+Assumptions:
+- Properties are the unchangeable definitions of the actor.
+- Capabilities are the changeable definitions of the actor.
+
+# 3. ...
