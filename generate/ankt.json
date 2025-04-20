@@ -1,0 +1,22 @@
+{
+	"name": "ankt",
+	"title": "Ankt",
+	"entry_points": [
+		{"x": 1, "y": 1, "z": 0, "m": 0},
+		{"x": 1, "y": 1, "z": 0, "m": 0},
+		{"x": 1, "y": 1, "z": 0, "m": 0},
+		{"x": 1, "y": 1, "z": 0, "m": 0}
+	],
+	"maps": [
+		{
+			"name": "anktsurveybase",
+			"title": "Survey base",
+			"width": 80,
+			"heigh": 80,
+			"gateways": [],
+			"tiles": [
+			]
+		}
+	]
+
+}
