@@ -2,6 +2,8 @@ from typing import Tuple
 
 import numpy as np
 
+tiles = {}
+
 connection_dt = {
 	"x": int, # x coordinate in map m
 	"y": int, # y coordinate in map m
@@ -37,7 +39,7 @@ def new_tile(
 ) -> np.ndarray:
 	return np.array((walkable, transparent, dark, light, connect), dtype=tile_dt)
 
-floor = new_tile(
+tiles["floor"] = new_tile(
 	walkable=True,
 	transparent=True,
 	dark=(ord(" "), (255, 255, 255), (96, 64, 64)),
@@ -45,10 +47,18 @@ floor = new_tile(
 	connect=None,
 )
 
-wall = new_tile(
+tiles["wall"] = new_tile(
 	walkable=True,
 	transparent=True,
 	dark=(ord("#"), (255, 255, 255), (32, 32, 32)),
 	light=(ord("#"), (255, 255, 255), (64, 64, 64)),
+	connect=None,
+)
+
+tiles["plain"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(ord("."), (255, 255, 255), (240, 230, 140)),
+	light=(ord("."), (255, 255, 255), (240, 230, 140)),
 	connect=None,
 )
