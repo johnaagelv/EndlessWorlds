@@ -2,21 +2,38 @@
 	"name": "ankt",
 	"title": "Ankt",
 	"entry_points": [
-		{"x": 1, "y": 1, "z": 0, "m": 0},
-		{"x": 1, "y": 1, "z": 0, "m": 0},
-		{"x": 1, "y": 1, "z": 0, "m": 0},
-		{"x": 1, "y": 1, "z": 0, "m": 0}
+		{"x": 40, "y": 12, "z": 0, "m": 0},
+		{"x": 40, "y": 22, "z": 0, "m": 0},
+		{"x": 41, "y": 11, "z": 0, "m": 0},
+		{"x": 41, "y": 21, "z": 0, "m": 0}
 	],
 	"maps": [
 		{
 			"name": "anktsurveybase",
 			"title": "Survey base",
 			"width": 80,
-			"heigh": 80,
-			"gateways": [],
-			"tiles": [
+			"heigh": 45,
+			"builds": [
+				{
+					"template": "landscape",
+					"tile": "plain",
+					"type": "square",
+					"fill": true,
+					"x": 0,
+					"y": 0,
+					"width": 80,
+					"height": 45
+				},
+				{
+					"template": "fence",
+					"tile": "barbwire",
+					"type": "circle",
+					"fill": false,
+					"x": 39,
+					"y": 22,
+					"radius": 20
+				}
 			]
 		}
 	]
-
 }
