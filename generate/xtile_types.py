@@ -1,5 +1,15 @@
 from typing import Tuple
+
 import numpy as np
+
+tiles = {}
+
+connection_dt = {
+	"x": int, # x coordinate in map m
+	"y": int, # y coordinate in map m
+	"m": int, # map number
+	"h": str, # Host - ip + port
+}
 
 graphic_dt = np.dtype(
 	[
@@ -15,7 +25,7 @@ tile_dt = np.dtype(
 		("transparent", bool), # True if tile doesn't block FOV
 		("dark", graphic_dt), # Graphics outside of FOV
 		("light", graphic_dt), # Graphics inside of FOV
-		("gateway", bool), # Gateway if true
+		{"connect", connection_dt}, # Connection information to 
 	]
 )
 
@@ -25,37 +35,30 @@ def new_tile(
 	transparent: int,
 	dark: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]],
 	light: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]],
-	gateway: bool,
-) -> np.array:
-	return np.array((walkable, transparent, dark, light, gateway), dtype=tile_dt)
+	connect: Tuple[int, int, int, str],
+) -> np.ndarray:
+	return np.array((walkable, transparent, dark, light, connect), dtype=tile_dt)
 
-tiles = {}
+	tiles["floor"] = new_tile(
+		walkable=True,
+		transparent=True,
+		dark=(ord(" "), (255, 255, 255), (96, 64, 64)),
+		light=(ord(" "), (255, 255, 255), (128, 96, 96)),
+		connect=None,
+	)
 
-tiles["blank"] = new_tile(
-	walkable=True,
-	transparent=True,
-	dark=(ord(" "), (0, 0, 0), (0, 0, 0)),
-	light=(ord(" "), (0, 0, 0), (0, 0, 0)),
-	gateway=False,
-)
-tiles["floor"] = new_tile(
-	walkable=True,
-	transparent=True,
-	dark=(ord(" "), (255, 255, 255), (96, 64, 64)),
-	light=(ord(" "), (255, 255, 255), (128, 96, 96)),
-	gateway=False,
-)
 tiles["wall"] = new_tile(
 	walkable=True,
 	transparent=True,
 	dark=(ord("#"), (255, 255, 255), (32, 32, 32)),
 	light=(ord("#"), (255, 255, 255), (64, 64, 64)),
-	gateway=False,
+	connect=None,
 )
+
 tiles["plain"] = new_tile(
 	walkable=True,
 	transparent=True,
 	dark=(ord("."), (255, 255, 255), (240, 230, 140)),
 	light=(ord("."), (255, 255, 255), (240, 230, 140)),
-	gateway=False,
+	connect=None,
 )
