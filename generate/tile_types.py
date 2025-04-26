@@ -31,6 +31,13 @@ def new_tile(
 
 tiles = {}
 
+tiles["blank"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(ord(" "), (0, 0, 0), (0, 0, 0)),
+	light=(ord(" "), (0, 0, 0), (0, 0, 0)),
+	gateway=False,
+)
 tiles["floor"] = new_tile(
 	walkable=True,
 	transparent=True,

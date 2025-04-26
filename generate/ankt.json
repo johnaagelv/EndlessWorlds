@@ -12,7 +12,7 @@
 			"name": "anktsurveybase",
 			"title": "Survey base",
 			"width": 80,
-			"heigh": 45,
+			"height ": 45,
 			"builds": [
 				{
 					"template": "landscape",
