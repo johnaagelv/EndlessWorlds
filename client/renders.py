@@ -11,7 +11,7 @@ class TRender:
 		logging.debug(f"TRender->__init__( config )")
 		logging.debug(f"- tileset setup")
 		self.tileset = tcod.tileset.load_tilesheet(
-			config["tileset"], 32, 8, tcod.tileset.CHARMAP_CP437
+			config["tileset"], 32, 8, tcod.tileset.CHARMAP_TCOD
 		)
 
 		logging.debug(f"- root_console setup")

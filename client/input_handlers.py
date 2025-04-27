@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger("EWClient")
 
 import tcod.event
-from actions import TAction, TEscapeAction, TMoveAction
+from actions import TAction, TEscapeAction, TMoveAction, TStairAction
 from entities import TActor
 
 class TEventHandler(tcod.event.EventDispatch[TAction]):
@@ -32,6 +32,7 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 		action: Optional[TAction] = None
 		
 		key = event.sym
+		logger.info(f"- key='{key}'")
 		if key == tcod.event.KeySym.UP:
 			action = TMoveAction(self.actor, dx=0, dy=-1)
 		elif key == tcod.event.KeySym.DOWN:
@@ -40,6 +41,10 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 			action = TMoveAction(self.actor, dx=-1, dy=0)
 		elif key == tcod.event.KeySym.RIGHT:
 			action = TMoveAction(self.actor, dx=1, dy=0)
+		elif key == tcod.event.KeySym.GREATER:
+			action = TStairAction(self.actor)
+		elif key == tcod.event.KeySym.LESS:
+			action = TStairAction(self.actor)
 		elif key == tcod.event.KeySym.ESCAPE:
 			action = TEscapeAction(self.actor)
 

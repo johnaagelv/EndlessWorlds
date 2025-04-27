@@ -43,10 +43,10 @@ class TClient:
 
 					if message.response['cmd'] == 'new':
 						logger.info(f"TClient initializing new world")
-						player.data['x'] = message.response['entry_point']['x']
-						player.data['y'] = message.response['entry_point']['y']
-						player.data['z'] = message.response['entry_point']['z']
-						player.data['m'] = message.response['entry_point']['m']
+						player.data['x'] = message.response['entry_point'][0]
+						player.data['y'] = message.response['entry_point'][1]
+						player.data['z'] = 0 #message.response['entry_point']['z']
+						player.data['m'] = 0 #message.response['entry_point']['m']
 						player.data['world'] = TWorld(player, message.response['map_sizes'])
 					elif message.response['cmd'] == 'fos':
 						logger.info(f"TClient applying FOS data")

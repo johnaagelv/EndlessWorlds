@@ -46,10 +46,10 @@ tiles["floor"] = new_tile(
 	gateway=False,
 )
 tiles["wall"] = new_tile(
-	walkable=True,
-	transparent=True,
-	dark=(ord("#"), (255, 255, 255), (32, 32, 32)),
-	light=(ord("#"), (255, 255, 255), (64, 64, 64)),
+	walkable=False,
+	transparent=False,
+	dark=(43, (255, 255, 255), (32, 32, 32)),
+	light=(43, (255, 255, 255), (64, 64, 64)),
 	gateway=False,
 )
 tiles["plain"] = new_tile(
@@ -57,5 +57,26 @@ tiles["plain"] = new_tile(
 	transparent=True,
 	dark=(ord("."), (255, 255, 255), (240, 230, 140)),
 	light=(ord("."), (255, 255, 255), (240, 230, 140)),
+	gateway=False,
+)
+tiles["gateway"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(76, (255, 255, 255), (240, 230, 140)),
+	light=(77, (255, 255, 255), (240, 230, 140)),
+	gateway=True,
+)
+tiles["downstair"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(76, (255, 255, 255), (240, 230, 140)),
+	light=(76, (255, 255, 255), (240, 230, 140)),
+	gateway=False,
+)
+tiles["upstair"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(77, (255, 255, 255), (240, 230, 140)),
+	light=(77, (255, 255, 255), (240, 230, 140)),
 	gateway=False,
 )
