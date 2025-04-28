@@ -33,12 +33,18 @@ class TWorld:
 		y = fos_request.get("y") # y coordinate on map m
 		# z = fos_request.get("z") # z coordinate = height on map m (not yet used)
 		r = fos_request.get("r") # r radius
+		if self.maps[m]["visible"]:
+			x_min = 0
+			x_max = self.maps[m]["width"]
+			y_min = 0
+			y_max = self.maps[m]["height"]
+		else:
+			x_min = max(x - r, 0)
+			x_max = min(x + r + 1, self.maps[m]["width"])
+			y_min = max(y - r, 0)
+			y_max = min(y + r + 1, self.maps[m]["height"])
 
-		x_min = max(x - r, 0)
-		x_max = min(x + r + 1, self.maps[m]["width"])
-		y_min = max(y - r, 0)
-		y_max = min(y + r + 1, self.maps[m]["height"])
-
+		logger.debug(f"FOS of {x_min}:{x_max}, {y_min}:{y_max}")
 		fos = {
 			"x_min": x_min,
 			"x_max": x_max,
@@ -61,6 +67,7 @@ class TWorld:
 				{
 					"width": m["width"],
 					"height": m["height"],
+					"visible": m["visible"],
 				}
 			)
 		return map_sizes

@@ -7,7 +7,6 @@ from renders import TRender
 from entities import TActor
 from worlds import TWorld
 from input_handlers import TEventHandler
-import tile_types
 from clients import TClient
 
 import logging
@@ -57,14 +56,14 @@ def main(log_level) -> None:
 			render.render_actor(player)
 			render.render()
 
-		# Get user input
-		for event in tcod.event.wait(timeout=5):
-			action = event_handler.dispatch(event)
+			# Get user input
+			for event in tcod.event.wait(timeout=5):
+				action = event_handler.dispatch(event)
 
-			if action is None:
-				continue
-		
-			action.run()
+				if action is None:
+					continue
+			
+				action.run()
 
 		# Ready the communicator
 		request = player.run()
@@ -74,25 +73,6 @@ def main(log_level) -> None:
 			
 			while client.run(player):
 				pass
-
-			"""
-			if player.fos is not None:
-				cmd = player.fos
-				action = cmd.get("cmd")
-				if action == "fos":
-					fos = cmd.get("fos")
-					x_min = fos.get("x_min")
-					x_max = fos.get("x_max")
-					y_min = fos.get("y_min")
-					y_max = fos.get("y_max")
-					view = fos.get("view")
-					gateways = fos.get("gateways")
-					temp = np.array(view)
-
-					player.data["world"].maps[player.data["m"]]["tiles"][x_min:x_max, y_min:y_max] = temp
-					player.data["world"].maps[player.data["m"]]["gateways"] = gateways
-			"""
-			player.fos = None
 
 	logging.info('World client stopped')
 

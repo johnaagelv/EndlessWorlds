@@ -45,9 +45,21 @@ class TRender:
 		width = map["width"]
 		height = map["height"]
 
+		view_width = self.root_console.width
+		view_height = self.root_console.height - 5
+
+		print(f"actor ({actor.data['x']},{actor.data['y']})")
+		print(f"- viewport ({view_width},{view_height}) - map ({width},{height})")
+		view_x1 = min(max(0, actor.data['x'] - int(view_width / 2)), width - view_width)
+		view_x2 = view_x1 + view_width
+		print(f"- x1:x2: {view_x1}:{view_x2}")
+
+		view_y1 = max(0, actor.data['y'] - int(height / 2))
+		view_y2 = min(height, actor.data['y'] + int(height / 2))
+
 		self.root_console.rgb[0:width, 0:height] = np.select(
-			condlist=[visible_tiles, explored_tiles],
-			choicelist=[light_tiles, dark_tiles],
+			condlist=[visible_tiles[view_x1:view_x2], explored_tiles[view_x1:view_x2]],
+			choicelist=[light_tiles[view_x1:view_x2], dark_tiles[view_x1:view_x2]],
 			default=tile_types.SHROUD
 		)
 
@@ -57,8 +69,18 @@ class TRender:
 	"""
 	def render_actor(self, actor: TActor):
 		logging.debug(f"TRender->render_actor( actor )")
+
+		map = actor.map
+		width = map["width"]
+		height = map["height"]
+
+		view_width = self.root_console.width
+		view_height = self.root_console.height - 5
+		view_x1 = min(max(0, actor.data['x'] - int(view_width / 2)), width - view_width)
+		view_x2 = view_x1 + view_width
+
 		self.root_console.print(
-			x = actor.data["x"], 
+			x = actor.data['x'] - view_x1, 
 			y = actor.data["y"],
 			string = actor.data["face"],
 			fg=actor.data["colour"],
@@ -68,7 +90,7 @@ class TRender:
 	Render the console
 	"""
 	def render(self):
-		logging.debug(f"TRender->render()")
+		logging.info(f"TRender->render()")
 		# Present the console
 		self.context.present(self.root_console)
 		# Clear the console for a new presentation
