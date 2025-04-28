@@ -16,11 +16,15 @@ LOG_FORMAT = "%(asctime)s %(levelname)-8s %(message)s"
 
 SCREEN_WIDTH = 80
 SCREEN_HEIGHT = 50
+VIEWPORT_WIDTH = SCREEN_WIDTH - 20
+VIEWPORT_HEIGHT = SCREEN_HEIGHT - 10
 
 config = {
 	"title": "Endless Worlds, Ankt, (c) 2025",
 	"screen_width": SCREEN_WIDTH,
 	"screen_height": SCREEN_HEIGHT,
+	"viewport_width": VIEWPORT_WIDTH,
+	"viewport_height": VIEWPORT_HEIGHT,
 	"tileset": "client/dejavu10x10_gs_tc.png",
 	"host": "192.168.1.104",
 	"port": 12345,

@@ -10,14 +10,15 @@ class TRender:
 	def __init__(self, config):
 		logging.debug(f"TRender->__init__( config )")
 		logging.debug(f"- tileset setup")
+		self.config = config
 		self.tileset = tcod.tileset.load_tilesheet(
-			config["tileset"], 32, 8, tcod.tileset.CHARMAP_TCOD
+			self.config["tileset"], 32, 8, tcod.tileset.CHARMAP_TCOD
 		)
 
 		logging.debug(f"- root_console setup")
 		self.root_console = tcod.console.Console(
-			width = config["screen_width"],
-			height = config["screen_height"],
+			width = self.config["screen_width"],
+			height = self.config["screen_height"],
 			order = "F",
 		)
 
@@ -25,7 +26,7 @@ class TRender:
 		self.context = 	tcod.context.new(
 			console = self.root_console,
 			tileset = self.tileset,
-			title = config["title"],
+			title = self.config["title"],
 			vsync = True,
 		)
 
@@ -45,21 +46,18 @@ class TRender:
 		width = map["width"]
 		height = map["height"]
 
-		view_width = self.root_console.width
-		view_height = self.root_console.height - 5
+		view_width = self.config['viewport_width']
+		view_height = self.config['viewport_height']
 
-		print(f"actor ({actor.data['x']},{actor.data['y']})")
-		print(f"- viewport ({view_width},{view_height}) - map ({width},{height})")
-		view_x1 = min(max(0, actor.data['x'] - int(view_width / 2)), width - view_width)
-		view_x2 = view_x1 + view_width
-		print(f"- x1:x2: {view_x1}:{view_x2}")
+		self.view_x1 = min(max(0, actor.data['x'] - int(view_width / 2)), width - view_width)
+		self.view_x2 = self.view_x1 + view_width
 
-		view_y1 = max(0, actor.data['y'] - int(height / 2))
-		view_y2 = min(height, actor.data['y'] + int(height / 2))
+		self.view_y1 = min(max(0, actor.data['y'] - int(view_height / 2)), height - view_height)
+		self.view_y2 = self.view_y1 + view_height
 
-		self.root_console.rgb[0:width, 0:height] = np.select(
-			condlist=[visible_tiles[view_x1:view_x2], explored_tiles[view_x1:view_x2]],
-			choicelist=[light_tiles[view_x1:view_x2], dark_tiles[view_x1:view_x2]],
+		self.root_console.rgb[0:view_width, 0:view_height] = np.select(
+			condlist=[visible_tiles[self.view_x1:self.view_x2, self.view_y1:self.view_y2], explored_tiles[self.view_x1:self.view_x2, self.view_y1:self.view_y2]],
+			choicelist=[light_tiles[self.view_x1:self.view_x2, self.view_y1:self.view_y2], dark_tiles[self.view_x1:self.view_x2, self.view_y1:self.view_y2]],
 			default=tile_types.SHROUD
 		)
 
@@ -70,18 +68,9 @@ class TRender:
 	def render_actor(self, actor: TActor):
 		logging.debug(f"TRender->render_actor( actor )")
 
-		map = actor.map
-		width = map["width"]
-		height = map["height"]
-
-		view_width = self.root_console.width
-		view_height = self.root_console.height - 5
-		view_x1 = min(max(0, actor.data['x'] - int(view_width / 2)), width - view_width)
-		view_x2 = view_x1 + view_width
-
 		self.root_console.print(
-			x = actor.data['x'] - view_x1, 
-			y = actor.data["y"],
+			x = actor.data['x'] - self.view_x1, 
+			y = actor.data["y"] - self.view_y1,
 			string = actor.data["face"],
 			fg=actor.data["colour"],
 		)

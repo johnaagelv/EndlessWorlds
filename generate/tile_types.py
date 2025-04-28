@@ -69,14 +69,14 @@ tiles["gateway"] = new_tile(
 tiles["downstair"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(76, (192, 192, 192), (0, 0, 0)),
+	dark=(46, (192, 192, 192), (0, 0, 0)),
 	light=(76, (255, 255, 255), (0, 0, 0)),
 	gateway=False,
 )
 tiles["upstair"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(77, (192, 192, 192), (0, 0, 0)),
-	light=(77, (255, 255, 255), (0, 0, 0)),
+	dark=(44, (192, 192, 192), (0, 0, 0)),
+	light=(44, (255, 255, 255), (0, 0, 0)),
 	gateway=False,
 )
