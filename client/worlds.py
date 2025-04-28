@@ -31,7 +31,7 @@ class TWorld:
 					"height": map_definition["height"],
 					"tiles": np.full((map_definition["width"],map_definition["height"]), fill_value=tile_types.floor, order="F"),
 					"visible": np.full((map_definition["width"],map_definition["height"]), fill_value=False, order="F"),
-					"explored": np.full((map_definition["width"],map_definition["height"]), fill_value=False, order="F"),
+					"explored": np.full((map_definition["width"],map_definition["height"]), fill_value=True, order="F"),
 				}
 			)
 
@@ -47,12 +47,3 @@ class TWorld:
 		logger.debug(f"TWorld->go_gateway( x, y, m )")
 		gateway = next((item for item in self.maps[m]["gateways"] if item["x"] ==x and item["y"] == y), None)
 		return gateway["gateway"]
-	
-	def render(self, console: Console, m: int) -> None:
-		logger.debug(f"TWorld->render( console, m )")
-		logger.debug(f"- m {m}")
-		console.rgb[0:self.maps[m]["width"], 0:self.maps[m]["height"]] = np.select(
-			condlist=[self.maps[m]['visible'], self.maps[m]['explored']],
-			choicelist=[self.maps[m]['tiles']['light'], self.maps[m]['tiles']['dark']],
-			default=tile_types.SHROUD["dark"],
-		)

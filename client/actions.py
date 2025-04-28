@@ -61,3 +61,24 @@ class TMoveAction(TAction):
 					# Move to x, y coordinate
 					self.actor.data["x"] = dest_x
 					self.actor.data["y"] = dest_y
+
+class TStairAction(TAction):
+	@property
+	def current_xy(self) -> Tuple[int, int]:
+		logger.debug(f"TStairAction->current_xy")
+		return self.actor.data['x'], self.actor.data['y']
+
+	def run(self):
+		logger.debug(f"TStairAction->run()")
+		world: TWorld = self.actor.data["world"]
+		map = world.maps[self.actor.data["m"]]
+		dest_x, dest_y = self.current_xy
+		if world.in_bounds(dest_x, dest_y, self.actor.data['m']):
+			# Check if walkable
+			if map["tiles"]["walkable"][dest_x, dest_y]:
+				gateway = world.go_gateway(dest_x, dest_y, self.actor.data["m"])
+				if gateway is not None:
+					# Move to x, y coordinate in map number m
+					self.actor.data["x"] = gateway["x"]
+					self.actor.data["y"] = gateway["y"]
+					self.actor.data["m"] = gateway["m"]

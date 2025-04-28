@@ -1,4 +1,5 @@
 from typing import Dict, List
+import pickle
 import random
 import logging
 logger = logging.getLogger("EWlogger")
@@ -9,102 +10,18 @@ import tile_types
 
 class TWorld:
 	maps: List = []
+	name: str
+	entry: List = []
 
 	def __init__(self, world_name: str = 'world'):
-		logger.debug("TWorld->init()")
-		self.entry_points = [
-			{"x": 3, "y": 3, "z": 0, "m": 0},
-			{"x": 4, "y": 3, "z": 0, "m": 0},
-			{"x": 3, "y": 4, "z": 0, "m": 0},
-			{"x": 4, "y": 4, "z": 0, "m": 0},
-		]
-		self.maps.append(
-			{
-				"name": "Survey base",
-				"width": 20,
-				"height": 20,
-				"tiles": np.full((20, 20), fill_value=tile_types.floor, order="F"),
-				"gateways": [],
-			}
-		)
-		self.maps.append(
-			{
-				"name": "Underground",
-				"width": 80,
-				"height": 20,
-				"tiles": np.full((80, 20), fill_value=tile_types.floor, order="F"),
-				"gateways": [],
-			}
-		)
-
-		for map in self.maps:
-			map['tiles'][0, 0:map['height']] = tile_types.wall
-			map['tiles'][map['width']-1, 0:map['height']] = tile_types.wall
-			map['tiles'][0:map['width'], 0] = tile_types.wall
-			map['tiles'][0:map['width'], map['height']-1] = tile_types.wall
-
-#		self.maps[0]["tiles"][20:22, 10:45] = tile_types.wall
-
-		self.maps[0]["tiles"][8:12, 10:13] = tile_types.wall
-		self.maps[0]["tiles"][10, 10]["gateway"] = True
-		self.maps[0]["tiles"][10, 10] = tile_types.gate
-		self.maps[0]["gateways"].append(
-			{
-				"x": 10,
-				"y": 10,
-				"gateway": {
-					"x": 10,
-					"y": 10,
-					"m": 1
-				}
-			}
-		)
-
-#		self.maps[0]["tiles"][44:47, 9:11] = tile_types.wall
-		self.maps[0]["tiles"][15, 10]["gateway"] = True
-		self.maps[0]["tiles"][15, 10] = tile_types.gate
-		self.maps[0]["gateways"].append(
-			{
-				"x": 15,
-				"y": 10,
-				"gateway": {
-					"x": 15,
-					"y": 10,
-					"m": 1
-				}
-			}
-		)
-
-#		self.maps[1]["tiles"][44:47, 10:12] = tile_types.wall
-		self.maps[1]["tiles"][15, 10]["gateway"] = True
-		self.maps[1]["tiles"][15, 10] = tile_types.gate
-		self.maps[1]["gateways"].append(
-			{
-				"x": 15,
-				"y": 10,
-				"gateway": {
-					"x": 15,
-					"y": 10,
-					"m": 0
-				}
-			}
-		)
-
-		self.maps[1]["tiles"][9:12, 10:12] = tile_types.wall
-		self.maps[1]["tiles"][10, 10]["gateway"] = True
-		self.maps[1]["tiles"][10, 10] = tile_types.gate
-		self.maps[1]["gateways"].append(
-			{
-				"x": 10,
-				"y": 10,
-				"gateway": {
-					"x": 10,
-					"y": 10,
-					"m": 0
-				}
-			}
-		)
-
+		logger.debug(f"TWorld->init({world_name})")
+		self.name = world_name
+		with open(world_name + ".dat", "rb") as f:
+			load_data = pickle.load(f)
+		
+		self.entry = load_data['entry']
+		self.maps = load_data['maps']
+	
 	"""
 	# Get and return the field of sense
 	"""
@@ -116,12 +33,18 @@ class TWorld:
 		y = fos_request.get("y") # y coordinate on map m
 		# z = fos_request.get("z") # z coordinate = height on map m (not yet used)
 		r = fos_request.get("r") # r radius
+		if self.maps[m]["visible"]:
+			x_min = 0
+			x_max = self.maps[m]["width"]
+			y_min = 0
+			y_max = self.maps[m]["height"]
+		else:
+			x_min = max(x - r, 0)
+			x_max = min(x + r + 1, self.maps[m]["width"])
+			y_min = max(y - r, 0)
+			y_max = min(y + r + 1, self.maps[m]["height"])
 
-		x_min = max(x - r, 0)
-		x_max = min(x + r + 1, self.maps[m]["width"])
-		y_min = max(y - r, 0)
-		y_max = min(y + r + 1, self.maps[m]["height"])
-
+		logger.debug(f"FOS of {x_min}:{x_max}, {y_min}:{y_max}")
 		fos = {
 			"x_min": x_min,
 			"x_max": x_max,
@@ -144,6 +67,7 @@ class TWorld:
 				{
 					"width": m["width"],
 					"height": m["height"],
+					"visible": m["visible"],
 				}
 			)
 		return map_sizes
@@ -154,4 +78,4 @@ class TWorld:
 	def entry_point(self) -> Dict:
 		logger.debug(f"TWorld->entry_point()")
 		# Random randint() method https://www.w3schools.com/python/ref_random_randint.asp
-		return self.entry_points[random.randint(0, len(self.entry_points)-1)] # Randint includes both start and stop values
+		return self.entry[random.randint(0, len(self.entry)-1)] # Randint includes both start and stop values
