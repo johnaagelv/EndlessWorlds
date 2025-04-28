@@ -38,4 +38,22 @@ Capabilities are then represented by properties, although not all properties rep
   - energy (min, max, current)
   - more to be defined in the future
 
-# 3. ...
+# 3. Map simplicity
+Currently built on the tile structure defined in the TCOD tutorial with addition for gateways.
+
+The tile structure has the properties:
+- Walkable (true/false)
+- Transparent (true/false)
+- Dark (symbol, foreground colour, background colour)
+- Light (symbol, foreground colour, background colour)
+- Gateway (true/false) - indicates a gateway tile when true
+
+Gateway tiles are automatic map changes, examples:
+- entering an open doorway tile of a house automatically changes the map to the inside of the house.
+- entering a cave entrance tile automatically changes the map to the cave tunnel system.
+
+To facilitate the automatic map changes, the world has a gateway list where each entry specifies
+the location of the gateway and the target location on a target map.
+
+Not all entries in the gateway list are for automatic map changes. Some will be for stairways, where
+the player invokes the map change by going down or up the stairway
