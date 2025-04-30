@@ -25,7 +25,7 @@ config = {
 	"screen_height": SCREEN_HEIGHT,
 	"viewport_width": VIEWPORT_WIDTH,
 	"viewport_height": VIEWPORT_HEIGHT,
-	"tileset": "client/dejavu10x10_gs_tc.png",
+	"tileset": "client/teeto_k_18x18.png",
 	"host": "192.168.1.104",
 	"port": 12345,
 }

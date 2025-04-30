@@ -54,9 +54,9 @@ class TMoveAction(TAction):
 				if world.in_gateway(dest_x, dest_y, self.actor.data["m"]):
 					gateway = world.go_gateway(dest_x, dest_y, self.actor.data["m"])
 					# Move to x, y coordinate in map number m
-					self.actor.data["x"] = gateway["x"]
-					self.actor.data["y"] = gateway["y"]
-					self.actor.data["m"] = gateway["m"]
+					self.actor.data["x"] = gateway["gateway"]["x"]
+					self.actor.data["y"] = gateway["gateway"]["y"]
+					self.actor.data["m"] = gateway["gateway"]["m"]
 				else:
 					# Move to x, y coordinate
 					self.actor.data["x"] = dest_x
@@ -79,6 +79,6 @@ class TStairAction(TAction):
 				gateway = world.go_gateway(dest_x, dest_y, self.actor.data["m"])
 				if gateway is not None:
 					# Move to x, y coordinate in map number m
-					self.actor.data["x"] = gateway["x"]
-					self.actor.data["y"] = gateway["y"]
-					self.actor.data["m"] = gateway["m"]
+					self.actor.data["x"] = gateway['gateway']["x"]
+					self.actor.data["y"] = gateway['gateway']["y"]
+					self.actor.data["m"] = gateway['gateway']["m"]

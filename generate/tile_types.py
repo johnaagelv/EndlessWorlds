@@ -41,15 +41,15 @@ tiles["blank"] = new_tile(
 tiles["floor"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(ord("."), (192, 192, 192), (0, 0, 0)),
-	light=(ord("."), (255, 255, 255), (0, 0, 0)),
+	dark=(32, (192, 192, 192), (0, 0, 0)),
+	light=(32, (255, 255, 255), (0, 0, 0)),
 	gateway=False,
 )
 tiles["wall"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(32, (192, 192, 192), (32, 32, 32)),
-	light=(32, (255, 255, 255), (64, 64, 64)),
+	dark=(ord("#"), (192, 192, 192), (32, 32, 32)),
+	light=(ord("#"), (255, 255, 255), (64, 64, 64)),
 	gateway=False,
 )
 tiles["plain"] = new_tile(
@@ -69,14 +69,49 @@ tiles["gateway"] = new_tile(
 tiles["downstair"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(46, (192, 192, 192), (0, 0, 0)),
-	light=(76, (255, 255, 255), (0, 0, 0)),
+	dark=(60, (192, 192, 192), (0, 0, 0)),
+	light=(60, (255, 255, 255), (0, 0, 0)),
 	gateway=False,
 )
 tiles["upstair"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(44, (192, 192, 192), (0, 0, 0)),
-	light=(44, (255, 255, 255), (0, 0, 0)),
+	dark=(62, (192, 192, 192), (0, 0, 0)),
+	light=(62, (255, 255, 255), (0, 0, 0)),
+	gateway=False,
+)
+tiles["grass1"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(59, (128, 192, 128), (0, 0, 0)),
+	light=(59, (128, 255, 128), (0, 0, 0)),
+	gateway=False,
+)
+tiles["grass2"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(59, (96, 128, 96), (0, 0, 0)),
+	light=(59, (128, 192, 128), (0, 0, 0)),
+	gateway=False,
+)
+tiles["rock1"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(ord("#"), (80, 80, 80), (80, 80, 80)),
+	light=(ord("#"), (80, 80, 80), (80, 80, 80)),
+	gateway=False,
+)
+tiles["rock2"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(ord("#"), (64, 64, 64), (64, 64, 64)),
+	light=(ord("#"), (64, 64, 64), (64, 64, 64)),
+	gateway=False,
+)
+tiles["underground"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(32, (32, 32, 32), (32, 32, 32)),
+	light=(32, (48, 48, 48), (48, 48, 48)),
 	gateway=False,
 )

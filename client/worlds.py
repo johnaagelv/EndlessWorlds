@@ -30,8 +30,8 @@ class TWorld:
 					"width": map_definition["width"],
 					"height": map_definition["height"],
 					"tiles": np.full((map_definition["width"],map_definition["height"]), fill_value=tile_types.floor, order="F"),
-					"visible": np.full((map_definition["width"],map_definition["height"]), fill_value=False, order="F"),
-					"explored": np.full((map_definition["width"],map_definition["height"]), fill_value=True, order="F"),
+					"visible": np.full((map_definition["width"],map_definition["height"]), fill_value=map_definition['visible'], order="F"),
+					"explored": np.full((map_definition["width"],map_definition["height"]), fill_value=map_definition['visible'], order="F"),
 				}
 			)
 
@@ -46,4 +46,4 @@ class TWorld:
 	def go_gateway(self, x: int, y: int, m: int):
 		logger.debug(f"TWorld->go_gateway( x, y, m )")
 		gateway = next((item for item in self.maps[m]["gateways"] if item["x"] ==x and item["y"] == y), None)
-		return gateway["gateway"]
+		return gateway
