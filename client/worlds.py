@@ -25,15 +25,24 @@ class TWorld:
 		logger.debug(f"- map_definitions {map_definitions!r}")
 		self.actor: TActor = actor
 		for map_definition in map_definitions:
+			map_width = int(map_definition.get("width"))
+			map_height = int(map_definition.get("height"))
+			map_visible = map_definition.get('visible')
 			self.maps.append(
 				{
-					"width": map_definition["width"],
-					"height": map_definition["height"],
-					"tiles": np.full((map_definition["width"],map_definition["height"]), fill_value=tile_types.floor, order="F"),
-					"visible": np.full((map_definition["width"],map_definition["height"]), fill_value=map_definition['visible'], order="F"),
-					"explored": np.full((map_definition["width"],map_definition["height"]), fill_value=map_definition['visible'], order="F"),
+					"width": map_width,
+					"height": map_height,
+					"tiles": np.full((map_width, map_height), fill_value=tile_types.floor, order="F"),
+					"visible": np.full((map_width, map_height), fill_value=map_visible, order="F"),
+					"explored": np.full((map_width, map_height), fill_value=map_visible, order="F"),
 				}
 			)
+			if map_visible:
+				fos = map_definition.get("fos")
+				temp = fos.get("view")
+				view = np.array(temp)
+				self.maps[-1]["tiles"][0:map_width, 0:map_height] = view
+
 
 	def in_bounds(self, x: int, y: int, m: int) -> bool:
 		logger.debug(f"TWorld->in_bounds( x, y, m )")

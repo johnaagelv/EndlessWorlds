@@ -102,7 +102,7 @@ class TMessage:
 		logger.debug(f"TMessage->_read()")
 		try:
 			# Should be ready to read
-			data = self.sock.recv(4096)
+			data = self.sock.recv(65536)
 		except BlockingIOError:
 			# Resource temporarily unavailable (errno EWOULDBLOCK)
 			pass

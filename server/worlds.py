@@ -25,7 +25,7 @@ class TWorld:
 	"""
 	# Get and return the field of sense
 	"""
-	def field_of_sense(self, fos_request: Dict) -> Dict:
+	def field_of_sense(self, fos_request: Dict, visible: bool = False) -> Dict:
 		logger.debug(f"TWorld->field_of_sense({fos_request!r})")
 		# Extract the fos parameters m, x, y, z, r
 		m = fos_request.get("m") # Map number
@@ -33,7 +33,7 @@ class TWorld:
 		y = fos_request.get("y") # y coordinate on map m
 		# z = fos_request.get("z") # z coordinate = height on map m (not yet used)
 		r = fos_request.get("r") # r radius
-		if self.maps[m]["visible"]:
+		if visible:
 			x_min = 0
 			x_max = self.maps[m]["width"]
 			y_min = 0
@@ -55,19 +55,23 @@ class TWorld:
 		}
 
 		return fos
-
+	
 	"""
 	Get and return the map sizes for a new player
 	"""
 	def map_sizes(self) -> List:
 		logger.debug(f"TWorld->map_sizes()")
 		map_sizes = []
-		for m in self.maps:
+		for map_idx, m in enumerate(self.maps):
+			fos = None
+			if m["visible"]:
+				fos = self.field_of_sense({"x":0, "y": 0, "z": 0, "m": map_idx, "r": 0}, True)
 			map_sizes.append(
 				{
 					"width": m["width"],
 					"height": m["height"],
 					"visible": m["visible"],
+					"fos": fos
 				}
 			)
 		return map_sizes
