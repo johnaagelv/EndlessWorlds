@@ -52,7 +52,12 @@ class TWorld:
 		logger.debug(f"TWorld->in_gateway( x, y, m )")
 		return self.maps[m]["tiles"][x, y]["gateway"]
 	
-	def go_gateway(self, x: int, y: int, m: int):
-		logger.debug(f"TWorld->go_gateway( x, y, m )")
-		gateway = next((item for item in self.maps[m]["gateways"] if item["x"] ==x and item["y"] == y), None)
+	def go_gateway(self, x: int, y: int, m: int, direction: str = None):
+		logger.debug(f"TWorld->go_gateway( x, y, m, direction={direction} )")
+		if direction is None:
+			gateway = next((item for item in self.maps[m]["gateways"] if item["x"] ==x and item["y"] == y), None)
+		else:
+			gateway = next((item for item in self.maps[m]["gateways"] if item["x"] ==x and item["y"] == y and item['action'] == direction), None)
+			gateways = self.maps[m]["gateways"]
+			print(f"{gateways!r}")
 		return gateway

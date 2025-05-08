@@ -137,3 +137,9 @@ white = (255, 255, 255)
 whitesmoke = (245, 245, 245)
 yellow = (255, 255, 0)
 yellowgreen = (139, 205, 50)
+
+bar_text = white
+bar_high = green
+bar_medium = orange
+bar_low = red
+bar_empty = (32, 32, 32)

@@ -118,7 +118,7 @@ def gen_tile(world: TWorld, map_idx: int, build):
 
 def gen_gateway(world: TWorld, map_idx: int, build):
 	# Creates gateways and stairwais and other map shifting tiles
-	# 0=gateway, 1=x, 2=y, 3=tile, 4=x, 5=y, 6=z, 7=map_idx
+	# 0=gateway, 1=x, 2=y, 3=tile, 4=x, 5=y, 6=z, 7=map_idx, 8=direction up/down
 	logger.debug(f"gen_gateway( {build!r} )")
 	gen_tile(world, map_idx, build)
 	tile_x = build[1]
@@ -127,10 +127,14 @@ def gen_gateway(world: TWorld, map_idx: int, build):
 	target_y = build[5]
 	target_z = build[6]
 	target_m = build[7]
+	user_action = None
+	if len(build) > 8:
+		user_action = build[8]
 	world.maps[map_idx]['gateways'].append(
 		{
 			"x": tile_x,
 			"y": tile_y,
+			"action": user_action,
 			"gateway": {
 				"x": target_x,
 				"y": target_y,

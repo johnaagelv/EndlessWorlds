@@ -42,9 +42,9 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 		elif key == tcod.event.KeySym.RIGHT:
 			action = TMoveAction(self.actor, dx=1, dy=0)
 		elif key == 46: #tcod.event.KeySym.KP_GREATER:
-			action = TStairAction(self.actor)
+			action = TStairAction(self.actor, "down")
 		elif key == 44: #tcod.event.KeySym.KP_LESS:
-			action = TStairAction(self.actor)
+			action = TStairAction(self.actor, "up")
 		elif key == tcod.event.KeySym.ESCAPE:
 			action = TEscapeAction(self.actor)
 

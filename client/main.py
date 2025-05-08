@@ -21,11 +21,31 @@ VIEWPORT_HEIGHT = SCREEN_HEIGHT - 10
 
 config = {
 	"title": "Endless Worlds, Ankt, (c) 2025",
+	"layout": "sc8050vp6040sp2005lp6005",
+	"layouts": {
+		"sc8050vp6040sp2005lp6005": {
+			"screen_width": 80,
+			"screen_height": 50,
+			"viewport_x": 0,
+			"viewport_y": 0,
+			"viewport_width": 60,
+			"viewport_height": 40,
+			"state_x": 0,
+			"state_y": 41,
+			"state_width": 20,
+			"state_height": 5,
+			"log_x": 20,
+			"log_y": 41,
+			"log_width": 60,
+			"log_height": 5,
+			"tileset": "client/redjack17.png",
+		},
+	},
 	"screen_width": SCREEN_WIDTH,
 	"screen_height": SCREEN_HEIGHT,
 	"viewport_width": VIEWPORT_WIDTH,
 	"viewport_height": VIEWPORT_HEIGHT,
-	"tileset": "client/teeto_k_18x18.png",
+	"tileset": "client/redjack17.png",
 	"host": "192.168.1.104",
 	"port": 12345,
 }
@@ -35,13 +55,40 @@ def main(log_level) -> None:
 	logging.info('World client started')
 
 	player_template = {
-		"x": 2, # X coordinate in map m
-		"y": 2, # Y coordinate in map m
-		"z": 0, # Z coordinate in map m
-		"r": 4, # Vision sense radius
+		"x": -1, # X coordinate in map m
+		"y": -1, # Y coordinate in map m
+		"z": -1, # Z coordinate in map m
 		"m": -1, # Map number
 		"face": "@", # How I look like
 		"colour": (255, 255, 255),
+		"states": {
+			"health": [500000, 0, 1000000], # current, min, max
+			"energy": [150000, 0, 1000000],
+			"strength": [50000, 0, 1000000],
+		},
+		"capabilities": {
+			"vision": [4], # default vision range
+			"hearing": [4],
+		},
+		"inventory": [],
+		"slots": {
+			"head": None, # cap, helmet
+			"neck": None, # necklace
+			"arms": None, # armor
+			"left arm": None, # armor, leather arm wraps
+			"right arm": None, # armor
+			"left wrist": None, # bracelet
+			"right wrist": None, # bracelet
+			"hands": None, # gloves
+			"left hand": None, # weapon, shield
+			"right hand": None, # weapon, shield
+			"left hand fingers": [None, None, None, None], # rings
+			"right hand fingers": [None, None, None, None], # rings
+			"body": None, # armor, leather vest
+			"waist": None, # tool or weapons belt
+			"legs": None, # armor
+			"feet": None, # boots
+		},
 		"playing": True, # Am I playing or not
 		"world": None,
 	}
@@ -50,7 +97,7 @@ def main(log_level) -> None:
 
 	event_handler = TEventHandler(player)
 	# Establish a render for presenting the game UI
-	render = TRender(config)
+	render = TRender(config['layouts'][config['layout']])
 	client = TClient()
 
 	while player.is_playing == True:
@@ -58,6 +105,7 @@ def main(log_level) -> None:
 		if player.data['world'] is not None:
 			render.render_world(player)
 			render.render_actor(player)
+			render.render_states(player)
 			render.render()
 
 			# Get user input
