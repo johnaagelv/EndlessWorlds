@@ -17,6 +17,9 @@ class TAction:
 	def run(self) -> None:
 		logger.debug(f"TAction->run()")
 		raise NotImplementedError()
+	
+	def use(self, state: str = "energy", value: int = 0):
+		self.actor.data['states'][state][0] -= value
 
 """
 TEscapeAction stops the actor playing the game
@@ -70,6 +73,7 @@ class TMoveAction(TAction):
 		if world.in_bounds(dest_x, dest_y, map_idx):
 			# Check if walkable
 			if map["tiles"]["walkable"][dest_x, dest_y]:
+				self.use('energy', 1)
 				if world.in_gateway(dest_x, dest_y, map_idx):
 					gateway = world.go_gateway(dest_x, dest_y, map_idx)
 					# Move to x, y coordinate in map number m
@@ -98,7 +102,6 @@ class TStairAction(TAction):
 			if map["tiles"]["walkable"][dest_x, dest_y]:
 				gateway = world.go_gateway(dest_x, dest_y, map_idx, self.direction)
 				if gateway is not None:
-					logger.debug(f"Gateway found {gateway!r}")
 					# Move to x, y coordinate in map number m
 					self.actor.data["x"] = gateway['gateway']["x"]
 					self.actor.data["y"] = gateway['gateway']["y"]

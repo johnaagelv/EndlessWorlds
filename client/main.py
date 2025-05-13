@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import sys
 import tcod
-import numpy as np
 
 from renders import TRender
 from entities import TActor
-from worlds import TWorld
 from input_handlers import TEventHandler
 from clients import TClient
+import colours
+from message_logs import TMessageLog
 
 import logging
 logger = logging.getLogger("EWClient")
@@ -34,9 +34,9 @@ config = {
 			"state_y": 41,
 			"state_width": 20,
 			"state_height": 5,
-			"log_x": 20,
+			"log_x": 21,
 			"log_y": 41,
-			"log_width": 60,
+			"log_width": 59,
 			"log_height": 5,
 			"tileset": "client/redjack17.png",
 		},
@@ -53,6 +53,9 @@ config = {
 def main(log_level) -> None:
 	logging.basicConfig(filename=LOG_FILENAME, format=LOG_FORMAT, filemode="w", level=log_level)
 	logging.info('World client started')
+
+	message_log = TMessageLog()
+	message_log.add("Welcome to Endless Worlds 2025", colours.green)
 
 	player_template = {
 		"x": -1, # X coordinate in map m
@@ -94,6 +97,7 @@ def main(log_level) -> None:
 	}
 
 	player = TActor(data=player_template)
+	player.log = message_log
 
 	event_handler = TEventHandler(player)
 	# Establish a render for presenting the game UI
@@ -105,7 +109,9 @@ def main(log_level) -> None:
 		if player.data['world'] is not None:
 			render.render_world(player)
 			render.render_actor(player)
+			render.render_entities(player)
 			render.render_states(player)
+			render.render_log(message_log.messages)
 			render.render()
 
 			# Get user input

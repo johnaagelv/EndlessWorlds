@@ -1,10 +1,13 @@
+from typing import Reversible
 import logging
 logger = logging.getLogger("EWClient")
 
+import textwrap
 import tcod
 import numpy as np
 import tile_types
 from entities import TActor
+from message_logs import TMessageLog, TLogMessage
 import colours
 
 class TRender:
@@ -75,6 +78,14 @@ class TRender:
 			string = actor.data["face"],
 			fg=actor.data["colour"],
 		)
+	
+	def render_entities(self, actor: TActor):
+		logging.debug(f"TRender->render_entities( actor )")
+		map = actor.map
+		visible_tiles = map['visible']
+		for entity in actor.data['world'].entities:
+			if visible_tiles[entity['x'], entity['y']]:
+				self.root_console.print(x=entity['x'], y=entity['y'], string=entity['face'], fg=entity['colour'])
 
 	def render_states(self, actor: TActor):
 		logging.debug(f"TRender->render_states( states )")
@@ -102,20 +113,51 @@ class TRender:
 			state_x = view_width - 2 - (current_value > 9) - (current_value > 99) - (current_value > 999)
 			self.root_console.print(x=view_x + state_x, y=view_y, string=f"{current_value}", fg=colours.bar_text)
 			view_y += 1
+
+	"""
+	Render messages
+	"""
+	def render_log(self, messages: TMessageLog) -> None:
+		x = self.config['log_x']
+		y = self.config['log_y']
+		width = self.config['log_width']
+		height = self.config['log_height']
+		self.render_messages(
+			self.root_console,
+			x, y, width, height,
+			messages
+		)
+
+	@staticmethod
+	def render_messages(
+		console: tcod.console.Console,
+		x: int,
+		y: int,
+		width: int,
+		height: int,
+		messages: Reversible[TMessageLog]
+	) -> None:
+		y_offset = height - 1
+		for message in reversed(messages):
+			for line in reversed(textwrap.wrap(message.full_text, width)):
+				console.print(x=x, y=y + y_offset, string=line, fg=message.fg)
+				y_offset -= 1
+				if y_offset < 0:
+					return
 	
 	"""
 	Render the console
 	"""
 	def render(self):
 		logging.info(f"TRender->render()")
-		x = 0
-		y = 44
-		for n in range(0,320):
-			self.root_console.print(x=x, y=y, string=f"{chr(n)}", fg=colours.white)
-			x += 1
-			if x > 63:
-				x=0
-				y += 1
+#		x = 0
+#		y = 44
+#		for n in range(0,320):
+#			self.root_console.print(x=x, y=y, string=f"{chr(n)}", fg=colours.white)
+#			x += 1
+#			if x > 63:
+#				x=0
+#				y += 1
 		
 		# Present the console
 		self.context.present(self.root_console)

@@ -5,10 +5,11 @@ logger = logging.getLogger("EWClient")
 from tcod.map import compute_fov
 
 from worlds import TWorld
-
+from message_logs import TMessageLog
 
 class TEntity:
 	data: Dict = {}
+	log: TMessageLog
 	def __init__(self, data):
 		logger.debug(f"TEntity->__init__( data )")
 		self.data = data
