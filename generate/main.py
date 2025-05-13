@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from typing import Dict, List
+import random
 import math
 import pickle
 import json
@@ -53,6 +54,11 @@ def gen_map(build) -> Dict:
 	map_width = build[2]
 	map_height = build[3]
 	map_visibility = build[5]
+	try:
+		random.seed(build[6])
+	except:
+		pass
+
 	map = {
 		"name": map_name,
 		"width": map_width,
@@ -112,7 +118,7 @@ def gen_tile(world: TWorld, map_idx: int, build):
 
 def gen_gateway(world: TWorld, map_idx: int, build):
 	# Creates gateways and stairwais and other map shifting tiles
-	# 0=gateway, 1=x, 2=y, 3=tile, 4=x, 5=y, 6=z, 7=map_idx
+	# 0=gateway, 1=x, 2=y, 3=tile, 4=x, 5=y, 6=z, 7=map_idx, 8=direction up/down
 	logger.debug(f"gen_gateway( {build!r} )")
 	gen_tile(world, map_idx, build)
 	tile_x = build[1]
@@ -121,10 +127,14 @@ def gen_gateway(world: TWorld, map_idx: int, build):
 	target_y = build[5]
 	target_z = build[6]
 	target_m = build[7]
+	user_action = None
+	if len(build) > 8:
+		user_action = build[8]
 	world.maps[map_idx]['gateways'].append(
 		{
 			"x": tile_x,
 			"y": tile_y,
+			"action": user_action,
 			"gateway": {
 				"x": target_x,
 				"y": target_y,
@@ -132,6 +142,123 @@ def gen_gateway(world: TWorld, map_idx: int, build):
 			}
 		}
 	)	
+
+def gen_area(world: TWorld, map_idx: int, build):
+	logger.debug(f"gen_area( {build!r} )")
+	map_tile1 = get_tile_by_name(build[5])
+	map_tile2 = get_tile_by_name(build[6])
+	try:
+		map_tile3 = get_tile_by_name(build[7])
+	except:
+		map_tile3 = get_tile_by_name('blank')
+	x1 = build[1]
+	y1 = build[2]
+	x2 = x1 + build[3]
+	y2 = y1 + build[4]
+	for x in range(x1, x2):
+		for y in range(y1, y2):
+			chance = random.random()
+			if chance > 0.75:
+				world.maps[map_idx]['tiles'][x, y] = map_tile1
+			elif chance > 0.5:
+				world.maps[map_idx]['tiles'][x, y] = map_tile2
+			else:
+				world.maps[map_idx]['tiles'][x, y] = map_tile3
+
+# [6, 46, 21, 450, 21, 2, 8, "floor"]
+def gen_trail(world: TWorld, map_idx: int, build):
+	logger.debug(f"gen_trail( {build!r} )")
+	map_tile = get_tile_by_name(build[7])
+	x1 = build[1]
+	y1 = build[2]
+	x2 = build[3]
+	y2 = build[4]
+	w1 = build[5]
+	w2 = build[6]
+	try:
+		random.seed(build[8])
+	except:
+		pass
+	if abs(x1 - x2) > abs(y1 - y2): # x axis is longest
+		y_step = abs(y1 - y2) / abs(x1 - x2)
+		y = float(y1)
+		y_start = min(y1, y2)
+		y_stop = max(y1, y2)
+		trail_width = random.randint(w1, w2)
+		trail_direction = random.randint(-5, 5)
+		x_start = min(x1, x2)
+		x_stop = max(x1, x2)
+		for x in range(x_start, x_stop):
+			chance = random.random()
+			if chance > 0.7:
+				trail_width = random.randint(w1, w2)
+				d_min = -2
+				d_max = 2
+				if y < trail_width * 2:
+					d_min = 1
+					d_max = 3
+				if y > world.maps[map_idx]['height'] - trail_width * 2:
+					d_min = -3
+					d_max = -1
+				if x > int(x_stop / 3) and y < y_stop:
+					d_min = 0
+					d_max = 3
+				if x > int(x_stop / 3) and y > y_stop:
+					d_min = -3
+					d_max = 0
+				trail_direction = random.randint(d_min, d_max)
+			
+			world.maps[map_idx]['tiles'][x, int(y) - trail_width:int(y) + trail_width] = map_tile
+			y += y_step + trail_direction
+			if y < trail_width * 2 or y > world.maps[map_idx]['height'] - trail_width * 2:
+				trail_direction = -trail_direction
+	else: # y axis is longest
+		x_step = abs(x1 - x2) / abs(y1 - y2)
+		x = float(x1)
+		x_start = min(x1, x2)
+		x_stop = max(x1, x2)
+		trail_width = random.randint(w1, w2)
+		trail_direction = random.randint(-5, 5)
+		y_start = min(y1, y2)
+		y_stop = max(y1, y2)
+		for y in range(y_start, y_stop):
+			chance = random.random()
+			if chance > 0.7:
+				trail_width = random.randint(w1, w2)
+				d_min = -2
+				d_max = 2
+				if x < trail_width * 2:
+					d_min = 1
+					d_max = 3
+				if x > world.maps[map_idx]['width'] - trail_width * 2:
+					d_min = -3
+					d_max = -1
+				if y > int(y_stop / 3) and x < x_stop:
+					d_min = 0
+					d_max = 3
+				if y > int(y_stop / 3) and x > x_stop:
+					d_min = -3
+					d_max = 0
+				trail_direction = random.randint(d_min, d_max)
+			
+			world.maps[map_idx]['tiles'][int(x) - trail_width:int(x) + trail_width, y] = map_tile
+			x += x_step + trail_direction
+			if x < trail_width * 2 or x > world.maps[map_idx]['width'] - trail_width * 2:
+				trail_direction = -trail_direction
+
+def gen_sym(world: TWorld, map_idx: int, build):
+	sym = 0
+	for y in range(0,16):
+		for x in range(0,32):
+			map_tile = tile_types.new_tile(
+				walkable=True,
+				transparent=True,
+				dark=(sym, (255, 255, 255), (0, 0, 0)),
+				light=(sym, (255, 255, 255), (0, 0, 0)),
+				gateway=False,
+			)
+			world.maps[map_idx]['tiles'][x, y] = map_tile
+			sym += 1
 
 def main():
 	log_level = logging.DEBUG
@@ -153,6 +280,14 @@ def main():
 				gen_gateway(world, map_idx, build)
 			elif build[0] == 4:
 				gen_gateway(world, map_idx, build)
+			elif build[0] == 5:
+				gen_area(world, map_idx, build)
+			elif build[0] == 6:
+				gen_trail(world, map_idx, build)
+			elif build[0] == 7:
+				gen_sym(world, map_idx, build)
+			else:
+				logger.error(f"ERROR: unhandled type {build[0]}")
 		
 		world.save()
 		logging.info('World generator stopped')
