@@ -52,13 +52,6 @@ tiles["wall"] = new_tile(
 	light=(43, (255, 255, 255), (64, 64, 64)),
 	gateway=False,
 )
-tiles["steel wall"] = new_tile(
-	walkable=False,
-	transparent=False,
-	dark=(9608, (192, 192, 192), (32, 32, 32)),
-	light=(9608, (255, 255, 255), (64, 64, 64)),
-	gateway=False,
-)
 tiles["gate"] = new_tile(
 	walkable=True,
 	transparent=False,
@@ -157,18 +150,39 @@ tiles["space with star"] = new_tile(
 	light=(183, (192, 192, 192), (0, 0, 0)),
 	gateway=False,
 )
+tiles["spaceship deck"] = new_tile(
+	walkable=False,
+	transparent=False,
+	dark=(32, (16, 16, 16), (32, 32, 32)),
+	light=(32, (16, 16, 16), (32, 32, 32)),
+	gateway=False,
+)
+tiles["spaceship outer shell"] = new_tile(
+	walkable=False,
+	transparent=False,
+	dark=(9608, (47, 79, 79), (47, 79, 79)),
+	light=(9608, (47, 79, 79), (47, 79, 79)),
+	gateway=False,
+)
+tiles["spaceship inner wall"] = new_tile(
+	walkable=False,
+	transparent=False,
+	dark=(9608, (70, 130, 180), (70, 130, 180)),
+	light=(9608, (70, 130, 180), (70, 130, 180)),
+	gateway=False,
+)
 tiles["console"] = new_tile(
 	walkable=False,
 	transparent=True,
-	dark=(242, (128, 128, 128), (0, 0, 0)),
-	light=(243, (255, 255, 255), (0, 0, 0)),
+	dark=(242, (255, 255, 255), (32, 32, 32)),
+	light=(243, (255, 255, 255), (32, 32, 32)),
 	gateway=False,
 )
 tiles["lift"] = new_tile(
 	walkable=True,
 	transparent=False,
-	dark=(9578, (128, 128, 128), (0, 0, 0)),
-	light=(9579, (255, 255, 255), (0, 0, 0)),
+	dark=(9578, (211, 211, 211), (32, 32, 32)),
+	light=(9579, (211, 211, 211), (32, 32, 32)),
 	gateway=False,
 )
 tiles["popsicle"] = new_tile(
@@ -181,7 +195,7 @@ tiles["popsicle"] = new_tile(
 tiles["door"] = new_tile(
 	walkable=True,
 	transparent=False,
-	dark=(9532, (255, 255, 255), (0, 0, 0)),
-	light=(9532, (255, 255, 255), (0, 0, 0)),
+	dark=(9532, (211, 211, 211), (32, 32, 32)),
+	light=(9532, (211, 211, 211), (32, 32, 32)),
 	gateway=False,
 )
