@@ -1,10 +1,10 @@
 {
 	"server": {
-		"host": "192.168.1.104",
+		"host": "192.168.1.107",
 		"port": 12345
 	},
 	"world": {
-		"name": "Ankt",
-		"filename": "Ankt.dat"
+		"name": "Spaceship Surveyor I",
+		"filename": "Demo.dat"
 	}
 }

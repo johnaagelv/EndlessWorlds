@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import utils
+import argparse
 
 from servers import TServer
 from worlds import TWorld
@@ -10,24 +11,17 @@ logger = logging.getLogger("EWlogger")
 LOG_FILENAME = "EW.log"
 LOG_FORMAT = "%(asctime)s %(levelname)-8s %(message)s"
 SERVER_PORT = 12345
-SERVER_HOST = '192.168.1.104'
+SERVER_HOST = '127.0.0.1'
+log_levels = {'info': logging.INFO, 'debug': logging.DEBUG}
 
-def main(host: str, port: int, log_level):
+def main(port: int, log_level: int):
 	print("World server started")
 	logging.basicConfig(filename=LOG_FILENAME, format=LOG_FORMAT, filemode="w", level=log_level)
 	logging.info('World server started')
 
-	server_configuration = utils.get_config('server')
-	if server_configuration is not None:
-		host = server_configuration['host']
-		port = server_configuration['port']
+	host = utils.get_local_ip()
 
 	world_configuration = utils.get_config('world')
-	if world_configuration is None:
-		logging.error(f"World configuration is missing in file 'server.json'")
-		print("World server stopped due to error. Check {LOG_FILENAME}")
-		exit ()
-	
 	world = TWorld(world_configuration['name'])
 	server = TServer(host, port, world)
 	try:
@@ -41,31 +35,18 @@ def main(host: str, port: int, log_level):
 
 if __name__ == "__main__":
 	port = SERVER_PORT
-	try:
-		host = utils.get_local_ip()
-	except: 
-		host = SERVER_HOST
-	
-	try:
-		public_ip = utils.get_public_ip()
-	except:
-		pass
-	
 	log_level = logging.INFO
-	try:
-		if len(sys.argv) >= 2:
-			host = sys.argv[1]
-		if len(sys.argv) >= 3:
-			port = int(sys.argv[2])
-		if len(sys.argv) == 4:
-			log_level = logging.DEBUG
-		if len(sys.argv) > 4:
-			raise SystemError()
-	except:
-		print(f"Usage: {sys.argv[0]} <host> <port> <log_level>")
-		print(f"  <host> default value is {SERVER_HOST}")
-		print(f"  <port> default value is {SERVER_PORT}")
-		print(f"  <log_level> may be DEBUG")
-		sys.exit(1)
 
-	main(host, port, log_level)
+	parser = argparse.ArgumentParser(
+		description="Runs a Roguelike World server.",
+		epilog="Author: John Aage Andersen, Reddit: johnaagelv, 2025"
+	)
+	parser.add_argument("-p", "--port", help=f"the port number to use, default is {SERVER_PORT}")
+	parser.add_argument("-l", "--log_level", help="the logging level to use: 'info' (default) or 'debug'")
+	args = parser.parse_args()
+	if args.port is not None:
+		port = args.port
+	if args.log_level is not None:
+		log_level = log_levels[args.log_level]
+
+	main(port, log_level)

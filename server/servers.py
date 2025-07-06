@@ -14,6 +14,7 @@ Server
 class TServer:
 	def __init__(self, host: str, port: int, world: TWorld):
 		logger.debug(f"TServer->init(host={host}, port={port})")
+		print(f"- using {host}:{port}")
 		self.host = host
 		self.port = port
 		self.world = world

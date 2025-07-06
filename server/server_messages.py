@@ -215,7 +215,7 @@ class TMessage:
 			# Extract the request from the content
 			request = pickle.loads(data)
 #		return True
-#		"""
+
 		request_cmd = request.get("cmd")
 		if request_cmd == "new":
 			# Gather the NEW GAME information and return it
@@ -225,8 +225,9 @@ class TMessage:
 			self.request = {
 				"cmd": request_cmd,
 				"cid": cid,
+				"name": self.world.name,
 				"entry_point": self.world.entry_point(), # One entry point of the world
-				"map_sizes" : self.world.map_sizes(), # All map sizes to ensure the client is prepared
+				"map_sizes" : self.world.map_definitions(), # All map sizes to ensure the client is prepared
 			}
 		elif request_cmd == "fos":
 			# Gather the FOS view and return it
@@ -236,7 +237,6 @@ class TMessage:
 			}
 		# Set selector to listen for write events, we're done reading.
 		self._set_selector_events_mask("w")
-#		"""
 
 	def create_response(self):
 		logger.debug("TMessage->create_response()")

@@ -18,10 +18,11 @@ class TWorld:
 		self.name = world_name
 		with open(world_name + ".dat", "rb") as f:
 			load_data = pickle.load(f)
-		
+
 		self.entry = load_data['entry']
 		self.maps = load_data['maps']
-	
+		print(f"- running {world_name} with {len(self.maps)} maps.")
+
 	"""
 	# Get and return the field of sense
 	"""
@@ -59,7 +60,7 @@ class TWorld:
 	"""
 	Get and return the map sizes for a new player
 	"""
-	def map_sizes(self) -> List:
+	def map_definitions(self) -> List:
 		logger.debug(f"TWorld->map_sizes()")
 		map_sizes = []
 		for map_idx, m in enumerate(self.maps):
@@ -68,6 +69,7 @@ class TWorld:
 				fos = self.field_of_sense({"x":0, "y": 0, "z": 0, "m": map_idx, "r": 0}, True)
 			map_sizes.append(
 				{
+					"name": m["name"],
 					"width": m["width"],
 					"height": m["height"],
 					"visible": m["visible"],
