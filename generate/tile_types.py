@@ -26,7 +26,7 @@ def new_tile(
 	dark: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]],
 	light: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]],
 	gateway: bool,
-) -> np.array:
+) -> np.ndarray:
 	return np.array((walkable, transparent, dark, light, gateway), dtype=tile_dt)
 
 tiles = {}
@@ -50,6 +50,13 @@ tiles["wall"] = new_tile(
 	transparent=False,
 	dark=(43, (192, 192, 192), (32, 32, 32)),
 	light=(43, (255, 255, 255), (64, 64, 64)),
+	gateway=False,
+)
+tiles["steel wall"] = new_tile(
+	walkable=False,
+	transparent=False,
+	dark=(9608, (192, 192, 192), (32, 32, 32)),
+	light=(9608, (255, 255, 255), (64, 64, 64)),
 	gateway=False,
 )
 tiles["gate"] = new_tile(
@@ -127,5 +134,54 @@ tiles["underground"] = new_tile(
 	transparent=True,
 	dark=(32, (32, 32, 32), (32, 32, 32)),
 	light=(32, (48, 48, 48), (48, 48, 48)),
+	gateway=False,
+)
+tiles["space"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(ord(" "), (0, 0, 0), (0, 0, 0)),
+	light=(ord(" "), (0, 0, 0), (0, 0, 0)),
+	gateway=False,
+)
+tiles["space with small star"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(183, (128, 128, 128), (0, 0, 0)),
+	light=(183, (128, 128, 128), (0, 0, 0)),
+	gateway=False,
+)
+tiles["space with star"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(183, (192, 192, 192), (0, 0, 0)),
+	light=(183, (192, 192, 192), (0, 0, 0)),
+	gateway=False,
+)
+tiles["console"] = new_tile(
+	walkable=False,
+	transparent=True,
+	dark=(242, (128, 128, 128), (0, 0, 0)),
+	light=(243, (255, 255, 255), (0, 0, 0)),
+	gateway=False,
+)
+tiles["lift"] = new_tile(
+	walkable=True,
+	transparent=False,
+	dark=(9578, (128, 128, 128), (0, 0, 0)),
+	light=(9579, (255, 255, 255), (0, 0, 0)),
+	gateway=False,
+)
+tiles["popsicle"] = new_tile(
+	walkable=False,
+	transparent=False,
+	dark=(937, (163, 237, 255), (194, 245, 255)),
+	light=(937, (163, 237, 255), (194, 245, 255)),
+	gateway=False,
+)
+tiles["door"] = new_tile(
+	walkable=True,
+	transparent=False,
+	dark=(9532, (255, 255, 255), (0, 0, 0)),
+	light=(9532, (255, 255, 255), (0, 0, 0)),
 	gateway=False,
 )

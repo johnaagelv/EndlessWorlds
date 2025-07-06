@@ -41,10 +41,6 @@ def get_tile_by_name(name: str) -> np.ndarray:
 		tile = tile_types.tiles['blank']
 	return tile
 
-"""
-Generate the world information.
-This includes the world name and the entry points where new players will be placed.
-"""
 def gen_world(build: dict) -> TWorld:
 	logger.info(f"gen_world( {build!r} )")
 	world = TWorld()
@@ -52,10 +48,6 @@ def gen_world(build: dict) -> TWorld:
 	world.entry = build["entry"]
 	return world
 
-"""
-0. Generate the initial map definition.
-This will be used by the following build instructions to add details to the map
-"""
 def gen_map(build: dict) -> dict:
 	logger.info("")
 	logger.info(f"gen_map( {build!r} )")
