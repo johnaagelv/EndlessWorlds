@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 from typing import Dict, List
+import sys
 import random
 import math
 import pickle
 import json
 import numpy as np
 import tile_types
+import tcod.tileset
 
 import logging
 logger = logging.getLogger("EWGenerate")
@@ -18,7 +20,7 @@ class TWorld:
 	entry: List
 
 	def save(self):
-		logger.debug(f"TWorld->save()")
+		logger.info(f"TWorld->save()")
 		with open(self.name + '.dat', "wb") as f:
 			save_data = {
 				"name": self.name,
@@ -28,27 +30,35 @@ class TWorld:
 			pickle.dump(save_data, f)
 			
 
-def get_tile_by_name(name) -> np.array:
-	logger.debug(f"get_tile_by_name( {name} )")
+def get_tile_by_name(name: str) -> np.ndarray:
+	logger.info(f"get_tile_by_name( {name} )")
 	try:
 		tile = tile_types.tiles[name]
 	except:
 		logger.warning(
-			f"WARNING: Tile {name} not found among tile types! \n"
-			f"- using tile 'blank' instead!"
+			f"- tile {name} not found among tile types! Using tile 'blank' instead!"
 		)
 		tile = tile_types.tiles['blank']
 	return tile
 
-def gen_world(build) -> TWorld:
-	logger.debug(f"gen_world( {build!r} )")
+"""
+Generate the world information.
+This includes the world name and the entry points where new players will be placed.
+"""
+def gen_world(build: dict) -> TWorld:
+	logger.info(f"gen_world( {build!r} )")
 	world = TWorld()
 	world.name = build["name"]
 	world.entry = build["entry"]
 	return world
 
-def gen_map(build) -> Dict:
-	logger.debug(f"gen_map( {build!r} )")
+"""
+0. Generate the initial map definition.
+This will be used by the following build instructions to add details to the map
+"""
+def gen_map(build: dict) -> dict:
+	logger.info("")
+	logger.info(f"gen_map( {build!r} )")
 	map_tile = get_tile_by_name(build[4])
 	map_name = build[1]
 	map_width = build[2]
@@ -65,12 +75,30 @@ def gen_map(build) -> Dict:
 		"height": map_height,
 		"tiles": np.full((map_width, map_height), fill_value=map_tile, order="F"),
 		"gateways": [],
+		"actions": [],
 		"visible": map_visibility,
 	}
 	return map
 
-def gen_square(world: TWorld, map_idx: int, build):
-	logger.debug(f"gen_square( {build!r} )")
+"""
+Add the specified tile to a world map
+"""
+def gen_tile(world: TWorld, map_idx: int, build: dict):
+	# 0=tile, 1=x, 2=y, 3=tile
+	logger.info(f"gen_tile( {build!r} )")
+	map_tile = get_tile_by_name(build[3])
+	tile_x = build[1]
+	tile_y = build[2]
+	world.maps[map_idx]['tiles'][tile_x, tile_y] = map_tile
+
+"""
+1. Generate a square/rectangle with a border of a tile or filled with a tile
+"""
+def gen_square(world: TWorld, map_idx: int, build: dict):
+	logger.info(f"gen_square( {build!r} )")
+	if len(build) < 7:
+		logger.error(f"- too few build parameters! {len(build)} given")
+		raise SystemError()
 	map_tile = get_tile_by_name(build[5])
 	x1 = build[1]
 	y1 = build[2]
@@ -85,41 +113,48 @@ def gen_square(world: TWorld, map_idx: int, build):
 		world.maps[map_idx]['tiles'][x1:x2, y1] = map_tile
 		world.maps[map_idx]['tiles'][x1:x2, y2-1] = map_tile
 
-def gen_circle(world: TWorld, map_idx: int, build):
+"""
+2. Generate a circular area with a border of a tile or filled with a tile
+"""
+def gen_circle(world: TWorld, map_idx: int, build: dict):
 	# 0=circle, 1=x, 2=y, 3=radius, 4=tile, 5=fill, 6=thickness
-	logger.debug(f"gen_circle( {build!r} )")
+	logger.info(f"gen_circle( {build!r} )")
+	if len(build) < 7:
+		logger.error(f"- too few build parameters! {len(build)} given")
+		raise SystemError()
 	map_tile = get_tile_by_name(build[4])
 	center_x = build[1]
 	center_y = build[2]
 	radius = build[3]
 	fill = build[5]
 	if fill:
-		for r in range(0, 360):
-			x = center_x + int(math.sin(r) * radius)
-			y = center_y + int(math.cos(r) * radius)
+		for r in range(0, 360, 1):
+			r_angle = math.radians(r)
+			x = center_x + int(math.sin(r_angle) * radius)
+			y = center_y + int(math.cos(r_angle) * radius)
 			world.maps[map_idx]['tiles'][min(center_x, x):max(center_x, x), min(center_y, y):max(center_y, y)] = map_tile
 	else:
 		thickness = 1
 		if len(build) >= 7:
 			thickness = max(build[6], 1)
-		for r in range(0, 360):
+		for r in range(0, 260, 1):
+			r_angle = math.radians(r)
 			for t in range(0, thickness):
-				x = center_x + int(math.sin(r) * (radius - t))
-				y = center_y + int(math.cos(r) * (radius - t))
+				x = center_x + int(math.sin(r_angle) * (radius - t))
+				y = center_y + int(math.cos(r_angle) * (radius - t))
 				world.maps[map_idx]['tiles'][x, y] = map_tile
 
-def gen_tile(world: TWorld, map_idx: int, build):
-	# 0=tile, 1=x, 2=y, 3=tile
-	logger.debug(f"gen_tile( {build!r} )")
-	map_tile = get_tile_by_name(build[3])
-	tile_x = build[1]
-	tile_y = build[2]
-	world.maps[map_idx]['tiles'][tile_x, tile_y] = map_tile
-
-def gen_gateway(world: TWorld, map_idx: int, build):
-	# Creates gateways and stairwais and other map shifting tiles
+"""
+3. Generate an movement activated gateway to a location on another map
+4. Generate an action activated gateway to a location on another map
+"""
+def gen_gateway(world: TWorld, map_idx: int, build: dict):
+	# Creates gateways and stairways and other map shifting tiles
 	# 0=gateway, 1=x, 2=y, 3=tile, 4=x, 5=y, 6=z, 7=map_idx, 8=direction up/down
-	logger.debug(f"gen_gateway( {build!r} )")
+	logger.info(f"gen_gateway( {build!r} )")
+	if (build[0] == 3 and len(build) < 8) or (build[0] == 4 and len(build) < 9):
+		logger.error(f"- too few build parameters! {len(build)} given")
+		raise SystemError()
 	gen_tile(world, map_idx, build)
 	tile_x = build[1]
 	tile_y = build[2]
@@ -143,14 +178,35 @@ def gen_gateway(world: TWorld, map_idx: int, build):
 		}
 	)	
 
-def gen_area(world: TWorld, map_idx: int, build):
-	logger.debug(f"gen_area( {build!r} )")
+"""
+5. Generate an area of up to 3 tiles based on chances
+Used for building forest, plains, space ...
+"""
+def gen_area(world: TWorld, map_idx: int, build: dict):
+	logger.info(f"gen_area( {build!r} )")
+	if len(build) < 7:
+		logger.error(f"- too few build parameters! {len(build)} given")
+		raise SystemError()
 	map_tile1 = get_tile_by_name(build[5])
 	map_tile2 = get_tile_by_name(build[6])
+	tile_chance1 = 0.75
+	tile_chance2 = 0.5
 	try:
 		map_tile3 = get_tile_by_name(build[7])
 	except:
 		map_tile3 = get_tile_by_name('blank')
+	try:
+		logger.info(f"- parse tile chances from 7")
+		tile_chance1 = float(int(build[7]) / 100)
+		tile_chance2 = float(int(build[8]) / 100)
+	except:
+		try:
+			logger.info(f"- parse tile chances from 8")
+			tile_chance1 = float(int(build[8]) / 100)
+			tile_chance2 = float(int(build[9]) / 100)
+		except:
+			pass
+	logger.info(f"- tile chances {tile_chance1}, {tile_chance2}")
 	x1 = build[1]
 	y1 = build[2]
 	x2 = x1 + build[3]
@@ -158,16 +214,23 @@ def gen_area(world: TWorld, map_idx: int, build):
 	for x in range(x1, x2):
 		for y in range(y1, y2):
 			chance = random.random()
-			if chance > 0.75:
+			if chance > tile_chance1:
 				world.maps[map_idx]['tiles'][x, y] = map_tile1
-			elif chance > 0.5:
+			elif chance > tile_chance2:
 				world.maps[map_idx]['tiles'][x, y] = map_tile2
 			else:
 				world.maps[map_idx]['tiles'][x, y] = map_tile3
 
+"""
+6. Generate a trail of tiles in the longest direction (up/down or left/right)
+Used for generating tunnels, rivers, ...
+"""
 # [6, 46, 21, 450, 21, 2, 8, "floor"]
-def gen_trail(world: TWorld, map_idx: int, build):
-	logger.debug(f"gen_trail( {build!r} )")
+def gen_trail(world: TWorld, map_idx: int, build: dict):
+	logger.info(f"gen_trail( {build!r} )")
+	if len(build) < 8:
+		logger.error(f"- too few build parameters! {len(build)} given")
+		raise SystemError()
 	map_tile = get_tile_by_name(build[7])
 	x1 = build[1]
 	y1 = build[2]
@@ -246,25 +309,53 @@ def gen_trail(world: TWorld, map_idx: int, build):
 			if x < trail_width * 2 or x > world.maps[map_idx]['width'] - trail_width * 2:
 				trail_direction = -trail_direction
 
-def gen_sym(world: TWorld, map_idx: int, build):
+"""
+7. Generate all the charmap tiles. Used for testing the tilesheet
+"""
+def gen_sym(world: TWorld, map_idx: int, build: dict):
 	sym = 0
-	for y in range(0,16):
-		for x in range(0,32):
+	for y in range(0,16,2):
+		for x in range(0, 64, 2):
+			sym_char = tcod.tileset.CHARMAP_CP437[sym]
 			map_tile = tile_types.new_tile(
 				walkable=True,
 				transparent=True,
-				dark=(sym, (255, 255, 255), (0, 0, 0)),
-				light=(sym, (255, 255, 255), (0, 0, 0)),
+				dark=(sym_char, (255, 255, 255), (0, 0, 0)),
+				light=(sym_char, (255, 255, 255), (0, 0, 0)),
 				gateway=False,
 			)
 			world.maps[map_idx]['tiles'][x, y] = map_tile
+			del(map_tile)
+			print(f"{x},{y} = {sym} = {sym_char}")
 			sym += 1
 
-def main():
-	log_level = logging.DEBUG
+"""
+8. Generate a tile of an item with user actions
+"""
+def gen_item(world: TWorld, map_idx: int, build: dict):
+	# Creates items with attached actions
+	# 0=item, 1=x, 2=y, 3=tile, 4=actions
+	logger.info(f"gen_item( {build!r} )")
+	if len(build) < 5:
+		logger.error(f"- too few build parameters! {len(build)} given")
+		raise SystemError()
+	# Add the tile to the map
+	gen_tile(world, map_idx, build)
+	tile_x: int = build[1]
+	tile_y: int = build[2]
+	user_actions: dict = build[4]
+	world.maps[map_idx]['actions'].append(
+		{
+			"x": tile_x,
+			"y": tile_y,
+			"actions": user_actions,
+		}
+	)
+
+def main(world_name: str, log_level: int):
 	logging.basicConfig(filename=LOG_FILENAME, format=LOG_FORMAT, filemode="w", level=log_level)
 	logging.info('World generator started')
-	with open("generate/ankt.gen", "rt") as f:
+	with open(world_name + ".gen", "rt") as f:
 		world_definition = json.load(f)
 		world = gen_world(world_definition)
 
@@ -272,6 +363,7 @@ def main():
 			if build[0] == 0:
 				world.maps.append(gen_map(build))
 				map_idx = len(world.maps)-1
+				logging.info(f"- map idx {map_idx} for {world.maps[map_idx]['name']}")
 			elif build[0] == 1:
 				gen_square(world, map_idx, build)
 			elif build[0] == 2:
@@ -286,6 +378,8 @@ def main():
 				gen_trail(world, map_idx, build)
 			elif build[0] == 7:
 				gen_sym(world, map_idx, build)
+			elif build[0] == 8:
+				gen_item(world, map_idx, build)
 			else:
 				logger.error(f"ERROR: unhandled type {build[0]}")
 		
@@ -293,4 +387,30 @@ def main():
 		logging.info('World generator stopped')
 
 if __name__ == "__main__":
-	main()
+	log_levels: dict = {
+		"info": logging.INFO,
+		"warning": logging.WARNING,
+		"debug": logging.DEBUG
+	}
+
+	log_level = logging.INFO # default logging level
+	world_name: str = "demo" # default world name 
+
+	try:
+		if len(sys.argv) >= 2:
+			world_name = sys.argv[1]
+			world_name = world_name.lower()
+
+		if len(sys.argv) >= 3:
+			log_level_name: str = sys.argv[2]
+			log_level = log_levels[log_level_name.lower()]
+
+		if len(sys.argv) < 2 or len(sys.argv) > 4:
+			raise SystemError()
+	except:
+		print(f"Usage: {sys.argv[0]} <world name> <log_level>")
+		print(f"  <world name> must be provided")
+		print(f"  <log_level> may be info (default), warning, debug")
+		sys.exit(1)
+
+	main(world_name, log_level)
