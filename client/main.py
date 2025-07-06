@@ -38,15 +38,16 @@ config = {
 			"log_y": 41,
 			"log_width": 59,
 			"log_height": 5,
-			"tileset": "client/redjack17.png",
+			"tileset": "redjack17.png",
 		},
 	},
 	"screen_width": SCREEN_WIDTH,
 	"screen_height": SCREEN_HEIGHT,
 	"viewport_width": VIEWPORT_WIDTH,
 	"viewport_height": VIEWPORT_HEIGHT,
-	"tileset": "client/redjack17.png",
-	"host": "192.168.1.104",
+	"tileset": "redjack17.png",
+#	"host": "91.105.47.63",
+	"host": "192.168.1.107",
 	"port": 12345,
 }
 	
@@ -135,7 +136,7 @@ def main(log_level) -> None:
 	logging.info('World client stopped')
 
 if __name__ == "__main__":
-	log_level = logging.INFO
+	log_level = logging.DEBUG
 	try:
 		if len(sys.argv) >= 2:
 			log_level = logging.DEBUG

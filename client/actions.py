@@ -38,6 +38,7 @@ class TMoveAction(TAction):
 		super().__init__(actor)
 		self.dx = dx
 		self.dy = dy
+		self.direction = None
 
 	"""
 	Provides the move factor aka move speed
@@ -64,7 +65,7 @@ class TMoveAction(TAction):
 	Execute the action
 	"""
 	def run(self):
-		logger.debug(f"TMoveAction->run()")
+		logger.info(f"TMoveAction->run()")
 		world: TWorld = self.actor.world
 		map_idx = self.actor.map_idx
 		map = self.actor.map
@@ -72,25 +73,30 @@ class TMoveAction(TAction):
 		# Check in bounds of the map
 		if world.in_bounds(dest_x, dest_y, map_idx):
 			# Check if walkable
-			if map["tiles"]["walkable"][dest_x, dest_y]:
-				self.use('energy', 1)
-				if world.in_gateway(dest_x, dest_y, map_idx):
-					gateway = world.go_gateway(dest_x, dest_y, map_idx)
-					# Move to x, y coordinate in map number m
-					self.actor.data["x"] = gateway["gateway"]["x"]
-					self.actor.data["y"] = gateway["gateway"]["y"]
-					self.actor.data["m"] = gateway["gateway"]["m"]
-				else:
-					# Move to x, y coordinate
-					self.actor.data["x"] = dest_x
-					self.actor.data["y"] = dest_y
+			if map is not None:
+				if map["tiles"]["walkable"][dest_x, dest_y]:
+					self.use('energy', 1)
+					if world.in_gateway(dest_x, dest_y, map_idx) or self.direction is not None:
+						# Get the gateway information 
+						gateway = world.go_gateway(dest_x, dest_y, map_idx, self.direction)
+						# Move to x, y coordinate in map number m
+						self.actor.data["x"] = gateway["gateway"]["x"]
+						self.actor.data["y"] = gateway["gateway"]["y"]
+						if map_idx != gateway['gateway']['m']:
+							self.actor.data["m"] = gateway["gateway"]["m"]
+							world.start_map(0)
+					else:
+						# Move to x, y coordinate
+						self.actor.data["x"] = dest_x
+						self.actor.data["y"] = dest_y
 
-class TStairAction(TAction):
+class TStairAction(TMoveAction):
 	def __init__(self, actor: TActor, direction: str):
 		logger.debug(f"TStairAction->__init__( actor, direction={direction} )")
-		super().__init__(actor)
+		super().__init__(actor, 0, 0)
 		self.direction = direction
 
+	"""
 	def run(self):
 		logger.debug(f"TStairAction->run()")
 		world: TWorld = self.actor.world
@@ -106,3 +112,4 @@ class TStairAction(TAction):
 					self.actor.data["x"] = gateway['gateway']["x"]
 					self.actor.data["y"] = gateway['gateway']["y"]
 					self.actor.data["m"] = gateway['gateway']["m"]
+	"""

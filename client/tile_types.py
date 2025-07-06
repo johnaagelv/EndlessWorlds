@@ -28,7 +28,7 @@ def new_tile(
 	dark: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]],
 	light: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]],
 	gateway: bool,
-) -> np.array:
+) -> np.ndarray:
 	return np.array((walkable, transparent, dark, light, gateway), dtype=tile_dt)
 
 SHROUD = np.array((ord(" "), (255, 255, 255), (0, 0, 0)), dtype=graphic_dt)

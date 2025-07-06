@@ -14,12 +14,12 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 	def handle_events(self) -> None:
 		logger.debug(f"TEventHandler->handle_event()")
 		for event in tcod.event.wait():
-			action: TAction = self.dispatch(event)
+			action = self.dispatch(event)
 
 			if action is None:
 				continue
 
-			action.run(self.actor)
+			action.run()
 
 			self.actor.update_fos()
 
@@ -33,7 +33,9 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 		
 		key = event.sym
 		logger.info(f"- key='{key}' {tcod.event.KeySym.GREATER} or {tcod.event.KeySym.LESS}")
-		if key == tcod.event.KeySym.UP:
+		if key == tcod.event.KeySym.ESCAPE:
+			action = TEscapeAction(self.actor)
+		elif key == tcod.event.KeySym.UP:
 			action = TMoveAction(self.actor, dx=0, dy=-1)
 		elif key == tcod.event.KeySym.DOWN:
 			action = TMoveAction(self.actor, dx=0, dy=1)
@@ -45,8 +47,8 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 			action = TStairAction(self.actor, "down")
 		elif key == 44: #tcod.event.KeySym.KP_LESS:
 			action = TStairAction(self.actor, "up")
-		elif key == tcod.event.KeySym.ESCAPE:
-			action = TEscapeAction(self.actor)
+		else:
+			action = TStairAction(self.actor, chr(key))
 
 		return action
 

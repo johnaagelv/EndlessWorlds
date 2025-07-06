@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Dict, Any
 import logging
 logger = logging.getLogger("EWClient")
 
@@ -16,66 +16,11 @@ import numpy as np
 from entities import TActor
 from worlds import TWorld
 
-class TClient:
-	def __init__(self):
-		logger.debug(f"TClient->__init__()")
-		self.sel = selectors.DefaultSelector()
-
-	""" Start connection to the specified server with the provided request """
-	def start_connection(self, host, port, request):
-		logger.debug(f"TClient->start_connection( host, port, request )")
-		addr = (host, port)
-		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		sock.setblocking(False)
-		sock.connect_ex(addr)
-		events = selectors.EVENT_READ | selectors.EVENT_WRITE
-		message = TMessage(self.sel, sock, addr, request)
-		self.sel.register(sock, events, data=message)
-
-	def run(self, player: TActor) -> Any:
-		logger.debug(f"TClient->run( actor )")
-		events = self.sel.select(timeout=5.0)
-		for key, mask in events:
-			message: TMessage = key.data
-			try:
-				message.process_events(mask)
-				if message.sock is None:
-
-					if message.response['cmd'] == 'new':
-						logger.info(f"TClient initializing new world")
-						player.data['x'] = message.response['entry_point'][0]
-						player.data['y'] = message.response['entry_point'][1]
-						player.data['z'] = message.response['entry_point'][2]
-						player.data['m'] = message.response['entry_point'][3]
-						player.data['world'] = TWorld(player, message.response['map_sizes'])
-					elif message.response['cmd'] == 'fos':
-						logger.info(f"TClient applying FOS data")
-						fos = message.response['fos']
-						x_min = fos.get("x_min")
-						x_max = fos.get("x_max")
-						y_min = fos.get("y_min")
-						y_max = fos.get("y_max")
-						view = fos.get("view")
-						gateways = fos.get("gateways")
-						temp = np.array(view)
-						player.data["world"].maps[player.data["m"]]["tiles"][x_min:x_max, y_min:y_max] = temp
-						player.data["world"].maps[player.data["m"]]["gateways"] = gateways
-
-			except Exception:
-				logger.warning(
-					f"TClient: Error: Exception for {message.addr}:\n"
-					f"{traceback.format_exc()}"
-				)
-				message.close()
-		if not self.sel.get_map():
-			return False
-		return True
-		
 class TMessage:
-	def __init__(self, selector, sock, addr, request):
+	def __init__(self, selector, sock: socket.socket, addr, request):
 		logger.debug(f"TMessage->__init__( selector, sock, addr, request )")
 		self.selector = selector
-		self.sock = sock
+		self.sock: socket.socket = sock
 		self.addr = addr
 		self.request = request
 		self._recv_buffer = b""
@@ -156,7 +101,7 @@ class TMessage:
 	def _process_response_json_content(self):
 		logger.debug(f"TMessage->_process_response_json_content()")
 		content = self.response
-		result = content.get("result")
+		result = content.get("result") # type: ignore
 
 	def _process_response_binary_content(self):
 		logger.debug(f"TMessage->_process_response_binary_content()")
@@ -212,7 +157,7 @@ class TMessage:
 			logger.debug(f"Error: socket.close() exception for {self.addr}: {e!r}")
 		finally:
 			# Delete reference to socket object for garbage collection
-			self.sock = None
+			self.sock = None # type: ignore
 
 	def queue_request(self):
 		logger.debug(f"TMessage->queue_request()")
@@ -247,7 +192,7 @@ class TMessage:
 	def process_jsonheader(self):
 		logger.debug(f"TMessage->process_jsonheader()")
 		hdrlen = self._jsonheader_len
-		if len(self._recv_buffer) >= hdrlen:
+		if len(self._recv_buffer) >= hdrlen: # type: ignore
 			self.jsonheader = self._json_decode(
 				self._recv_buffer[:hdrlen], "utf-8"
 			)
@@ -263,23 +208,90 @@ class TMessage:
 
 	def process_response(self):
 		logger.debug(f"TMessage->process_response()")
-		content_len = self.jsonheader["content-length"]
+		content_len = self.jsonheader["content-length"] # type: ignore
 		if len(self._recv_buffer) < content_len:
 			return
 		data = self._recv_buffer[:content_len]
 		self._recv_buffer = self._recv_buffer[content_len:]
-		if self.jsonheader["content-type"] == "text/json":
-			encoding = self.jsonheader["content-encoding"]
+		if self.jsonheader["content-type"] == "text/json": # type: ignore
+			encoding = self.jsonheader["content-encoding"] # type: ignore
 			self.response = self._json_decode(data, encoding)
 			self._process_response_json_content()
 		else:
 			# Binary or unknown content-type
 			self.response = pickle.loads(data)
 			logger.debug(
-				f"- Received {self.jsonheader['content-type']} "
+				f"- Received {self.jsonheader['content-type']} " # type: ignore
 				f"response from {self.addr}"
 			)
 			logger.debug(f"- content {self.response!r}")
 			# self._process_response_binary_content()
 		# Close when response has been processed
 		self.close()
+
+class TClient:
+	def __init__(self):
+		logger.debug(f"TClient->__init__()")
+		self.sel = selectors.DefaultSelector()
+
+	""" Start connection to the specified server with the provided request """
+	def start_connection(self, host, port, request):
+		logger.debug(f"TClient->start_connection( host, port, request )")
+		addr = (host, port)
+		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		sock.setblocking(False)
+		sock.connect_ex(addr)
+		events = selectors.EVENT_READ | selectors.EVENT_WRITE
+		message = TMessage(self.sel, sock, addr, request)
+		self.sel.register(sock, events, data=message)
+
+	def run(self, player: TActor) -> Any:
+		logger.debug(f"TClient->run( actor )")
+		events = self.sel.select(timeout=5.0)
+		for key, mask in events:
+			message: TMessage = key.data
+			try:
+				message.process_events(mask)
+				if message.sock is None:
+
+					if message.response['cmd'] == 'new':
+						logger.info(f"TClient initializing new world")
+						player.data['x'] = message.response['entry_point'][0]
+						player.data['y'] = message.response['entry_point'][1]
+						player.data['z'] = message.response['entry_point'][2]
+						player.data['m'] = message.response['entry_point'][3]
+						player.data['world'] = TWorld(player, message.response['map_sizes'])
+						player.log.add(f"{message.response['name']}")
+
+					elif message.response['cmd'] == 'fos':
+						logger.info(f"TClient applying FOS data")
+						fos = message.response['fos']
+						x_min = fos.get("x_min")
+						x_max = fos.get("x_max")
+						y_min = fos.get("y_min")
+						y_max = fos.get("y_max")
+						view = fos.get("view")
+						gateways = fos.get("gateways")
+						temp = np.array(view)
+						world: TWorld = player.data['world']
+						test_map = world.maps[player.data['m']]
+						tiles_map: np.ndarray = test_map['tiles']
+#						print(tiles_map)
+						current_map: Dict
+						if test_map is not None:
+							current_map = test_map
+							current_map['tiles'][x_min:x_max, y_min:y_max] = temp
+
+						player.data["world"].maps[player.data["m"]]["tiles"][x_min:x_max, y_min:y_max] = temp
+						player.data["world"].maps[player.data["m"]]["gateways"] = gateways
+
+			except:
+				logger.warning(
+					f"TClient: Error: Exception for {message.addr}:\n"
+					f"{traceback.format_exc()}"
+				)
+				message.close()
+
+		if not self.sel.get_map():
+			return False
+		return True

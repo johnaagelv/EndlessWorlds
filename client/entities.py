@@ -32,7 +32,7 @@ class TActor(TEntity):
 	Provide the current map
 	"""
 	@property
-	def map(self):
+	def map(self) -> dict:
 		logger.debug(f"TActor->map")
 		return self.world.maps[self.map_idx]
 
@@ -45,7 +45,7 @@ class TActor(TEntity):
 		return self.data["m"]
 
 	@property
-	def me(self):
+	def me(self) -> dict:
 		logger.debug(f"TActor->me")
 		return self.data
 	
@@ -86,9 +86,11 @@ class TActor(TEntity):
 		return request
 
 	def update_fos(self) -> None:
-		self.map['visible'][:] = compute_fov(
-			self.map['tiles']['transparent'],
-			(self.data['x'], self.data['y']),
-			radius = self.capability('vision')
-		)
-		self.map['explored'] |= self.map['visible']
+		current_map = self.map
+		if current_map is not None:
+			current_map['visible'][:] = compute_fov(
+				current_map['tiles']['transparent'],
+				(self.data['x'], self.data['y']),
+				radius = self.capability('vision')
+			)
+			current_map['explored'] |= current_map['visible']

@@ -1,4 +1,4 @@
-from typing import Reversible
+from typing import Reversible, List
 import logging
 logger = logging.getLogger("EWClient")
 
@@ -12,21 +12,21 @@ import colours
 
 class TRender:
 	def __init__(self, config):
-		logging.debug(f"TRender->__init__( config )")
-		logging.debug(f"- tileset setup")
+		logging.info(f"TRender->__init__( config )")
+		logging.info(f"- tileset setup")
 		self.config = config
 		self.tileset = tcod.tileset.load_tilesheet(
 			self.config["tileset"], 16, 16, tcod.tileset.CHARMAP_CP437
 		)
 
-		logging.debug(f"- root_console setup")
+		logging.info(f"- root_console setup")
 		self.root_console = tcod.console.Console(
 			width = self.config["screen_width"],
 			height = self.config["screen_height"],
 			order = "F",
 		)
 
-		logging.debug(f"- context setup")
+		logging.info(f"- context setup")
 		self.context = 	tcod.context.new(
 			console = self.root_console,
 			tileset = self.tileset,
@@ -75,9 +75,17 @@ class TRender:
 		self.root_console.print(
 			x = actor.data['x'] - self.view_x1, 
 			y = actor.data["y"] - self.view_y1,
-			string = actor.data["face"],
+			text = actor.data["face"],
 			fg=actor.data["colour"],
 		)
+
+		if actor.map['name']:
+			self.root_console.print(
+				x = 61,
+				y = 1,
+				text = actor.map['name'],
+				fg=actor.data["colour"]
+			)
 	
 	def render_entities(self, actor: TActor):
 		logging.debug(f"TRender->render_entities( actor )")
@@ -85,7 +93,7 @@ class TRender:
 		visible_tiles = map['visible']
 		for entity in actor.data['world'].entities:
 			if visible_tiles[entity['x'], entity['y']]:
-				self.root_console.print(x=entity['x'], y=entity['y'], string=entity['face'], fg=entity['colour'])
+				self.root_console.print(x=entity['x'], y=entity['y'], text=entity['face'], fg=entity['colour'])
 
 	def render_states(self, actor: TActor):
 		logging.debug(f"TRender->render_states( states )")
@@ -109,15 +117,15 @@ class TRender:
 			self.root_console.draw_rect(x=view_x, y=view_y, width=view_width, height=1, ch=1, bg=colours.bar_empty)
 			if bar_width > 0:
 				self.root_console.draw_rect(x=view_x, y=view_y, width=bar_width, height=1, ch=1, bg=bar_filled)
-			self.root_console.print(x=view_x + 1, y=view_y, string=f"{state_key}", fg=colours.bar_text)
+			self.root_console.print(x=view_x + 1, y=view_y, text=f"{state_key}", fg=colours.bar_text)
 			state_x = view_width - 2 - (current_value > 9) - (current_value > 99) - (current_value > 999)
-			self.root_console.print(x=view_x + state_x, y=view_y, string=f"{current_value}", fg=colours.bar_text)
+			self.root_console.print(x=view_x + state_x, y=view_y, text=f"{current_value}", fg=colours.bar_text)
 			view_y += 1
 
 	"""
 	Render messages
 	"""
-	def render_log(self, messages: TMessageLog) -> None:
+	def render_log(self, messages) -> None:
 		x = self.config['log_x']
 		y = self.config['log_y']
 		width = self.config['log_width']
@@ -135,12 +143,12 @@ class TRender:
 		y: int,
 		width: int,
 		height: int,
-		messages: Reversible[TMessageLog]
+		messages: Reversible[TLogMessage]
 	) -> None:
 		y_offset = height - 1
 		for message in reversed(messages):
 			for line in reversed(textwrap.wrap(message.full_text, width)):
-				console.print(x=x, y=y + y_offset, string=line, fg=message.fg)
+				console.print(x=x, y=y + y_offset, text=line, fg=message.fg)
 				y_offset -= 1
 				if y_offset < 0:
 					return
@@ -150,15 +158,6 @@ class TRender:
 	"""
 	def render(self):
 		logging.info(f"TRender->render()")
-#		x = 0
-#		y = 44
-#		for n in range(0,320):
-#			self.root_console.print(x=x, y=y, string=f"{chr(n)}", fg=colours.white)
-#			x += 1
-#			if x > 63:
-#				x=0
-#				y += 1
-		
 		# Present the console
 		self.context.present(self.root_console)
 		# Clear the console for a new presentation
