@@ -137,8 +137,15 @@ white = (255, 255, 255)
 whitesmoke = (245, 245, 245)
 yellow = (255, 255, 0)
 
+fresh_air = (166, 231, 255)
+
 green_yellow = (139, 205, 50)
 
+grey = (128, 128, 128)
+rocket_metallic = (138, 127, 128)
+
+blue_prussian = (0, 49, 83)
+space_cadet = (29, 41, 81)
 
 yellow_mikado = (255, 196, 12)
 yellow_munsell = (239, 204, 0)

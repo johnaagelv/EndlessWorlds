@@ -148,50 +148,50 @@ tiles["space with small star"] = new_tile(
 tiles["space with star"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(183, (192, 192, 192), (0, 0, 0)),
-	light=(183, (192, 192, 192), (0, 0, 0)),
+	dark=(183, colour.silver, colour.black),
+	light=(183, colour.silver, colour.black),
 	gateway=False,
 )
 tiles["spaceship deck"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(32, (16, 16, 16), (32, 32, 32)),
-	light=(32, (16, 16, 16), (32, 32, 32)),
+	dark=(32, colour.lightslategray, colour.lightslategray),
+	light=(32, colour.lightslategray, colour.lightslategray),
 	gateway=False,
 )
 tiles["spaceship outer shell"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9608, (47, 79, 79), (47, 79, 79)),
-	light=(9608, (47, 79, 79), (47, 79, 79)),
+	dark=(9608, colour.darkslategray, colour.darkslategray),
+	light=(9608, colour.darkslategray, colour.darkslategray),
 	gateway=False,
 )
 tiles["spaceship inner wall"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9608, (70, 130, 180), (70, 130, 180)),
-	light=(9608, (70, 130, 180), (70, 130, 180)),
+	dark=(9608, colour.rocket_metallic, colour.rocket_metallic),
+	light=(9608, colour.rocket_metallic, colour.rocket_metallic),
 	gateway=False,
 )
-tiles["console"] = new_tile(
+tiles["spaceship console"] = new_tile(
 	walkable=False,
 	transparent=True,
-	dark=(242, (255, 255, 255), (32, 32, 32)),
-	light=(243, (255, 255, 255), (32, 32, 32)),
+	dark=(242, colour.white, colour.lightslategray),
+	light=(243, colour.white, colour.lightslategray),
 	gateway=False,
 )
-tiles["lift"] = new_tile(
+tiles["spaceship lift"] = new_tile(
 	walkable=True,
 	transparent=False,
-	dark=(9578, (211, 211, 211), (32, 32, 32)),
-	light=(9579, (211, 211, 211), (32, 32, 32)),
+	dark=(9578, colour.white, colour.lightslategray),
+	light=(9579, colour.white, colour.lightslategray),
 	gateway=False,
 )
 tiles["popsicle"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(937, (163, 237, 255), (194, 245, 255)),
-	light=(937, (163, 237, 255), (194, 245, 255)),
+	dark=(937, colour.white, colour.fresh_air),
+	light=(937, colour.fresh_air, colour.white),
 	gateway=False,
 )
 tiles["spaceship safety door"] = new_tile(
@@ -204,7 +204,7 @@ tiles["spaceship safety door"] = new_tile(
 tiles["spaceship cabin door"] = new_tile(
 	walkable=True,
 	transparent=False,
-	dark=(9532, colour.darkgray, colour.black),
-	light=(9532, colour.darkgray, colour.black),
+	dark=(9532, colour.darkgray, colour.lightslategray),
+	light=(9532, colour.darkgray, colour.lightslategray),
 	gateway=False,
 )
