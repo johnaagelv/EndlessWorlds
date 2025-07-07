@@ -158,3 +158,5 @@ spaceship_deck = rocket_metallic
 spaceship_wall = eerie_black
 spaceship_shell = darkslategray
 spaceship_container = saddlebrown
+cryo_fluid = (44, 188, 201)
+cryo_base = (92, 135, 140)
