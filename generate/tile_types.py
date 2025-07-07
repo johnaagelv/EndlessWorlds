@@ -1,6 +1,8 @@
 from typing import Tuple
 import numpy as np
 
+import colours as colour
+
 graphic_dt = np.dtype(
 	[
 		("ch", np.int32), # Unicode codepoint
@@ -34,22 +36,22 @@ tiles = {}
 tiles["blank"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(ord(" "), (0, 0, 0), (0, 0, 0)),
-	light=(ord(" "), (0, 0, 0), (0, 0, 0)),
+	dark=(ord(" "), colour.black, colour.black),
+	light=(ord(" "), colour.black, colour.black),
 	gateway=False,
 )
 tiles["floor"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(32, (192, 192, 192), (0, 0, 0)),
-	light=(32, (255, 255, 255), (0, 0, 0)),
+	dark=(32, colour.silver, colour.black),
+	light=(32, colour.white, colour.black),
 	gateway=False,
 )
 tiles["wall"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(43, (192, 192, 192), (32, 32, 32)),
-	light=(43, (255, 255, 255), (64, 64, 64)),
+	dark=(43, colour.silver, (32, 32, 32)),
+	light=(43, colour.white, (64, 64, 64)),
 	gateway=False,
 )
 tiles["gate"] = new_tile(
@@ -192,10 +194,17 @@ tiles["popsicle"] = new_tile(
 	light=(937, (163, 237, 255), (194, 245, 255)),
 	gateway=False,
 )
-tiles["door"] = new_tile(
+tiles["spaceship safety door"] = new_tile(
 	walkable=True,
 	transparent=False,
-	dark=(9532, (211, 211, 211), (32, 32, 32)),
-	light=(9532, (211, 211, 211), (32, 32, 32)),
+	dark=(9532, colour.yellow_safety, colour.black),
+	light=(9532, colour.yellow_safety, colour.black),
+	gateway=False,
+)
+tiles["spaceship cabin door"] = new_tile(
+	walkable=True,
+	transparent=False,
+	dark=(9532, colour.darkgray, colour.black),
+	light=(9532, colour.darkgray, colour.black),
 	gateway=False,
 )

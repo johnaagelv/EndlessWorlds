@@ -136,4 +136,12 @@ wheat = (245, 222, 179)
 white = (255, 255, 255)
 whitesmoke = (245, 245, 245)
 yellow = (255, 255, 0)
-yellowgreen = (139, 205, 50)
+
+green_yellow = (139, 205, 50)
+
+
+yellow_mikado = (255, 196, 12)
+yellow_munsell = (239, 204, 0)
+yellow_safety = (238, 210, 2)
+yellow_chartreuse = (223, 255, 0)
+
