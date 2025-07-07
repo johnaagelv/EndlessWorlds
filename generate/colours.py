@@ -137,6 +137,8 @@ white = (255, 255, 255)
 whitesmoke = (245, 245, 245)
 yellow = (255, 255, 0)
 
+eerie_black = (27, 27, 27)
+
 fresh_air = (166, 231, 255)
 
 green_yellow = (139, 205, 50)
@@ -152,3 +154,7 @@ yellow_munsell = (239, 204, 0)
 yellow_safety = (238, 210, 2)
 yellow_chartreuse = (223, 255, 0)
 
+spaceship_deck = rocket_metallic
+spaceship_wall = eerie_black
+spaceship_shell = darkslategray
+spaceship_container = saddlebrown
