@@ -151,8 +151,8 @@ tiles["space with star"] = new_tile(
 	gateway=False,
 )
 tiles["spaceship deck"] = new_tile(
-	walkable=False,
-	transparent=False,
+	walkable=True,
+	transparent=True,
 	dark=(32, (16, 16, 16), (32, 32, 32)),
 	light=(32, (16, 16, 16), (32, 32, 32)),
 	gateway=False,
