@@ -303,6 +303,13 @@ tiles["spaceship propulsion"] = new_tile(
 	walkable=False,
 	transparent=False,
 	dark=(9688, colour.silver, colour.black),
-	light=(9688, colour.silver, colour.black),
+	light=(9688, colour.silver, colour.yellow),
+	gateway=False,
+)
+tiles["propulsion fluid"] = new_tile(
+	walkable=False,
+	transparent=False,
+	dark=(35, colour.space_cadet, colour.goldenrod),
+	light=(9618, colour.space_cadet, colour.goldenrod),
 	gateway=False,
 )
