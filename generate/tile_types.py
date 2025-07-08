@@ -215,56 +215,77 @@ tiles["spaceship container"] = new_tile(
 	light=(9532, colour.spaceship_container, colour.spaceship_wall),
 	gateway=False,
 )
-tiles["spaceship pipe upper left"] = new_tile(
+tiles["cryopipe upper left"] = new_tile(
 	walkable=False,
 	transparent=False,
 	dark=(9554, colour.cryo_fluid, colour.spaceship_wall),
 	light=(9554, colour.cryo_fluid, colour.spaceship_wall),
 	gateway=False,
 )
-tiles["spaceship pipe upper"] = new_tile(
+tiles["cryopipe horizontal"] = new_tile(
 	walkable=False,
 	transparent=False,
 	dark=(9472, colour.cryo_fluid, colour.spaceship_wall),
 	light=(9472, colour.cryo_fluid, colour.spaceship_wall),
 	gateway=False,
 )
-tiles["spaceship pipe cross"] = new_tile(
+tiles["cryopipe cross"] = new_tile(
 	walkable=False,
 	transparent=False,
 	dark=(9568, colour.cryo_fluid, colour.spaceship_wall),
 	light=(9568, colour.cryo_fluid, colour.spaceship_wall),
 	gateway=False,
 )
-tiles["spaceship pipe upper t"] = new_tile(
+tiles["cryopipe upper t"] = new_tile(
 	walkable=False,
 	transparent=False,
 	dark=(9516, colour.cryo_fluid, colour.spaceship_wall),
 	light=(9516, colour.cryo_fluid, colour.spaceship_wall),
 	gateway=False,
 )
-tiles["spaceship pipe left t"] = new_tile(
+tiles["cryopipe left t"] = new_tile(
 	walkable=False,
 	transparent=False,
 	dark=(9500, colour.cryo_fluid, colour.spaceship_wall),
 	light=(9500, colour.cryo_fluid, colour.spaceship_wall),
 	gateway=False,
 )
-tiles["spaceship pipe right t"] = new_tile(
+tiles["cryopipe right t"] = new_tile(
 	walkable=False,
 	transparent=False,
 	dark=(9508, colour.cryo_fluid, colour.spaceship_wall),
 	light=(9508, colour.cryo_fluid, colour.spaceship_wall),
 	gateway=False,
 )
-tiles["spaceship pipe upper right"] = new_tile(
+tiles["cryopipe upper right"] = new_tile(
 	walkable=False,
 	transparent=False,
 	dark=(9558, colour.cryo_fluid, colour.spaceship_wall),
 	light=(9558, colour.cryo_fluid, colour.spaceship_wall),
 	gateway=False,
 )
-tiles["spaceship cryotank"] = new_tile(
+tiles["cryopipe vertical"] = new_tile(
+	walkable=False,
+	transparent=False,
+	dark=(9474, colour.cryo_fluid, colour.spaceship_wall),
+	light=(9474, colour.cryo_fluid, colour.spaceship_wall),
+	gateway=False,
+)
+tiles["cryopipe lower right"] = new_tile(
+	walkable=False,
+	transparent=False,
+	dark=(9496, colour.cryo_fluid, colour.spaceship_wall),
+	light=(9496, colour.cryo_fluid, colour.spaceship_wall),
+	gateway=False,
+)
+tiles["cryopipe lower left"] = new_tile(
+	walkable=False,
+	transparent=False,
+	dark=(9492, colour.cryo_fluid, colour.spaceship_wall),
+	light=(9492, colour.cryo_fluid, colour.spaceship_wall),
+	gateway=False,
+)
+tiles["cryotank"] = new_tile(
 	walkable=False,
 	transparent=False,
 	dark=(9608, colour.cryo_base, colour.cryo_fluid),
