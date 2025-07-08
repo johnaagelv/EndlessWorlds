@@ -187,6 +187,13 @@ tiles["spaceship lift"] = new_tile(
 	light=(9579, colour.white, colour.spaceship_deck),
 	gateway=False,
 )
+tiles["spaceship stairs"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(88, colour.darkgray, colour.spaceship_deck),
+	light=(88, colour.darkgray, colour.spaceship_deck),
+	gateway=False,
+)
 tiles["popsicle"] = new_tile(
 	walkable=False,
 	transparent=False,

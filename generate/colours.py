@@ -155,7 +155,7 @@ yellow_safety = (238, 210, 2)
 yellow_chartreuse = (223, 255, 0)
 
 spaceship_deck = rocket_metallic
-spaceship_wall = eerie_black
+spaceship_wall = (32,32,32)
 spaceship_shell = darkslategray
 spaceship_container = saddlebrown
 cryo_fluid = (44, 188, 201)
