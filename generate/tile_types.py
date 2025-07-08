@@ -183,8 +183,8 @@ tiles["spaceship console"] = new_tile(
 tiles["spaceship lift"] = new_tile(
 	walkable=True,
 	transparent=False,
-	dark=(9578, colour.white, colour.spaceship_deck),
-	light=(9579, colour.white, colour.spaceship_deck),
+	dark=(9578, colour.black, colour.spaceship_deck),
+	light=(9579, colour.silver, colour.spaceship_deck),
 	gateway=False,
 )
 tiles["spaceship stairs"] = new_tile(
@@ -297,5 +297,12 @@ tiles["cryotank"] = new_tile(
 	transparent=False,
 	dark=(9608, colour.cryo_base, colour.cryo_fluid),
 	light=(9608, colour.cryo_base, colour.cryo_fluid),
+	gateway=False,
+)
+tiles["spaceship propulsion"] = new_tile(
+	walkable=False,
+	transparent=False,
+	dark=(9688, colour.silver, colour.black),
+	light=(9688, colour.silver, colour.black),
 	gateway=False,
 )

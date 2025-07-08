@@ -11,7 +11,7 @@
 		[8, 37, 19, "spaceship console", ["on", "off"]],
 		[8, 40, 19, "spaceship console", ["on", "off"]],
 
-		[1, 37, 23, 4, 2, "spaceship wall", true],
+		[1, 37, 21, 4, 2, "spaceship wall", true],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 1, "down"],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 0, "1"],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 1, "2"],
@@ -31,6 +31,8 @@
 		[2, 39, 22, 8, "spaceship deck", true, 2],
 		[1, 36, 15, 2, 1, "spaceship console", true],
 		[1, 40, 15, 2, 1, "spaceship console", true],
+
+		[1, 37, 21, 4, 2, "spaceship wall", true],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 0, "up"], 
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 2, "down"],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 0, "1"],
@@ -51,6 +53,8 @@
 		[2, 39, 22, 14, "space", false, 2],
 		[2, 39, 22, 12, "spaceship shell", true, 2],
 		[2, 39, 22, 10, "spaceship deck", true, 2],
+
+		[1, 37, 21, 4, 2, "spaceship wall", true],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 1, "up"], 
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 3, "down"],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 0, "1"],
@@ -71,6 +75,8 @@
 		[2, 39, 22, 18, "space", false, 2],
 		[2, 39, 22, 16, "spaceship shell", true, 2],
 		[2, 39, 22, 14, "spaceship deck", true, 2],
+
+		[1, 37, 21, 4, 2, "spaceship wall", true],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 2, "up"], 
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 4, "down"],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 0, "1"],
@@ -91,6 +97,8 @@
 		[2, 39, 22, 22, "space", false, 2],
 		[2, 39, 22, 20, "spaceship shell", true, 2],
 		[2, 39, 22, 18, "spaceship deck", true, 2],
+
+		[1, 37, 21, 4, 2, "spaceship wall", true],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 3, "up"], 
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 5, "down"],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 0, "1"],
@@ -524,6 +532,17 @@
 		[2, 39, 22, 20, "spaceship shell", true, 2],
 		[2, 39, 22, 18, "spaceship deck", true, 2],
 
+		[2, 30, 14, 6, "spaceship wall", true, 1],
+		[2, 30, 14, 5, "spaceship propulsion", true, 1],
+		[2, 48, 14, 6, "spaceship wall", true, 1],
+		[2, 48, 14, 5, "spaceship propulsion", true, 1],
+
+		[2, 30, 30, 6, "spaceship wall", true, 1],
+		[2, 30, 30, 5, "spaceship propulsion", true, 1],
+		[2, 48, 30, 6, "spaceship wall", true, 1],
+		[2, 48, 30, 5, "spaceship propulsion", true, 1],
+
+		[1, 37, 21, 4, 2, "spaceship wall", true],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 6, "up"],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 0, "1"],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 1, "2"],
@@ -535,6 +554,5 @@
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 7, "8"],
 
 		[4, 39, 22, "spaceship stairs", 39, 22, 0, 6, "up"]
-
 	]
 }
