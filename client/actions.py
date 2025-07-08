@@ -33,12 +33,12 @@ class TEscapeAction(TAction):
 TMoveAction moves the actor in one direction
 """
 class TMoveAction(TAction):
-	def __init__(self, actor: TActor, dx: int, dy: int):
-		logger.debug(f"TMoveAction->__init__( actor, dx, dy )")
+	def __init__(self, actor: TActor, dx: int, dy: int, user_action: int = 0):
+		logger.debug(f"TMoveAction->__init__( actor, dx, dy, user_action )")
 		super().__init__(actor)
 		self.dx = dx
 		self.dy = dy
-		self.direction = None
+		self.direction = user_action
 
 	"""
 	Provides the move factor aka move speed

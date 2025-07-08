@@ -12,21 +12,21 @@ import colours
 
 class TRender:
 	def __init__(self, config):
-		logging.info(f"TRender->__init__( config )")
-		logging.info(f"- tileset setup")
+#		logging.info(f"TRender->__init__( config )")
+#		logging.info(f"- tileset setup")
 		self.config = config
 		self.tileset = tcod.tileset.load_tilesheet(
 			self.config["tileset"], 16, 16, tcod.tileset.CHARMAP_CP437
 		)
 
-		logging.info(f"- root_console setup")
+#		logging.info(f"- root_console setup")
 		self.root_console = tcod.console.Console(
 			width = self.config["screen_width"],
 			height = self.config["screen_height"],
 			order = "F",
 		)
 
-		logging.info(f"- context setup")
+#		logging.info(f"- context setup")
 		self.context = 	tcod.context.new(
 			console = self.root_console,
 			tileset = self.tileset,
@@ -39,7 +39,7 @@ class TRender:
 	{width, height, tiles}
 	"""
 	def render_world(self, actor: TActor):
-		logging.debug(f"TRender->render_world( actor )")
+#		logging.debug(f"TRender->render_world( actor )")
 		actor.update_fos()
 		map = actor.map
 		visible_tiles = map['visible']
@@ -70,7 +70,7 @@ class TRender:
 	{x, y, face, colour}
 	"""
 	def render_actor(self, actor: TActor):
-		logging.debug(f"TRender->render_actor( actor )")
+#		logging.debug(f"TRender->render_actor( actor )")
 
 		self.root_console.print(
 			x = actor.data['x'] - self.view_x1, 
@@ -88,7 +88,7 @@ class TRender:
 			)
 	
 	def render_entities(self, actor: TActor):
-		logging.debug(f"TRender->render_entities( actor )")
+#		logging.debug(f"TRender->render_entities( actor )")
 		map = actor.map
 		visible_tiles = map['visible']
 		for entity in actor.data['world'].entities:
@@ -96,7 +96,7 @@ class TRender:
 				self.root_console.print(x=entity['x'], y=entity['y'], text=entity['face'], fg=entity['colour'])
 
 	def render_states(self, actor: TActor):
-		logging.debug(f"TRender->render_states( states )")
+#		logging.debug(f"TRender->render_states( states )")
 		view_x = self.config['state_x']
 		view_y = self.config['state_y']
 		view_width = self.config['state_width']
@@ -157,7 +157,7 @@ class TRender:
 	Render the console
 	"""
 	def render(self):
-		logging.info(f"TRender->render()")
+#		logging.info(f"TRender->render()")
 		# Present the console
 		self.context.present(self.root_console)
 		# Clear the console for a new presentation

@@ -35,7 +35,7 @@ class TWorld:
 	map_names: list
 
 	def __init__(self, actor, map_definitions: list):
-		logger.info(f"TWorld->__init__( actor={actor}, map_definitions={map_definitions} )")
+#		logger.info(f"TWorld->__init__( actor={actor}, map_definitions={map_definitions} )")
 #		logger.debug(f"- map_definitions {map_definitions!r}")
 		self.actor: TActor = actor
 #		self.maps: List[Dict | None]
@@ -57,11 +57,11 @@ class TWorld:
 		self.start_map(0)
 
 	def start_map(self, map_idx):
-		logger.info(f"TWorld->start_map( map_idx={map_idx} )")
+#		logger.info(f"TWorld->start_map( map_idx={map_idx} )")
 		map_idx = self.actor.map_idx
-		logger.info(f"- switch to map_idx={map_idx}")
+#		logger.info(f"- switch to map_idx={map_idx}")
 		if self.maps[map_idx]['loaded'] == False:
-			logger.info(f" - loading map definition")
+#			logger.info(f" - loading map definition")
 			map_definition = self.map_definitions[map_idx]
 
 			map_name = map_definition.get('name')
@@ -90,15 +90,15 @@ class TWorld:
 		#self.actor.log.add(self.maps[map_idx]['name'])
 		
 	def in_bounds(self, x: int, y: int, m: int) -> bool:
-		logger.debug(f"TWorld->in_bounds( x={x}, y={y}, m={m} )")
+#		logger.debug(f"TWorld->in_bounds( x={x}, y={y}, m={m} )")
 		current_map = self.maps[m]
 		if current_map is not None:
 			return 0 <= x < current_map["width"] and 0 <= y < current_map["height"]
 		return False
 
 	def in_gateway(self, x: int, y: int, m: int) -> bool:
-		logger.debug(f"TWorld->in_gateway( x={x}, y={y}, m={m} )")
-		logger.info(f"TWorld->in_gateway( x={x}, y={y}, m={m} )")
+#		logger.debug(f"TWorld->in_gateway( x={x}, y={y}, m={m} )")
+#		logger.info(f"TWorld->in_gateway( x={x}, y={y}, m={m} )")
 		current_map = self.maps[m]
 		if current_map is not None:
 			logger.info(current_map['tiles'][x, y])

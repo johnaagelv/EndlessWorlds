@@ -48,10 +48,13 @@ class TEventHandler(tcod.event.EventDispatch[TAction]):
 		elif key == 44: #tcod.event.KeySym.KP_LESS:
 			action = TStairAction(self.actor, "up")
 		else:
-			action = TStairAction(self.actor, chr(key))
+			if key < 256:
+				action = TStairAction(self.actor, chr(key))
+			else:
+				action = TMoveAction(self.actor, dx=0, dy=0, user_action=key)
 
 		return action
 
-	def on_render(self, console: tcod.console.Console) -> None:
-		logger.debug(f"TEventHandler->on_render( console )")
-		#self.engine.render(console)
+#	def on_render(self, console: tcod.console.Console) -> None:
+#		logger.debug(f"TEventHandler->on_render( console )")
+#		self.engine.render(console)

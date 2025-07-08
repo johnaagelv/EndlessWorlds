@@ -299,6 +299,13 @@ tiles["cryotank"] = new_tile(
 	light=(9608, colour.cryo_base, colour.cryo_fluid),
 	gateway=False,
 )
+tiles["cryocontainer"] = new_tile(
+	walkable=False,
+	transparent=False,
+	dark=(9688, colour.cryo_fluid, colour.cryo_base),
+	light=(9688, colour.cryo_fluid, colour.cryo_base),
+	gateway=False,
+)
 tiles["spaceship propulsion"] = new_tile(
 	walkable=False,
 	transparent=False,

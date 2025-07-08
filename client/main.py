@@ -30,8 +30,8 @@ config = {
 			"viewport_y": 0,
 			"viewport_width": 60,
 			"viewport_height": 40,
-			"state_x": 0,
-			"state_y": 41,
+			"state_x": 60,
+			"state_y": 2,
 			"state_width": 20,
 			"state_height": 5,
 			"log_x": 21,
@@ -56,7 +56,6 @@ def main(log_level) -> None:
 	logging.info('World client started')
 
 	message_log = TMessageLog()
-	message_log.add("Welcome to Endless Worlds 2025", colours.green)
 
 	player_template = {
 		"x": -1, # X coordinate in map m

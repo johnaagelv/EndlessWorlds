@@ -18,7 +18,7 @@ from worlds import TWorld
 
 class TMessage:
 	def __init__(self, selector, sock: socket.socket, addr, request):
-		logger.debug(f"TMessage->__init__( selector, sock, addr, request )")
+#		logger.debug(f"TMessage->__init__( selector, sock, addr, request )")
 		self.selector = selector
 		self.sock: socket.socket = sock
 		self.addr = addr
@@ -31,7 +31,7 @@ class TMessage:
 		self.response = None
 
 	def _set_selector_events_mask(self, mode):
-		logger.debug(f"TMessage->_set_selector_events_mask( mode )")
+#		logger.debug(f"TMessage->_set_selector_events_mask( mode )")
 		"""Set selector to listen for events: mode is 'r', 'w', or 'rw'."""
 		if mode == "r":
 			events = selectors.EVENT_READ
@@ -44,7 +44,7 @@ class TMessage:
 		self.selector.modify(self.sock, events, data=self)
 
 	def _read(self):
-		logger.debug(f"TMessage->_read()")
+#		logger.debug(f"TMessage->_read()")
 		try:
 			# Should be ready to read
 			data = self.sock.recv(65536)
@@ -58,7 +58,7 @@ class TMessage:
 				raise RuntimeError("Peer closed.")
 
 	def _write(self):
-		logger.debug(f"TMessage->_write()")
+#		logger.debug(f"TMessage->_write()")
 		if self._send_buffer:
 #			print(f"Sending {self._send_buffer!r} to {self.addr}")
 			try:
@@ -71,11 +71,11 @@ class TMessage:
 				self._send_buffer = self._send_buffer[sent:]
 
 	def _json_encode(self, obj, encoding):
-		logger.debug(f"TMessage->_json_encode( obj, encoding )")
+#		logger.debug(f"TMessage->_json_encode( obj, encoding )")
 		return json.dumps(obj, ensure_ascii=False).encode(encoding)
 
 	def _json_decode(self, json_bytes, encoding):
-		logger.debug(f"TMessage->_json_decode( json_bytes, encoding )")
+#		logger.debug(f"TMessage->_json_decode( json_bytes, encoding )")
 		tiow = io.TextIOWrapper(
 			io.BytesIO(json_bytes), encoding=encoding, newline=""
 		)
@@ -86,7 +86,7 @@ class TMessage:
 	def _create_message(
 		self, *, content_bytes, content_type, content_encoding
 	):
-		logger.debug(f"TMessage->_create_message( content_bytes, content_type, content_encoding )")
+#		logger.debug(f"TMessage->_create_message( content_bytes, content_type, content_encoding )")
 		jsonheader = {
 			"byteorder": sys.byteorder,
 			"content-type": content_type,
@@ -99,23 +99,23 @@ class TMessage:
 		return message
 
 	def _process_response_json_content(self):
-		logger.debug(f"TMessage->_process_response_json_content()")
+#		logger.debug(f"TMessage->_process_response_json_content()")
 		content = self.response
 		result = content.get("result") # type: ignore
 
 	def _process_response_binary_content(self):
-		logger.debug(f"TMessage->_process_response_binary_content()")
+#		logger.debug(f"TMessage->_process_response_binary_content()")
 		content = self.response
 
 	def process_events(self, mask):
-		logger.debug(f"TMessage->process_events( mask )")
+#		logger.debug(f"TMessage->process_events( mask )")
 		if mask & selectors.EVENT_READ:
 			self.read()
 		if mask & selectors.EVENT_WRITE:
 			self.write()
 
 	def read(self):
-		logger.debug(f"TMessage->read()")
+#		logger.debug(f"TMessage->read()")
 		self._read()
 
 		if self._jsonheader_len is None:
@@ -130,7 +130,7 @@ class TMessage:
 				self.process_response()
 
 	def write(self):
-		logger.debug(f"TMessage->write()")
+#		logger.debug(f"TMessage->write()")
 		if not self._request_queued:
 			self.queue_request()
 
@@ -142,7 +142,7 @@ class TMessage:
 				self._set_selector_events_mask("r")
 
 	def close(self):
-		logger.debug(f"TMessage->close()")
+#		logger.debug(f"TMessage->close()")
 		try:
 			self.selector.unregister(self.sock)
 		except Exception as e:
@@ -160,7 +160,7 @@ class TMessage:
 			self.sock = None # type: ignore
 
 	def queue_request(self):
-		logger.debug(f"TMessage->queue_request()")
+#		logger.debug(f"TMessage->queue_request()")
 		content = self.request
 		content_type = "binary/custom-server-binary-type"
 		content_encoding = "binary"
@@ -181,7 +181,7 @@ class TMessage:
 		self._request_queued = True
 
 	def process_protoheader(self):
-		logger.debug(f"TMessage->process_protoheader()")
+#		logger.debug(f"TMessage->process_protoheader()")
 		hdrlen = 2
 		if len(self._recv_buffer) >= hdrlen:
 			self._jsonheader_len = struct.unpack(
@@ -190,7 +190,7 @@ class TMessage:
 			self._recv_buffer = self._recv_buffer[hdrlen:]
 
 	def process_jsonheader(self):
-		logger.debug(f"TMessage->process_jsonheader()")
+#		logger.debug(f"TMessage->process_jsonheader()")
 		hdrlen = self._jsonheader_len
 		if len(self._recv_buffer) >= hdrlen: # type: ignore
 			self.jsonheader = self._json_decode(
@@ -207,7 +207,7 @@ class TMessage:
 					logger.error(f"Missing required header '{reqhdr}'.")
 
 	def process_response(self):
-		logger.debug(f"TMessage->process_response()")
+#		logger.debug(f"TMessage->process_response()")
 		content_len = self.jsonheader["content-length"] # type: ignore
 		if len(self._recv_buffer) < content_len:
 			return
@@ -231,12 +231,12 @@ class TMessage:
 
 class TClient:
 	def __init__(self):
-		logger.debug(f"TClient->__init__()")
+#		logger.debug(f"TClient->__init__()")
 		self.sel = selectors.DefaultSelector()
 
 	""" Start connection to the specified server with the provided request """
 	def start_connection(self, host, port, request):
-		logger.debug(f"TClient->start_connection( host, port, request )")
+#		logger.debug(f"TClient->start_connection( host, port, request )")
 		addr = (host, port)
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		sock.setblocking(False)
@@ -246,7 +246,7 @@ class TClient:
 		self.sel.register(sock, events, data=message)
 
 	def run(self, player: TActor) -> Any:
-		logger.debug(f"TClient->run( actor )")
+#		logger.debug(f"TClient->run( actor )")
 		events = self.sel.select(timeout=5.0)
 		for key, mask in events:
 			message: TMessage = key.data
@@ -255,7 +255,7 @@ class TClient:
 				if message.sock is None:
 
 					if message.response['cmd'] == 'new':
-						logger.info(f"TClient initializing new world")
+#						logger.info(f"TClient initializing new world")
 						player.data['x'] = message.response['entry_point'][0]
 						player.data['y'] = message.response['entry_point'][1]
 						player.data['z'] = message.response['entry_point'][2]
@@ -264,7 +264,7 @@ class TClient:
 						player.log.add(f"{message.response['name']}")
 
 					elif message.response['cmd'] == 'fos':
-						logger.info(f"TClient applying FOS data")
+#						logger.info(f"TClient applying FOS data")
 						fos = message.response['fos']
 						x_min = fos.get("x_min")
 						x_max = fos.get("x_max")
