@@ -155,8 +155,11 @@ def gen_gateway(world: TWorld, map_idx: int, build: dict):
 	target_z = build[6]
 	target_m = build[7]
 	user_action = None
+	target_host: str = ""
 	if len(build) > 8:
 		user_action = build[8]
+	if len(build) > 9:
+		target_host = build[9]
 	world.maps[map_idx]['gateways'].append(
 		{
 			"x": tile_x,
@@ -165,7 +168,8 @@ def gen_gateway(world: TWorld, map_idx: int, build: dict):
 			"gateway": {
 				"x": target_x,
 				"y": target_y,
-				"m": target_m
+				"m": target_m,
+				"h": target_host
 			}
 		}
 	)	

@@ -76,11 +76,13 @@ class TActor(TEntity):
 				"y": self.data["y"],
 				"z": self.data["z"],
 				"m": map_idx,
+				"h": self.data["h"],
 				"r": self.capability('vision'),
 			}
 		else:
 			request = {
 				"cmd": "new",
+				"h": self.data["h"],
 			}
 		logger.debug(f"- request: {request!r}")
 		return request

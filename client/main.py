@@ -62,6 +62,7 @@ def main(log_level) -> None:
 		"y": -1, # Y coordinate in map m
 		"z": -1, # Z coordinate in map m
 		"m": -1, # Map number
+		"h": f"{config['host']}:{config['port']}", # Host (address and port)
 		"face": "@", # How I look like
 		"colour": (255, 255, 255),
 		"states": {
@@ -127,7 +128,7 @@ def main(log_level) -> None:
 		request = player.run()
 
 		if request is not None:
-			client.start_connection(config["host"], config["port"], request)
+			client.start_connection(request)
 			
 			while client.run(player):
 				pass

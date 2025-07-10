@@ -235,9 +235,10 @@ class TClient:
 		self.sel = selectors.DefaultSelector()
 
 	""" Start connection to the specified server with the provided request """
-	def start_connection(self, host, port, request):
-#		logger.debug(f"TClient->start_connection( host, port, request )")
-		addr = (host, port)
+	def start_connection(self, request):
+#		logger.debug(f"TClient->start_connection( request )")
+		host_port = request['h'].split(':')
+		addr = (host_port[0], int(host_port[1]))
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		sock.setblocking(False)
 		sock.connect_ex(addr)

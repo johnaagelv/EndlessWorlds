@@ -82,9 +82,13 @@ class TMoveAction(TAction):
 						# Move to x, y coordinate in map number m
 						self.actor.data["x"] = gateway["gateway"]["x"]
 						self.actor.data["y"] = gateway["gateway"]["y"]
-						if map_idx != gateway['gateway']['m']:
-							self.actor.data["m"] = gateway["gateway"]["m"]
-							world.start_map(0)
+						if gateway['gateway']['h'] == "":
+							if map_idx != gateway['gateway']['m']:
+								self.actor.data["m"] = gateway["gateway"]["m"]
+								world.start_map(0)
+						else:
+							self.actor.data["h"] = gateway['gateway']['h']
+							self.actor.data["m"] = -1
 					else:
 						# Move to x, y coordinate
 						self.actor.data["x"] = dest_x

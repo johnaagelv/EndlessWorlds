@@ -320,3 +320,10 @@ tiles["propulsion fluid"] = new_tile(
 	light=(9618, colour.space_cadet, colour.goldenrod),
 	gateway=False,
 )
+tiles["matter transporter"] = new_tile(
+	walkable=True,
+	transparent=False,
+	dark=(162, colour.red, colour.black),
+	light=(162, colour.green, colour.yellow),
+	gateway=True,
+)

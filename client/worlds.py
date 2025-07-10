@@ -115,7 +115,8 @@ class TWorld:
 			"gateway": {
 				"x": x,
 				"y": y,
-				"m": m
+				"m": m,
+				"h": ""
 			}
 		}
 		if direction is None:
