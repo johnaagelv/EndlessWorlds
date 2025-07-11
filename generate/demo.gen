@@ -104,9 +104,9 @@
 		[2, 39, 22, 20, "spaceship shell", true, 2],
 		[2, 39, 22, 18, "spaceship deck", true, 2],
 
-		[2, 24, 22, 3, "spaceship wall", false, 1],
-		[4, 22, 22, "matter transporter", 10, 10, 0, 0, "down", "192.168.1.104:12345"],
-		[8, 27, 22, "spaceship deck", []],
+		[1, 24, 22, 3, 3, "spaceship wall", false],
+		[4, 24, 22, "matter transporter", 10, 10, 0, 0, "down", "192.168.1.104:12345"],
+		[8, 26, 22, "spaceship safety door", []],
 
 		[1, 37, 21, 4, 2, "spaceship wall", true],
 		[4, 38, 22, "spaceship lift", 38, 22, 0, 3, "up"], 
