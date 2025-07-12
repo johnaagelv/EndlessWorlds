@@ -355,29 +355,30 @@ def main(world_name: str, log_level: int):
 		world_definition = json.load(f)
 		world = gen_world(world_definition)
 
-		for build in world_definition["maps"]:
-			if build[0] == 0:
-				world.maps.append(gen_map(build))
-				map_idx = len(world.maps)-1
-				logging.info(f"- map idx {map_idx} for {world.maps[map_idx]['name']}")
-			elif build[0] == 1:
-				gen_square(world, map_idx, build)
-			elif build[0] == 2:
-				gen_circle(world, map_idx, build)
-			elif build[0] == 3:
-				gen_gateway(world, map_idx, build)
-			elif build[0] == 4:
-				gen_gateway(world, map_idx, build)
-			elif build[0] == 5:
-				gen_area(world, map_idx, build)
-			elif build[0] == 6:
-				gen_trail(world, map_idx, build)
-			elif build[0] == 7:
-				gen_sym(world, map_idx, build)
-			elif build[0] == 8:
-				gen_item(world, map_idx, build)
-			else:
-				logger.error(f"ERROR: unhandled type {build[0]}")
+		for map in world_definition["maps"]:
+			for build in map:
+				if build[0] == 0:
+					world.maps.append(gen_map(build))
+					map_idx = len(world.maps)-1
+					logging.info(f"- map idx {map_idx} for {world.maps[map_idx]['name']}")
+				elif build[0] == 1:
+					gen_square(world, map_idx, build)
+				elif build[0] == 2:
+					gen_circle(world, map_idx, build)
+				elif build[0] == 3:
+					gen_gateway(world, map_idx, build)
+				elif build[0] == 4:
+					gen_gateway(world, map_idx, build)
+				elif build[0] == 5:
+					gen_area(world, map_idx, build)
+				elif build[0] == 6:
+					gen_trail(world, map_idx, build)
+				elif build[0] == 7:
+					gen_sym(world, map_idx, build)
+				elif build[0] == 8:
+					gen_item(world, map_idx, build)
+				else:
+					logger.error(f"ERROR: unhandled type {build[0]}")
 		
 		world.save()
 		logging.info('World generator stopped')

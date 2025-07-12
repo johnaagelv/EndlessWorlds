@@ -158,5 +158,6 @@ spaceship_deck = rocket_metallic
 spaceship_wall = (32,32,32)
 spaceship_shell = darkslategray
 spaceship_container = saddlebrown
+glass_wall = (0xE0, 0xF2, 0xF1)
 cryo_fluid = (44, 188, 201)
 cryo_base = (92, 135, 140)

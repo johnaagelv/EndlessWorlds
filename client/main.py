@@ -47,7 +47,7 @@ config = {
 	"viewport_height": VIEWPORT_HEIGHT,
 	"tileset": "redjack17.png",
 #	"host": "91.105.47.63",
-	"host": "192.168.1.107",
+	"host": "192.168.1.104",
 	"port": 12345,
 }
 	

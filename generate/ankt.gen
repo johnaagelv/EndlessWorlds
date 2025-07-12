@@ -1,79 +1,89 @@
 {
 	"id":"",
 	"name": "Ankt",
-	"entry": [[39, 22, 0, 1], [39, 22, 0, 1]],
+	"entry": [[38, 22, 0, 0], [39, 22, 0, 0]],
 	"maps": [
-		[0, "Tower Ankt", 580, 545, "plain", true, 1234567890],
-		[5, 0, 0, 580, 545, "grass1", "grass2"],
+		[
+			[0, "Tower Ankt", 5800, 5450, "plain", false, 1234567890],
+			[5, 0, 0, 5800, 5450, "grass1", "grass2"],
 
-		[2, 39, 22, 7, "wall", true, 2],
-		[2, 39, 22, 5, "floor", true, 1],
-		[1, 43, 21, 2, 2, "floor", true],
-		[4, 38, 21, "stairway", 38, 21, 0, 1, "down"],
-		[4, 38, 21, "stairway", 38, 21, 0, 3, "up"], 
+			[2, 39, 22, 7, "wall", true, 2],
+			[2, 39, 22, 5, "floor", true, 1],
+			[1, 43, 21, 2, 2, "floor", true],
+			[4, 38, 21, "stairway", 38, 21, 0, 1, "down"],
+			[4, 38, 21, "stairway", 38, 21, 0, 3, "up"], 
 
-		[2, 59, 22, 7, "wall", true, 2],
-		[2, 59, 22, 5, "floor", true, 1],
-		[1, 53, 21, 2, 2, "floor", true],
+			[2, 59, 22, 7, "wall", true, 2],
+			[2, 59, 22, 5, "floor", true, 1],
+			[1, 53, 21, 2, 2, "floor", true],
 
-		[2, 39, 42, 7, "wall", true, 0],
-		[2, 39, 42, 5, "floor", true, 0],
-		[1, 43, 41, 2, 2, "floor", true],
-		[4, 39, 42, "matter transporter", 24, 22, 0, 4, "up", "192.168.1.107:12345"],
+			[2, 39, 42, 7, "wall", true, 0],
+			[2, 39, 42, 5, "floor", true, 0],
+			[1, 43, 41, 2, 2, "floor", true],
+			[4, 39, 42, "matter transporter", 24, 22, 0, 4, "up", "192.168.1.107:12345"],
 
-		[2, 59, 42, 7, "wall", true, 2],
-		[2, 59, 42, 5, "floor", true, 1],
-		[1, 53, 41, 2, 2, "floor", true],
+			[2, 59, 42, 7, "wall", true, 2],
+			[2, 59, 42, 5, "floor", true, 1],
+			[1, 53, 41, 2, 2, "floor", true],
 
-		[1, 45, 19, 9, 2, "wall", true],
-		[1, 36, 27, 2, 9, "wall", true],
-		[1, 45, 43, 9, 2, "wall", true],
-		[1, 60, 27, 2, 9, "wall", true],
+			[1, 45, 19, 9, 2, "wall", true],
+			[1, 36, 27, 2, 9, "wall", true],
+			[1, 45, 43, 9, 2, "wall", true],
+			[1, 60, 27, 2, 9, "wall", true],
 
-		[1, 60, 31, 1, 2, "floor", true],
-		[1, 61, 31, 1, 2, "gate", true],
-		
-		[0, "Tower basement", 80, 50, "wall", false, 1234567890],
-		[2, 39, 22, 7, "wall", true, 2],
-		[2, 39, 22, 5, "floor", true, 1],
-		[4, 38, 21, "stairway_up", 38, 21, 0, 0, "up"],
-		[4, 38, 23, "stairway_down", 38, 23, 0, 2, "down"],
+			[1, 60, 31, 1, 2, "floor", true],
+			[1, 61, 31, 1, 2, "gate", true]
+		],
 
-		[2, 39, 42, 7, "wall", true, 2],
-		[2, 39, 42, 5, "floor", true, 1],
-		[1, 39, 26, 1, 12, "floor", true],
+		[
+			[0, "Tower basement", 80, 50, "wall", false, 1234567890],
+			[2, 39, 22, 7, "wall", true, 2],
+			[2, 39, 22, 5, "floor", true, 1],
+			[4, 38, 21, "stairway_up", 38, 21, 0, 0, "up"],
+			[4, 38, 23, "stairway_down", 38, 23, 0, 2, "down"],
 
-		[0, "Tower underground", 480, 145, "wall", false, 1234567890],
-		[5, 0, 0, 480, 145, "rock1", "rock2", "rock1"],
-		[2, 39, 22, 7, "wall", true, 2],
-		[2, 39, 22, 5, "floor", true, 1],
-		[1, 43, 21, 2, 2, "floor", true],
-		[4, 38, 23, "stairway_up", 38, 23, 0, 1, "up"],
-		[6, 45, 21, 480, 32, 2, 6, "underground", 1234567890],
-		[6, 66, 66, 186, 26, 2, 5, "underground", 1234567890],
-		[3, 479, 5, "gateway", 79, 5, 0, 1],
+			[2, 39, 42, 7, "wall", true, 2],
+			[2, 39, 42, 5, "floor", true, 1],
+			[1, 39, 26, 1, 12, "floor", true]
+		],
 
-		[0, "Tower level 1", 580, 545, "plain", false, 1234567890],
-		[5, 0, 0, 580, 545, "blank", "blank"],
+		[
+			[0, "Tower underground", 480, 145, "wall", false, 1234567890],
+			[5, 0, 0, 480, 145, "rock1", "rock2", "rock1"],
+			[2, 39, 22, 7, "wall", true, 2],
+			[2, 39, 22, 5, "floor", true, 1],
+			[1, 43, 21, 2, 2, "floor", true],
+			[4, 38, 23, "stairway_up", 38, 23, 0, 1, "up"],
+			[6, 45, 21, 480, 32, 2, 6, "underground", 1234567890],
+			[6, 66, 66, 186, 26, 2, 5, "underground", 1234567890],
+			[3, 479, 5, "gateway", 79, 5, 0, 1]
+		],
 
-		[2, 39, 22, 7, "wall", true, 1],
-		[2, 39, 22, 5, "floor", true, 1],
-		[4, 38, 21, "stairway", 38, 21, 0, 0, "down"],
-		[4, 38, 21, "stairway", 38, 21, 0, 4, "up"],
+		[
+			[0, "Tower level 1", 580, 545, "plain", false, 1234567890],
+			[5, 0, 0, 580, 545, "blank", "blank"],
 
-		[0, "Tower level 2", 580, 545, "plain", false, 1234567890],
-		[5, 0, 0, 580, 545, "blank", "blank"],
+			[2, 39, 22, 7, "wall", true, 1],
+			[2, 39, 22, 5, "floor", true, 1],
+			[4, 38, 21, "stairway", 38, 21, 0, 0, "down"],
+			[4, 38, 21, "stairway", 38, 21, 0, 4, "up"]
+		],
 
-		[2, 39, 22, 7, "wall", true, 0],
-		[2, 39, 22, 5, "floor", true, 0],
-		[1, 43, 21, 2, 2, "floor", true],
-		[4, 38, 21, "stairway_down", 38, 21, 0, 3, "down"],
+		[
+			[0, "Tower level 2", 580, 545, "plain", false, 1234567890],
+			[5, 0, 0, 580, 545, "blank", "blank"],
 
-		[2, 59, 22, 7, "wall", true, 0],
-		[2, 59, 22, 5, "floor", true, 0],
-		[1, 53, 21, 2, 2, "floor", true],
+			[2, 39, 22, 7, "wall", true, 0],
+			[2, 39, 22, 5, "floor", true, 0],
+			[1, 43, 21, 2, 2, "floor", true],
+			[4, 38, 21, "stairway_down", 38, 21, 0, 3, "down"],
 
-		[1, 45, 19, 9, 2, "wall", true],
-		[1, 45, 23, 9, 2, "wall", true]
+			[2, 59, 22, 7, "wall", true, 0],
+			[2, 59, 22, 5, "floor", true, 0],
+			[1, 53, 21, 2, 2, "floor", true],
+
+			[1, 45, 19, 9, 2, "wall", true],
+			[1, 45, 23, 9, 2, "wall", true]
+		]
 	]
 }
