@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger("EWlogger")
 LOG_FILENAME = "EW.log"
 LOG_FORMAT = "%(asctime)s %(levelname)-8s %(message)s"
-SERVER_PORT = 12345
+SERVER_PORT: int = 12345
 SERVER_HOST = '127.0.0.1'
 log_levels = {'info': logging.INFO, 'debug': logging.DEBUG}
 
@@ -37,12 +37,12 @@ def main(port: int, log_level: int, world_name: str):
 	print("World server stopped")
 
 if __name__ == "__main__":
-	port = SERVER_PORT
-	log_level = logging.INFO
-	world = "demo"
+	port: int = SERVER_PORT
+	log_level: int = logging.INFO
+	world_name: str = "demo"
 
 	parser = argparse.ArgumentParser(
-		description="Runs a Roguelike World server.",
+		description="Runs a multiplayer Roguelike World server.",
 		epilog="Author: John Aage Andersen, Reddit: johnaagelv, 2025"
 	)
 	parser.add_argument("-p", "--port", help=f"the port number to use, default is {SERVER_PORT}")
@@ -50,10 +50,11 @@ if __name__ == "__main__":
 	parser.add_argument("-w", "--world", help="name of the world to serve")
 	args = parser.parse_args()
 	if args.port is not None:
-		port = args.port
+		port = int(args.port)
 	if args.log_level is not None:
-		log_level = log_levels[args.log_level]
+		if args.log_level.lower() in log_levels.keys():
+			log_level = log_levels[args.log_level.lower()]
 	if args.world is not None:
-		world = args.world
+		world_name = args.world.lower()
 
-	main(port, log_level, world)
+	main(port, log_level, world_name)

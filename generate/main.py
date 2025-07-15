@@ -124,17 +124,19 @@ def gen_circle(world: TWorld, map_idx: int, build: dict):
 			r_angle = math.radians(r)
 			x = center_x + int(math.sin(r_angle) * radius)
 			y = center_y + int(math.cos(r_angle) * radius)
-			world.maps[map_idx]['tiles'][min(center_x, x):max(center_x, x), min(center_y, y):max(center_y, y)] = map_tile
+			if min(center_x, x) >= 0 and max(center_x, x) <= world.maps[map_idx]['width'] and min(center_y, y) >= 0 and max(center_y, y) <= world.maps[map_idx]['height']:
+				world.maps[map_idx]['tiles'][min(center_x, x):max(center_x, x), min(center_y, y):max(center_y, y)] = map_tile
 	else:
 		thickness = 1
 		if len(build) >= 7:
 			thickness = max(build[6], 1)
-		for r in range(0, 260, 1):
+		for r in range(0, 360):
 			r_angle = math.radians(r)
 			for t in range(0, thickness):
 				x = center_x + int(math.sin(r_angle) * (radius - t))
 				y = center_y + int(math.cos(r_angle) * (radius - t))
-				world.maps[map_idx]['tiles'][x, y] = map_tile
+				if min(center_x, x) >= 0 and max(center_x, x) < world.maps[map_idx]['width'] and min(center_y, y) >= 0 and max(center_y, y) < world.maps[map_idx]['height']:
+					world.maps[map_idx]['tiles'][x, y] = map_tile
 
 """
 3. Generate an movement activated gateway to a location on another map

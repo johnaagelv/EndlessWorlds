@@ -161,3 +161,9 @@ spaceship_container = saddlebrown
 glass_wall = (0xE0, 0xF2, 0xF1)
 cryo_fluid = (44, 188, 201)
 cryo_base = (92, 135, 140)
+
+ocean_seaside = (224, 242, 241)
+
+grass1 = lawngreen
+grass2 = (39, 159, 39)
+grass3 = forestgreen

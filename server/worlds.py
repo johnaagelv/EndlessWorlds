@@ -9,9 +9,9 @@ import numpy as np
 import tile_types
 
 class TWorld:
-	maps: List = []
+	maps: list = []
 	name: str
-	entry: List = []
+	entry: list = []
 
 	def __init__(self, world_name: str = 'world'):
 		logger.debug(f"TWorld->init({world_name})")
@@ -26,10 +26,11 @@ class TWorld:
 	"""
 	# Get and return the field of sense
 	"""
-	def field_of_sense(self, fos_request: Dict, visible: bool = False) -> Dict:
+	def field_of_sense(self, fos_request: dict, visible: bool = False) -> dict:
 		logger.debug(f"TWorld->field_of_sense({fos_request!r})")
 		# Extract the fos parameters m, x, y, z, r
-		m = fos_request.get("m") # Map number
+		if fos_request is not None:
+			m = fos_request.get("m") # Map number
 		x = fos_request.get("x") # x coordinate on map m
 		y = fos_request.get("y") # y coordinate on map m
 		# z = fos_request.get("z") # z coordinate = height on map m (not yet used)
@@ -62,9 +63,9 @@ class TWorld:
 	"""
 	def map_definitions(self) -> List:
 		logger.debug(f"TWorld->map_sizes()")
-		map_sizes = []
+		map_sizes: list = []
 		for map_idx, m in enumerate(self.maps):
-			fos = None
+			fos: dict | None = None
 			if m["visible"]:
 				fos = self.field_of_sense({"x":0, "y": 0, "z": 0, "m": map_idx, "r": 0}, True)
 			map_sizes.append(

@@ -1,0 +1,17 @@
+{
+	"id":"",
+	"name": "landing",
+	"entry": [[150, 152, 0, 0], [139, 152, 0, 0]],
+	"maps": [
+		[
+			[0, "Landing zone", 200, 200, "plain", true, 1234567890],
+			[5, 0, 0, 200, 200, "grass2", "grass1", "grass3", 66, 33],
+			[2, 175, 175, 30, "ocean coastline", true, 1],
+			[2, 150, 199, 27, "ocean coastline", true, 1],
+			[2, 199, 160, 37, "ocean coastline", true, 1],
+			[2, 180, 179, 26, "ocean deep", true, 1],
+			[2, 157, 199, 22, "ocean deep", true, 1],
+			[2, 199, 161, 27, "ocean deep", true, 1]
+		]
+	]
+}

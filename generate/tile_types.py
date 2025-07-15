@@ -99,15 +99,22 @@ tiles["stairway"] = new_tile(
 tiles["grass1"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(44, (128, 192, 128), (0, 0, 0)),
-	light=(44, (128, 255, 128), (0, 0, 0)),
+	dark=(44, colour.grass3, colour.black),
+	light=(44, colour.grass1, colour.black),
 	gateway=False,
 )
 tiles["grass2"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(46, (96, 128, 96), (0, 0, 0)),
-	light=(46, (128, 192, 128), (0, 0, 0)),
+	dark=(46, colour.grass1, colour.black),
+	light=(46, colour.grass2, colour.black),
+	gateway=False,
+)
+tiles["grass3"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(35, colour.grass2, colour.black),
+	light=(35, colour.grass3, colour.black),
 	gateway=False,
 )
 tiles["rock1"] = new_tile(
@@ -332,5 +339,19 @@ tiles["spaceship glass wall right"] = new_tile(
 	transparent=True,
 	dark=(9616, colour.glass_wall, colour.spaceship_deck),
 	light=(9616, colour.glass_wall, colour.spaceship_deck),
+	gateway=False,
+)
+tiles["ocean coastline"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(163, colour.mediumblue, colour.darkblue),
+	light=(163, colour.mediumblue, colour.darkblue),
+	gateway=False,
+)
+tiles["ocean deep"] = new_tile(
+	walkable=False,
+	transparent=True,
+	dark=(163, colour.darkblue, colour.darkblue),
+	light=(163, colour.darkblue, colour.darkblue),
 	gateway=False,
 )
