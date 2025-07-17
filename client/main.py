@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 import sys
 import tcod
 
@@ -6,7 +7,6 @@ from renders import TRender
 from entities import TActor
 from input_handlers import TEventHandler
 from clients import TClient
-import colours
 from message_logs import TMessageLog
 
 import logging
@@ -20,7 +20,7 @@ VIEWPORT_WIDTH = SCREEN_WIDTH - 20
 VIEWPORT_HEIGHT = SCREEN_HEIGHT - 10
 
 config = {
-	"title": "Endless Worlds, Ankt, (c) 2025",
+	"title": "Endless Worlds, 2025",
 	"layout": "sc8050vp6040sp2005lp6005",
 	"layouts": {
 		"sc8050vp6040sp2005lp6005": {
@@ -46,7 +46,6 @@ config = {
 	"viewport_width": VIEWPORT_WIDTH,
 	"viewport_height": VIEWPORT_HEIGHT,
 	"tileset": "redjack17.png",
-#	"host": "91.105.47.63",
 	"host": "192.168.1.104",
 	"port": 12345,
 }
