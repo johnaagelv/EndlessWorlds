@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import os.path
 import tcod.console
 import tcod.context
-import tcod.event
 import tcod.tileset
 
 import g
@@ -32,7 +32,10 @@ def main(log_level) -> None:
 	)
 	tcod.tileset.procedural_block_elements(tileset=tileset)
 
-	g.states = [game.states.MainMenu()]
+	# Check that a savefile exists
+	savefile_exists = os.path.exists('savefile.sav')
+
+	g.states = [game.states.MainMenu(savefile_exists)]
 	g.console = tcod.console.Console(SCREEN_WIDTH, SCREEN_HEIGHT)
 	g.console.print(0, 0, "Endless Worlds, 2025")
 

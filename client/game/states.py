@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 logger = logging.getLogger("EWClient")
 
+import pickle
 import attrs
 import tcod.console
 import tcod.event
@@ -61,14 +62,18 @@ class InGame(State):
 """ Main/escape menu """
 class MainMenu(game.menus.ListMenu):
 	__slotes__ = ()
-	def __init__(self) -> None:
+	def __init__(self, savefile_exists: bool = False) -> None:
 		logger.info("MainMenu(game.menus.ListMenu)->__init__() -> None")
 		items = [
 			game.menus.SelectItem("New game", self.new_game),
 			game.menus.SelectItem("Quit", self.quit),
 		]
+		if savefile_exists:
+			items.insert(1, game.menus.SelectItem("Load game", self.load_))
+
 		if hasattr(g, "world"):
-			items.insert(0, game.menus.SelectItem("Continue", self.continue_))
+			items.insert(1, game.menus.SelectItem("Continue", self.continue_))
+			items.insert(2, game.menus.SelectItem("Save", self.save_))
 		
 		super().__init__(
 			items=tuple(items),
@@ -76,9 +81,27 @@ class MainMenu(game.menus.ListMenu):
 			x=5,
 			y=5,
 		)
+
+	""" Load the world from the savefile """
+	@staticmethod
+	def load_() -> StateResult:
+		logger.info("MainMenu(game.menus.ListMenu)->load_() -> StateResult")
+		with open("savefile.sav", "rb") as f:
+			g.world = pickle.loads(f.read())
+		return Reset(InGame())
+
+	""" Save the world and clear the world """
+	@staticmethod
+	def save_() -> StateResult:
+		logger.info("MainMenu(game.menus.ListMenu)->save_() -> StateResult")
+		with open("savefile.sav", "wb") as f:
+			f.write(pickle.dumps(g.world))
+		del(g.world)
+		return Reset(MainMenu())
+
 	@staticmethod
 	def continue_() -> StateResult:
-		logger.info("MainMenu(game.menus.ListMenu)->continue() -> StateResult")
+		logger.info("MainMenu(game.menus.ListMenu)->continue_() -> StateResult")
 		return Reset(InGame())
 
 	@staticmethod
