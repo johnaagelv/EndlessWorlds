@@ -1,0 +1,4 @@
+tcod >= 18.1
+numpy >= 1.8
+attrs >= 1.0
+tcod-ecs >= 1.0

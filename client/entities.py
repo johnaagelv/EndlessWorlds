@@ -1,10 +1,19 @@
-from typing import Dict, Optional, Tuple
+from __future__ import annotations
+
+from typing import Dict, Optional, Tuple, Type, TypeVar, TYPE_CHECKING
+
 import logging
 logger = logging.getLogger("EWClient")
 
 from tcod.map import compute_fov
 
-from worlds import TWorld
+if TYPE_CHECKING:
+	from components.ai import TBaseAI
+	from components.fighters import TFighter
+	from worlds import TWorld
+
+T = TypeVar("T", bound="TEntity")
+
 from message_logs import TMessageLog
 
 class TEntity:
@@ -13,12 +22,11 @@ class TEntity:
 	def __init__(self, data):
 		logger.debug(f"TEntity->__init__( data )")
 		self.data = data
+		self.x = self.data['x']
+		self.y = self.data['y']
 
-class TActor(TEntity):
-	def __init__(self, data):
-		logger.debug(f"TActor->__init__( data )")
-		super().__init__(data)
-		self.fos = None
+	def run(self) -> Optional[Dict]:
+		raise NotImplementedError()
 
 	"""
 	Provide the World
@@ -58,11 +66,30 @@ class TActor(TEntity):
 	def current_xy(self) -> Tuple[int, int]:
 		logger.debug(f"TActor->current_xy")
 		return self.data['x'], self.data['y']
-	
+
 	def capability(self, capability: str):
 		logger.debug(f"TActor->capability( capability={capability} )")
 		return self.data['capabilities'][capability][0]
 
+	def update_fos(self) -> None:
+		current_map = self.map
+		if current_map is not None:
+			current_map['visible'][:] = compute_fov(
+				current_map['tiles']['transparent'],
+				(self.data['x'], self.data['y']),
+				radius = self.capability('vision')
+			)
+			current_map['explored'] |= current_map['visible']
+
+"""
+ACTOR is the player
+"""
+class TActor(TEntity):
+	def __init__(self, data):
+		logger.debug(f"TActor->__init__( data )")
+		super().__init__(data)
+		self.fos = None
+	
 	def run(self) -> Optional[Dict]:
 		logger.debug(f"TActor->run()")
 		request = None
@@ -87,12 +114,3 @@ class TActor(TEntity):
 		logger.debug(f"- request: {request!r}")
 		return request
 
-	def update_fos(self) -> None:
-		current_map = self.map
-		if current_map is not None:
-			current_map['visible'][:] = compute_fov(
-				current_map['tiles']['transparent'],
-				(self.data['x'], self.data['y']),
-				radius = self.capability('vision')
-			)
-			current_map['explored'] |= current_map['visible']

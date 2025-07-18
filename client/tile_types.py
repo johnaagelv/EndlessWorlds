@@ -18,4 +18,6 @@ tile_dt = np.dtype(
 	]
 )
 
+blank = np.array((False, False, (32, (255, 255, 255), (0, 0, 0)),(32, (255, 255, 255), (0, 0, 0))), dtype=tile_dt)
+
 SHROUD = np.array((ord(" "), (255, 255, 255), (0, 0, 0)), dtype=graphic_dt)

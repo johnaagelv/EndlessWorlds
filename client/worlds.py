@@ -1,17 +1,18 @@
-from typing import Dict, List, TYPE_CHECKING
+from __future__ import annotations
+from typing import List, Optional, Dict, TYPE_CHECKING
 import logging
 logger = logging.getLogger("EWClient")
 
 import numpy as np
-import json
 
 if TYPE_CHECKING:
-	from entities import TActor
+	from entities import TEntity
+	from engines import TEngine
 
 import tile_types
 
 class TMap:
-	def __init__(self, map_definition = None, name = None):
+	def __init__(self, map_definition: Dict, name: str):
 		if map_definition is None and name is not None:
 			self.load_map(name)
 		elif map_definition is not None and name is None:
@@ -20,7 +21,7 @@ class TMap:
 			self.height = int(map_definition.get("height"))
 			self.is_visible = map_definition.get('visible')
 
-			self.tiles = np.full((self.width, self.height), fill_value=tile_types.floor, order="F")
+			self.tiles = np.full((self.width, self.height), fill_value=tile_types.SHROUD, order="F")
 			self.visible = np.full((self.width, self.height), fill_value=self.is_visible, order="F")
 			self.explored = np.full((self.width, self.height), fill_value=self.is_visible, order="F")
 		else:
@@ -33,11 +34,12 @@ class TWorld:
 	maps: list[dict]
 	entities: list = []
 	map_names: list
+	engine: TEngine
 
 	def __init__(self, actor, map_definitions: list):
 #		logger.info(f"TWorld->__init__( actor={actor}, map_definitions={map_definitions} )")
 #		logger.debug(f"- map_definitions {map_definitions!r}")
-		self.actor: TActor = actor
+		self.actor: TEntity = actor
 #		self.maps: List[Dict | None]
 		map_template = {
 			"loaded": bool,
@@ -73,7 +75,7 @@ class TWorld:
 				"name": map_name,
 				"width": map_width,
 				"height": map_height,
-				"tiles": np.full((map_width, map_height), fill_value=tile_types.floor, order="F"),
+				"tiles": np.full((map_width, map_height), fill_value=tile_types.blank, order="F"),
 				"visible": np.full((map_width, map_height), fill_value=map_visible, order="F"),
 				"explored": np.full((map_width, map_height), fill_value=map_visible, order="F"),
 			}
@@ -127,3 +129,6 @@ class TWorld:
 		logger.debug(f"- gateway={gateway!r}")
 		logger.info(f"- gateway={gateway!r}")
 		return gateway
+
+	def get_entities_at_location(self, location_x: int, location_y: int) -> Optional[List]:
+		return [entity for entity in self.entities if entity.data['x'] == location_x and entity.data['y'] == location_y]

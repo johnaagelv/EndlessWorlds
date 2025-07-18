@@ -5,10 +5,10 @@ logger = logging.getLogger("EWClient")
 
 import tcod.event
 from actions import TAction, TEscapeAction, TMoveAction, TStairAction
-from entities import TActor
+from entities import TEntity, TActor
 
 class TEventHandler(tcod.event.EventDispatch[TAction]):
-	def __init__(self, actor: TActor):
+	def __init__(self, actor: TEntity):
 		logger.debug(f"TEventHandler->__init__( actor )")
 		self.actor = actor
 
