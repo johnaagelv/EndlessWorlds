@@ -22,10 +22,13 @@ def apply_state_result(result: StateResult) -> None:
 	logger.info("apply_state_result( result: StateResult ) -> None")
 	match result:
 		case Push(state=state):
+			# Append a new state to g.states
 			g.states.append(state)
 		case Pop():
+			# Remove the current state if any
 			g.states.pop()
 		case Reset(state=state):
+			# Remove all states from g.states and replace with the specified state
 			while g.states:
 				apply_state_result(Pop())
 			apply_state_result(Push(state))

@@ -12,3 +12,6 @@ IsActor: Final = "IsActor"
 
 """ Entity is an item """
 IsItem: Final = "IsItem"
+
+""" Entity is a map """
+IsMap: Final = "IsMap"

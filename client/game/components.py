@@ -8,6 +8,12 @@ from typing import Final, Self
 import attrs
 import tcod.ecs.callbacks
 from tcod.ecs import Entity
+import numpy as np
+
+""" Map of an entity """
+@attrs.define(frozen=False)
+class Map:
+	map: np.ndarray
 
 """ Position of an entity """
 @attrs.define(frozen=True)
@@ -42,3 +48,6 @@ class Graphic:
 
 """ Amount of gold """
 Gold: Final = ("Gold", int)
+
+""" Amount of silver """
+Silver: Final = ("Silver", int)

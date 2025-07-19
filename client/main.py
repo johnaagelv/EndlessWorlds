@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import os.path
 import tcod.console
 import tcod.context
 import tcod.tileset
 
 import g
 import game.states
-#import game.world_tools
 import game.state_tools
 
 import sys
@@ -28,16 +26,13 @@ def main(log_level) -> None:
 	logging.info('World client started')
 
 	tileset = tcod.tileset.load_tilesheet(
-		"Alloy_curses_12x12.png", columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
+		"redjack17.png", columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
+#		"Alloy_curses_12x12.png", columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
 	)
 	tcod.tileset.procedural_block_elements(tileset=tileset)
 
-	# Check that a savefile exists
-	savefile_exists = os.path.exists('savefile.sav')
-
-	g.states = [game.states.MainMenu(savefile_exists)]
-	g.console = tcod.console.Console(SCREEN_WIDTH, SCREEN_HEIGHT)
-	g.console.print(0, 0, "Endless Worlds, 2025")
+	g.states = [game.states.MainMenu()]
+	g.console = tcod.console.Console(SCREEN_WIDTH, SCREEN_HEIGHT, order="F")
 
 	with tcod.context.new(
 		console=g.console,
