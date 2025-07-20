@@ -3,17 +3,35 @@ from __future__ import annotations
 import logging
 logger = logging.getLogger("EWClient")
 
-from typing import Final, Self
+from typing import Final, List, Self
 
 import attrs
 import tcod.ecs.callbacks
-from tcod.ecs import Entity
+from tcod.ecs import Entity, Registry
 import numpy as np
 
-""" Map of an entity """
+""" World registry """
 @attrs.define(frozen=False)
-class Map:
+class World:
+	registry: Registry
+
+""" Map memory of an entity """
+@attrs.define(frozen=False)
+class ExplorationMemory:
 	map: np.ndarray
+	visible: np.ndarray
+	explored: np.ndarray
+	gateways: List
+
+""" Map parts visible by entity's Field of Sense """
+@attrs.define(frozen=False)
+class Visible:
+	visible: np.ndarray
+
+""" Map parts explored by entity """
+@attrs.define(frozen=False)
+class Explored:
+	explored: np.ndarray
 
 """ Position of an entity """
 @attrs.define(frozen=True)
@@ -48,6 +66,3 @@ class Graphic:
 
 """ Amount of gold """
 Gold: Final = ("Gold", int)
-
-""" Amount of silver """
-Silver: Final = ("Silver", int)

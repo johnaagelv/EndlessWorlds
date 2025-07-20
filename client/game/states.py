@@ -13,12 +13,14 @@ from tcod.event import KeySym
 import g
 from game.tags import IsPlayer, IsItem, IsActor
 from game.constants import DIRECTION_KEYS
-from game.components import Gold, Graphic, Map, Position, Silver
+from game.components import Gold, Graphic, ExplorationMemory, Position, Visible, Explored
 from game.state import Push, Reset, State, StateResult
 import game.menus
 import game.world_tools
+import tcod.ecs
 
 import numpy as np
+import tile_types
 
 """ Primary in-game state """
 @attrs.define()
@@ -27,10 +29,19 @@ class InGame(State):
 	def on_draw(self, console: tcod.console.Console) -> None:
 		logger.info("InGame(State)->on_draw( console ) -> None")
 		# Draw the map
-		for entity in g.world.Q.all_of(components=[Map]):
-			map = entity.components[Map]
-			console.rgb[:,:] = map.map['dark']
-			
+		map: np.ndarray
+		visible: np.ndarray
+		explored: np.ndarray
+		for entity in g.world.Q.all_of(components=[ExplorationMemory]):
+			map = entity.components[ExplorationMemory].map
+			visible = entity.components[ExplorationMemory].visible
+			explored = entity.components[ExplorationMemory].explored
+
+		console.rgb[0:80,0:50] = np.select(
+			condlist=[visible, explored],
+			choicelist=[map['light'], map['dark']],
+			default=tile_types.SHROUD
+		)
 
 		# Draw all the items
 		for entity in g.world.Q.all_of(components=[Position, Graphic], tags=[IsItem]):
@@ -64,13 +75,15 @@ class InGame(State):
 				player.components[Position] += DIRECTION_KEYS[sym]
 
 			case tcod.event.KeyDown(sym=sym) if sym == tcod.event.KeySym.COMMA:
-				# Auto pickup gold
-				for gold in g.world.Q.all_of(components=[Gold], tags=[player.components[Position], IsItem]):
+				# Manually pick up the item
+				items = g.world.Q.all_of(tags=[player.components[Position], IsItem]).get_entities()
+				if len(items) > 1:
+					print(f"Pickup of {len(items)} items!")
+				for gold in items:
 					player.components[Gold] += gold.components[Gold]
+#				for gold in g.world.Q.all_of(components=[Gold], tags=[player.components[Position], IsItem]):
+#					player.components[Gold] += gold.components[Gold]
 					gold.clear()
-				for silver in g.world.Q.all_of(components=[Silver], tags=[player.components[Position], IsItem]):
-					player.components[Silver] += silver.components[Silver]
-					silver.clear()
 				return None
 			case tcod.event.KeyDown(sym=KeySym.ESCAPE):
 				return Push(MainMenu())
