@@ -11,7 +11,8 @@ import tcod.console
 import tcod.event
 from tcod.event import KeySym
 
-import game.state_tools
+#import game.state_tools
+import game.systems
 from game.constants import DIRECTION_KEYS
 from game.state import Pop, State, StateResult
 
@@ -36,6 +37,7 @@ class SelectItem(MenuItem):
 	""" Handle events selecting this menu item """
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		logger.info("SelectItem(MenuItem)->on_event( event ) -> StateResult")
+		print(f"SelectItem: {self.label}")
 		match event:
 			case tcod.event.KeyDown(sym=sym) if sym in {KeySym.RETURN, KeySym.RETURN2, KeySym.KP_ENTER}:
 				return self.callback()
@@ -87,6 +89,7 @@ class ListMenu(State):
 	def activate_selected(self, event: tcod.event.Event) -> StateResult:
 		logger.info("ListMenu(State)->activate_selected( event ) -> StateResult")
 		if self.selected is not None:
+			print(f"Selected {self.selected}")
 			return self.items[self.selected].on_event(event)
 		return None
 	
@@ -98,7 +101,8 @@ class ListMenu(State):
 	""" Render the menu """
 	def on_draw(self, console: tcod.console.Console) -> None:
 		logger.info("ListMenu(State)->on_draw( console ) -> None")
-		game.state_tools.draw_previous_state(self, console)
+		#game.state_tools.draw_previous_state(self, console)
+		game.systems.draw_previous_state(self, console)
 		for i, item in enumerate(self.items):
 			item.on_draw(console, x=self.x, y=self.y + i, highlight=i == self.selected)
 

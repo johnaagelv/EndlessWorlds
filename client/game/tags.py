@@ -15,3 +15,10 @@ IsItem: Final = "IsItem"
 
 """ Entity is a map """
 IsMap: Final = "IsMap"
+
+""" Entity is the current map """
+IsCurrent: Final = "IsCurrent"
+
+""" Entity is a container """
+IsContainer: Final = "IsContainer"
+IsInventory: Final = "IsInventory"

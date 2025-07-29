@@ -7,7 +7,7 @@ import tcod.tileset
 
 import g
 import game.states
-import game.state_tools
+import game.systems
 
 import sys
 
@@ -39,12 +39,15 @@ def main(log_level) -> None:
 		tileset=tileset,
 		title="Endless Worlds, 2025",
 	) as g.context:
-		game.state_tools.main_loop()
+		logging.info('Entering main loop')
+		while g.states:
+			game.systems.main_draw()
+			game.systems.main_input()
 
 	logging.info('World client stopped')
 
 if __name__ == "__main__":
-	log_level = logging.DEBUG
+	log_level = logging.INFO
 	try:
 		if len(sys.argv) >= 2:
 			log_level = logging.DEBUG

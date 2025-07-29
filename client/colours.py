@@ -138,8 +138,13 @@ whitesmoke = (245, 245, 245)
 yellow = (255, 255, 0)
 yellowgreen = (139, 205, 50)
 
+international_orange = (255, 79, 0)
+venetian_red = (200, 8, 21)
+safety_yellow = (238, 210, 2)
+dark_charcoal = (51, 51, 51)
+
 bar_text = white
-bar_high = green
+bar_high = darkgreen
 bar_medium = orange
-bar_low = red
-bar_empty = (32, 32, 32)
+bar_low = venetian_red
+bar_empty = dark_charcoal

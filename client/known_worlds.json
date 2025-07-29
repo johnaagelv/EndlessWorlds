@@ -1,0 +1,12 @@
+{
+	"worlds": [
+		{
+			"name": "Spaceship Surveyor I",
+			"ip": "192.168.1.104:12345"
+		},
+		{
+			"name": "System HR 8799 - Planet Ankt",
+			"ip": "192.168.1.104:12345"
+		}
+	]
+}
