@@ -15,12 +15,12 @@ from game.tags import IsPlayer
 """ Is a """
 @attrs.define(frozen=True)
 class IsA:
-	stats: object
+	name: str
 
 """ Base container """
 @attrs.define(frozen=False)
 class BaseContainer:
-	registry: object
+	registry: Registry
 	slots: int # Number of items this container can contain
 	# weight: int # Max weight of all items that this container can contain
 

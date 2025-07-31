@@ -36,14 +36,15 @@ def new_world() -> Registry:
 	player.components[gc.EnergyImpacts] = gc.EnergyImpacts(-100, -50, -1, [gc.Strength, gc.Health])
 	player.components[gc.Strength] = gc.Strength(500000, 62500, 125000, 250000)
 	player.components[gc.StrengthImpacts] = gc.StrengthImpacts(-10, -5, -1, [gc.Energy, gc.Health])
+	player.components[gc.Gold] = gc.Gold(1)
+	player.components[gc.IsA] = gc.IsA("Gold")
 
-	inventory = registry[object()]
-	inventory.tags |= {IsContainer, IsInventory}
+	inventory = Registry()
 	player.components[gc.Inventory] = gc.Inventory(inventory, 8)
-	inventory.components[gc.Gold] = gc.Gold(1)
-	equipment = registry[object()]
-	equipment.tags |= {IsContainer}
-	player.components[gc.Equipment] = gc.Equipment(equipment, 8)
+#	equipment = registry[object()]
+#	equipment.tags |= {IsContainer}
+#	player.components[gc.Equipment] = gc.Equipment(equipment, 8)
+
 	player.tags |= {IsPlayer}
 
 	world.components[gc.ExplorationMemory] = gc.ExplorationMemory(
@@ -55,7 +56,7 @@ def new_world() -> Registry:
 
 	for _ in range(rng.randint(6,12)):
 		valuable = registry[object()]
-		valuable.components[gc.IsA] = gc.IsA(gc.Gold)
+		valuable.components[gc.IsA] = gc.IsA("Gold")
 		valuable.components[gc.Position] = gc.Position(rng.randint(0, 10), rng.randint(0, 25))
 		valuable.components[gc.Graphic] = gc.Graphic(ord("$"), fg=(255, 255, 0))
 		valuable.components[gc.Gold] = gc.Gold(rng.randint(1, 10))
@@ -64,7 +65,7 @@ def new_world() -> Registry:
 
 	for _ in range(rng.randint(12,22)):
 		valuable = registry[object()]
-		valuable.components[gc.IsA] = gc.IsA(gc.Food)
+		valuable.components[gc.IsA] = gc.IsA("Food")
 		valuable.components[gc.Position] = gc.Position(rng.randint(0, 60), rng.randint(0, 35))
 		valuable.components[gc.Graphic] = gc.Graphic(9576, fg=colours.lightgoldenrodyellow)
 		valuable.components[gc.Food] = gc.Food(rng.randint(1000, 50000))

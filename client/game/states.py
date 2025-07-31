@@ -25,7 +25,6 @@ import colours
 import numpy as np
 import tile_types
 
-
 """ Primary in-game state """
 @attrs.define()
 class InGame(State):
@@ -94,6 +93,15 @@ class InGame(State):
 			console.print(x=view_x + state_x, y=view_y, text=str(current_value), fg=colours.bar_text)
 			view_y += 1
 
+	""" Draw the messages from the messagelog """
+	def _draw_messages(self, console: tcod.console.Console) -> None:
+		view_x = 1
+		view_width = 58
+		view_height = 6
+		view_y = console.height - view_height - 1
+		
+		g.messages.render(console, view_x, view_y, view_width, view_height)
+
 	""" Main game drawing method """
 	def on_draw(self, console: tcod.console.Console) -> None:
 		logger.info("InGame(State)->on_draw( console ) -> None")
@@ -101,10 +109,7 @@ class InGame(State):
 		self._draw_items(console)
 		self._draw_actors(console)
 		self._draw_states(console)
-
-		# If any text added in the world, print it
-		if text := g.world[None].components.get(("Text", str)):
-			console.print(x=1, y=console.height - 2, text=text, fg=(255, 255, 255), bg=(0, 0, 0))
+		self._draw_messages(console)
 
 	""" Affects other states """
 	def apply_impact(self, main_state, impact_state):
@@ -121,7 +126,7 @@ class InGame(State):
 		logger.info("InGame(State)->on_event( event ) -> StateResult")
 		# Get the player
 		(player,) = g.world.Q.all_of(tags=[IsPlayer])
-		(inventory,) = g.world.Q.all_of(tags=[IsInventory])
+		inventory = player.components[gc.Inventory].registry
 
 		self.apply_impact(gc.Energy, gc.EnergyImpacts)
 		self.apply_impact(gc.Health, gc.HealthImpacts)
@@ -139,25 +144,32 @@ class InGame(State):
 
 			case tcod.event.KeyDown(sym=tcod.event.KeySym.COMMA):
 				# Manually pick up the item
+				inventory_max_count = player.components[gc.Inventory].slots
 				for item in g.world.Q.all_of(tags=[player.components[gc.Position], IsItem]):
-					if item.components[gc.IsA].stats == gc.Gold:
-						try:
-							value = inventory.components[gc.Gold].value
-						except:
-							inventory.components[gc.Gold] = gc.Gold(0)
-						inventory.components[gc.Gold] += item.components[gc.Gold].value
+					if gc.Gold in item.components:
+						player.components[gc.Gold] += item.components[gc.Gold].value
+						g.messages.add(f"Picked up {item.components[gc.Gold].value} gold", colours.white)
 						item.clear()
-					elif item.components[gc.IsA].stats == gc.Food:
-						try:
-							value = inventory.components[gc.Food].value
-						except:
-							inventory.components[gc.Food] = gc.Food(0)
-						inventory.components[gc.Food] += item.components[gc.Food].value
+
+					elif gc.Food in item.components:
+						inventory_items = inventory.Q.all_of(components=[gc.IsA],tags=[IsItem]).get_entities()
+						if len(inventory_items) >= inventory_max_count:
+							g.messages.add("No free space", colours.orangered)
+							continue
+						inventory_item = inventory[object()]
+						inventory_item.components[gc.Food] = gc.Food(item.components[gc.Food].value)
+						inventory_item.components[gc.IsA] = gc.IsA("Food")
+						inventory_item.tags |= {IsItem}
+
+						g.messages.add("Picked up a food parcel", colours.white)
 						item.clear()
+					else:
+						pass # Unknown command, so do nothing
 				return None
 			
 			case tcod.event.KeyDown(sym=KeySym.ESCAPE):
 				return Push(MainMenu())
+
 			case _:
 				return None
 
@@ -170,24 +182,27 @@ class InventoryMenu(game.menus.ListMenu):
 		# Get the player
 		(player,) = g.world.Q.all_of(tags=[IsPlayer])
 
-		choices = g.world.Q.all_of(tags=[IsItem])
+		inventory = player.components[gc.Inventory].registry
+		choices = inventory.Q.all_of(components=[gc.IsA])
 		for item in choices:
-			current_name = item.__class__.__name__
-			menu_items.append(game.menus.SelectItem(f"{current_name}", self.on_select))
+			if gc.Food in item.components:
+				current_name = "Food parcel"
+				current_value = int(item.components[gc.Food].value / 1000)
 
-		menu_items.append(game.menus.SelectItem("Cancel", self.on_cancel))
+			menu_items.append(game.menus.SelectItem(current_name, current_value, self.on_select))
+
+		menu_items.append(game.menus.SelectItem("Cancel", None, self.on_cancel))
 
 		super().__init__(
 			items=tuple(menu_items),
 			selected=0,
-			x=61,
-			y=5,
+			x=25,
+			y=8,
+			title="Inventory"
 		)
 
 	def on_select(self) -> StateResult:
-#		a = enumerate(self.items)
-#		item = self.choices[self.selected]
-#		print(f"Select={self.selected} as ???")
+		g.messages.add(f"Doing something with something [{self.selected}]", colours.darkgreen)
 		return Pop()
 
 	@staticmethod
@@ -208,19 +223,20 @@ class KnownWorldsMenu(game.menus.ListMenu):
 				known_worlds = json.load(f)
 			
 			for known_world in known_worlds['worlds']:
-				menu_items.append( game.menus.SelectItem(known_world['name'], self.on_select))
+				menu_items.append( game.menus.SelectItem(known_world['name'], None, self.on_select))
 
-		menu_items.append(game.menus.SelectItem("Cancel", self.on_cancel))
+		menu_items.append(game.menus.SelectItem("Cancel", None, self.on_cancel))
 
 		super().__init__(
 			items=tuple(menu_items),
 			selected=0,
 			x=5,
 			y=5,
+			title=None
 		)
 
 	def on_select(self) -> StateResult:
-
+		g.messages.add(f"Initiating world [{self.selected}]", colours.darkblue)
 		return Reset(MainMenu())
 	
 	@staticmethod
@@ -234,30 +250,32 @@ class MainMenu(game.menus.ListMenu):
 	def __init__(self) -> None:
 		logger.info("MainMenu(game.menus.ListMenu)->__init__() -> None")
 		menu_items = [
-			game.menus.SelectItem("Choose world", self.choose_known_world),
-			game.menus.SelectItem("New game", self.new_game),
+			game.menus.SelectItem("Choose world", None, self.choose_known_world),
+			game.menus.SelectItem("New game", None, self.new_game),
 		]
 		# Check that a savefile exists
 		if os.path.exists('savefile.sav'):
-			menu_items.append(game.menus.SelectItem("Load game", self.load_))
+			menu_items.append(game.menus.SelectItem("Load game", None, self.load_))
 
 		if hasattr(g, "world"):
-			menu_items.append(game.menus.SelectItem("Continue", self.continue_))
-			menu_items.append(game.menus.SelectItem("Save", self.save_))
+			menu_items.append(game.menus.SelectItem("Continue", None, self.continue_))
+			menu_items.append(game.menus.SelectItem("Save", None, self.save_))
 
-		menu_items.append(game.menus.SelectItem("Quit", self.quit))
+		menu_items.append(game.menus.SelectItem("Quit", None, self.quit))
 
 		super().__init__(
 			items=tuple(menu_items),
 			selected=0,
 			x=5,
 			y=5,
+			title=None
 		)
 
 	""" Load the world from the savefile """
 	@staticmethod
 	def load_() -> StateResult:
 		logger.info("MainMenu(game.menus.ListMenu)->load_() -> StateResult")
+		g.messages.add(f"Loading saved game", colours.darkgreen)
 		with open("savefile.sav", "rb") as f:
 			g.world = pickle.loads(f.read())
 		return Reset(InGame())
@@ -266,6 +284,7 @@ class MainMenu(game.menus.ListMenu):
 	@staticmethod
 	def save_() -> StateResult:
 		logger.info("MainMenu(game.menus.ListMenu)->save_() -> StateResult")
+		g.messages.add(f"Saving game", colours.darkgreen)
 		with open("savefile.sav", "wb") as f:
 			f.write(pickle.dumps(g.world))
 		del(g.world)
@@ -284,6 +303,7 @@ class MainMenu(game.menus.ListMenu):
 	@staticmethod
 	def new_game() -> StateResult:
 		logger.info("MainMenu(game.menus.ListMenu)->new_game() -> StateResult")
+		g.messages.add(f"Starting a new game", colours.darkgreen)
 		g.world = game.world_tools.new_world()
 		# Clear g.world for all states and add InGame states
 		return Reset(InGame())

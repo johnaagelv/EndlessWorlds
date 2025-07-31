@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from typing import List
 import tcod.console
 import tcod.context
 import tcod.ecs
 
 import game.state
+import message_logs
 
 """ The window managed by tcod """
 context: tcod.context.Context
@@ -19,3 +21,6 @@ states: list[game.state.State] = []
 
 """ The current main console """
 console: tcod.console.Console
+
+""" Message log """
+messages = message_logs.TMessageLog()
