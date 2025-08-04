@@ -22,3 +22,5 @@ IsCurrent: Final = "IsCurrent"
 """ Entity is a container """
 IsContainer: Final = "IsContainer"
 IsInventory: Final = "IsInventory"
+
+IsConsumable: Final = "IsConsumable"

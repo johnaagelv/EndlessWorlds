@@ -3,18 +3,18 @@ from __future__ import annotations
 import logging
 logger = logging.getLogger("EWClient")
 
-from typing import Dict, List
+from typing import List
 import os.path
 import pickle
 import attrs
 import tcod.console
 import tcod.event
-from tcod.ecs import Registry
 import json
 from tcod.event import KeySym
+from random import Random
 
 import g
-from game.tags import IsPlayer, IsItem, IsActor, IsInventory
+from game.tags import IsPlayer, IsItem, IsActor, IsConsumable
 from game.constants import DIRECTION_KEYS
 import game.components as gc
 from game.state import Pop, Push, Reset, State, StateResult
@@ -92,6 +92,23 @@ class InGame(State):
 			state_x = view_width - 2 - (current_value > 9) - (current_value > 99) - (current_value > 999)
 			console.print(x=view_x + state_x, y=view_y, text=str(current_value), fg=colours.bar_text)
 			view_y += 1
+		
+		# Draw other states, numeric
+		item = player.components[gc.Gold]
+		console.print(x=view_x, y=view_y, text=" Gold {:>13} ".format(item.value), fg=colours.gold, bg=colours.black)
+
+	""" Draw the actor's states """
+	def _draw_inventory(self, console: tcod.console.Console) -> None:
+		(player,) = g.world.Q.all_of(tags=[IsPlayer])
+		view_width = 20
+		view_x = console.width - view_width - 1 # TODO: Values from configuration
+		view_y = 5
+		inventory = player.components[gc.Inventory].registry
+		items = inventory.Q.all_of(components=[gc.Food])
+		for item in items:
+			if gc.Food in item.components:
+				console.print(x=view_x, y=view_y, text=" Food {:>13} ".format(int(item.components[gc.Food].value/1000)), fg=colours.white, bg=colours.black)
+
 
 	""" Draw the messages from the messagelog """
 	def _draw_messages(self, console: tcod.console.Console) -> None:
@@ -109,6 +126,7 @@ class InGame(State):
 		self._draw_items(console)
 		self._draw_actors(console)
 		self._draw_states(console)
+		self._draw_inventory(console)
 		self._draw_messages(console)
 
 	""" Affects other states """
@@ -124,6 +142,9 @@ class InGame(State):
 	""" Handle events for the in-game state (game ticks) """
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		logger.info("InGame(State)->on_event( event ) -> StateResult")
+
+		rng = g.world[None].components[Random]
+
 		# Get the player
 		(player,) = g.world.Q.all_of(tags=[IsPlayer])
 		inventory = player.components[gc.Inventory].registry
@@ -139,32 +160,45 @@ class InGame(State):
 				player.components[gc.Position] += DIRECTION_KEYS[sym]
 				player.components[gc.Energy] += player.components[gc.EnergyUsage].value
 
+				for npc in g.world.Q.all_of(tags=[IsActor]):
+					npc_movement = (rng.randint(-1,1), rng.randint(-1,1))
+					if gc.Relationship in npc.components:
+						actor_relationship = npc.components[gc.Relationship].value
+						x_diff = player.components[gc.Position].x > npc.components[gc.Position].x
+						y_diff = player.components[gc.Position].y > npc.components[gc.Position].y
+						npc_movement = (1 if x_diff else -1, 1 if y_diff else -1)
+						
+					npc.components[gc.Position] += npc_movement
+
 			case tcod.event.KeyDown(sym=tcod.event.KeySym.I):
 				return Push(InventoryMenu())
 
 			case tcod.event.KeyDown(sym=tcod.event.KeySym.COMMA):
 				# Manually pick up the item
 				inventory_max_count = player.components[gc.Inventory].slots
-				for item in g.world.Q.all_of(tags=[player.components[gc.Position], IsItem]):
-					if gc.Gold in item.components:
+				items = g.world.Q.all_of(components=[gc.Gold], tags=[player.components[gc.Position], IsItem]).get_entities()
+				if len(items) > 0:
+					item_amount = 0
+					for item in items:
 						player.components[gc.Gold] += item.components[gc.Gold].value
-						g.messages.add(f"Picked up {item.components[gc.Gold].value} gold", colours.white)
+						item_amount += item.components[gc.Gold].value
 						item.clear()
+					g.messages.add(f"Picked up {item_amount} gold", colours.white)
 
-					elif gc.Food in item.components:
-						inventory_items = inventory.Q.all_of(components=[gc.IsA],tags=[IsItem]).get_entities()
-						if len(inventory_items) >= inventory_max_count:
-							g.messages.add("No free space", colours.orangered)
-							continue
+				items = g.world.Q.all_of(components=[gc.Food], tags=[player.components[gc.Position], IsConsumable]).get_entities()
+				if len(items) > 0:
+					item_amount = 0
+					inventory_items = inventory.Q.all_of(components=[gc.Food]).get_entities()
+					if len(inventory_items) ==0:
 						inventory_item = inventory[object()]
-						inventory_item.components[gc.Food] = gc.Food(item.components[gc.Food].value)
-						inventory_item.components[gc.IsA] = gc.IsA("Food")
-						inventory_item.tags |= {IsItem}
+						inventory_item.components[gc.Food] = gc.Food(0, "food")
 
-						g.messages.add("Picked up a food parcel", colours.white)
+					(inventory_item, ) = inventory.Q.all_of(components=[gc.Food])
+					for item in items:
+						inventory_item.components[gc.Food] += item.components[gc.Food].value
+						item_amount += item.components[gc.Food].value
 						item.clear()
-					else:
-						pass # Unknown command, so do nothing
+					g.messages.add(f"Picked up {int(item_amount/1000)} food energy", colours.white)
 				return None
 			
 			case tcod.event.KeyDown(sym=KeySym.ESCAPE):
@@ -183,30 +217,23 @@ class InventoryMenu(game.menus.ListMenu):
 		(player,) = g.world.Q.all_of(tags=[IsPlayer])
 
 		inventory = player.components[gc.Inventory].registry
-		choices = inventory.Q.all_of(components=[gc.IsA])
-		for item in choices:
-			if gc.Food in item.components:
-				current_name = "Food parcel"
-				current_value = int(item.components[gc.Food].value / 1000)
+		choices = inventory.Q.all_of(tags=[IsConsumable])
+#		for item in choices:
+#			if gc.Food in item.components:
+#				current_name = "Food parcel"
+#				current_value = int(item.components[gc.Food].value / 1000)
 
-			menu_items.append(game.menus.SelectItem(current_name, current_value, self.on_select))
+#			menu_items.append(game.menus.SelectItem(current_name, current_value, self.on_select))
 
 		menu_items.append(game.menus.SelectItem("Cancel", None, self.on_cancel))
 
-		super().__init__(
-			items=tuple(menu_items),
-			selected=0,
-			x=25,
-			y=8,
-			title="Inventory"
-		)
+		# Initialize the menu
+		super().__init__(items=tuple(menu_items), selected=0, x=25, y=5, title="Inventory")
 
+	""" Inventory item has been selected, handle it """
 	def on_select(self) -> StateResult:
-		g.messages.add(f"Doing something with something [{self.selected}]", colours.darkgreen)
-		return Pop()
-
-	@staticmethod
-	def on_cancel() -> StateResult:
+		selected_item = (item for idx, item in enumerate(self.items) if idx == self.selected)
+		g.messages.add(f"Selected [{self.selected}], {selected_item}", colours.darkgreen)
 		return Pop()
 
 """ Known worlds menu """
@@ -227,24 +254,14 @@ class KnownWorldsMenu(game.menus.ListMenu):
 
 		menu_items.append(game.menus.SelectItem("Cancel", None, self.on_cancel))
 
-		super().__init__(
-			items=tuple(menu_items),
-			selected=0,
-			x=5,
-			y=5,
-			title=None
-		)
+		super().__init__(items=tuple(menu_items), selected=0, x=25, y=5, title=None)
 
 	def on_select(self) -> StateResult:
-		g.messages.add(f"Initiating world [{self.selected}]", colours.darkblue)
-		return Reset(MainMenu())
-	
-	@staticmethod
-	def on_cancel() -> StateResult:
+		selected_item = (item for idx, item in enumerate(self.items) if idx == self.selected)
+		g.messages.add(f"Initiating world '{selected_item}'", colours.darkblue)
 		return Reset(MainMenu())
 
-
-""" Main/escape menu """
+""" Main menu """
 class MainMenu(game.menus.ListMenu):
 	__slots__ = ()
 	def __init__(self) -> None:
@@ -263,18 +280,13 @@ class MainMenu(game.menus.ListMenu):
 
 		menu_items.append(game.menus.SelectItem("Quit", None, self.quit))
 
-		super().__init__(
-			items=tuple(menu_items),
-			selected=0,
-			x=5,
-			y=5,
-			title=None
-		)
+		super().__init__(items=tuple(menu_items), selected=0, x=25, y=5, title=None)
 
 	""" Load the world from the savefile """
 	@staticmethod
 	def load_() -> StateResult:
 		logger.info("MainMenu(game.menus.ListMenu)->load_() -> StateResult")
+		g.messages.clear()
 		g.messages.add(f"Loading saved game", colours.darkgreen)
 		with open("savefile.sav", "rb") as f:
 			g.world = pickle.loads(f.read())
@@ -287,27 +299,30 @@ class MainMenu(game.menus.ListMenu):
 		g.messages.add(f"Saving game", colours.darkgreen)
 		with open("savefile.sav", "wb") as f:
 			f.write(pickle.dumps(g.world))
-		del(g.world)
 		return Reset(MainMenu())
 
+	""" User selected to continue """
 	@staticmethod
 	def continue_() -> StateResult:
 		logger.info("MainMenu(game.menus.ListMenu)->continue_() -> StateResult")
 		return Reset(InGame())
 
-	@staticmethod
-	def choose_known_world() -> StateResult:
+	""" User selected to choose a World """
+	def choose_known_world(self) -> StateResult:
 		logger.info("MainMenu(game.menus.ListMenu)->choose_known_world() -> StateResult")
 		return Reset(KnownWorldsMenu())
-	
+
+	""" User selected to start a new game """
 	@staticmethod
 	def new_game() -> StateResult:
 		logger.info("MainMenu(game.menus.ListMenu)->new_game() -> StateResult")
+		g.messages.clear()
 		g.messages.add(f"Starting a new game", colours.darkgreen)
 		g.world = game.world_tools.new_world()
 		# Clear g.world for all states and add InGame states
 		return Reset(InGame())
-	
+
+	""" User selected to quit the game """
 	@staticmethod
 	def quit() -> StateResult:
 		logger.info("MainMenu(game.menus.ListMenu)->quit() -> StateResult")

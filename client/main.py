@@ -9,37 +9,39 @@ import g
 import game.states
 import game.systems
 
+from game.components import MessageLog
+
 import sys
 
 import logging
 logger = logging.getLogger("EWClient")
-LOG_FILENAME = "EWclient.log"
-LOG_FORMAT = "%(asctime)s %(levelname)-8s %(message)s"
 
-SCREEN_WIDTH = 80
-SCREEN_HEIGHT = 50
-VIEWPORT_WIDTH = SCREEN_WIDTH - 20
-VIEWPORT_HEIGHT = SCREEN_HEIGHT - 10
-	
 def main(log_level) -> None:
-	logging.basicConfig(filename=LOG_FILENAME, format=LOG_FORMAT, filemode="w", level=log_level)
+	logging.basicConfig(filename=g.LOG_FILENAME, format=g.LOG_FORMAT, filemode="w", level=log_level)
 	logging.info('World client started')
 
+	""" Start the message log """
+	g.messages = MessageLog()
+
+	logging.debug(f"Loading tileset {g.GAME_TILESET_FILENAME}")
 	tileset = tcod.tileset.load_tilesheet(
-		"redjack17.png", columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
-#		"Alloy_curses_12x12.png", columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
+		g.GAME_TILESET_FILENAME, columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
 	)
 	tcod.tileset.procedural_block_elements(tileset=tileset)
 
+	logging.debug(f"Starting main menu state")
 	g.states = [game.states.MainMenu()]
-	g.console = tcod.console.Console(SCREEN_WIDTH, SCREEN_HEIGHT, order="F")
 
+	logging.debug(f"Starting main console")
+	g.console = tcod.console.Console(g.SCREEN_WIDTH, g.SCREEN_HEIGHT, order="F")
+
+	logging.debug(f"Starting main context")
 	with tcod.context.new(
 		console=g.console,
 		tileset=tileset,
-		title="Endless Worlds, 2025",
+		title=g.GAME_TITLE,
 	) as g.context:
-		logging.info('Entering main loop')
+		logging.debug('Starting main game loop')
 		while g.states:
 			game.systems.main_draw()
 			game.systems.main_input()

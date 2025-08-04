@@ -3,14 +3,15 @@ from __future__ import annotations
 import logging
 logger = logging.getLogger("EWClient")
 
-from typing import Final, List, Self
-
+from typing import Final, List, Reversible, Self, Tuple
+import textwrap
 import attrs
 import tcod.ecs.callbacks
 from tcod.ecs import Entity, Registry
 import numpy as np
 import g
 from game.tags import IsPlayer
+import colours
 
 """ Is a """
 @attrs.define(frozen=True)
@@ -22,7 +23,7 @@ class IsA:
 class BaseContainer:
 	registry: Registry
 	slots: int # Number of items this container can contain
-	# weight: int # Max weight of all items that this container can contain
+	#weight: int # Max weight of all items that this container can contain
 
 """ Inventory """
 class Inventory(BaseContainer):
@@ -44,8 +45,9 @@ class Toolsbelt(BaseContainer):
 @attrs.define(frozen=False)
 class BaseItem:
 	value: int # Usually 1 but gold, arrows, ammunition, and consumables may be larger
+	name: str | None
 	def __add__(self, value: int) -> Self:
-		return self.__class__(max(0, self.value + value))
+		return self.__class__(max(0, self.value + value), self.name)
 
 """ Water ... """
 class WaterPouch(BaseItem):
@@ -58,6 +60,8 @@ class Gold(BaseItem):
 """ Food parcels """
 class Food(BaseItem):
 	...
+
+#FoodParcel : Final = ("Food", int)
 
 """ Map memory of an entity """
 @attrs.define(frozen=False)
@@ -196,3 +200,53 @@ class StrengthImpacts:
 	medium: int
 	high: int
 	impacts: List
+
+""" Message for one action performed in the game by the player """
+class Message:
+	def __init__(self, text: str, fg: Tuple[int, int, int]):
+		self.plain_text = text
+		self.fg = fg
+		self.count = 1
+
+	@property
+	def full_text(self) -> str:
+		if self.count > 1:
+			return f"{self.plain_text} (x{self.count})"
+		return self.plain_text
+
+""" MessageLog to keep track of all actions performed in the game by the player """
+class MessageLog:
+	def __init__(self) -> None:
+		self.messages: List[Message] = []
+	
+	""" Add a message to the message log """
+	def add(self, text: str, fg: Tuple[int, int, int] = colours.white, *, stack: bool = True) -> None:
+		if stack and self.messages and text == self.messages[-1].plain_text:
+			self.messages[-1].count += 1
+		else:
+			self.messages.append(Message(text, fg))
+
+	""" Render the messages that can fit within the specified window size """
+	def render(self, console: tcod.console.Console, x: int, y: int, width: int, height: int) -> None:
+		self.render_messages(console, x, y, width, height, self.messages)
+
+	""" Render all the messages that can fit within the specified window size """
+	@staticmethod
+	def render_messages(console: tcod.console.Console, x: int, y: int, width: int, height: int, messages: Reversible[Message]) -> None:
+		y_offset = height - 1
+		for message in reversed(messages):
+			for line in reversed(textwrap.wrap(message.full_text, width)):
+				console.print(x=x, y=y+y_offset, text=line, fg=message.fg)
+				y_offset -= 1
+				if y_offset < 0:
+					return
+
+	""" Empty the message log """
+	def clear(self) -> None:
+		self.messages = []
+		return None
+
+@attrs.define(frozen=False)
+class Relationship:
+	item: tcod.ecs.Entity
+	value: int # bad > normal > good

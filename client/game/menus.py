@@ -35,8 +35,8 @@ class MenuItem(Protocol):
 """ Clickable menu item """
 @attrs.define()
 class SelectItem(MenuItem):
-	label: str
-	count: int | None
+	label: str # Label to show in this menu item
+	count: int | None # Optional count to show
 	callback: Callable[[], StateResult]
 
 	""" Handle events selecting this menu item """

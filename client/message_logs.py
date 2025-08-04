@@ -38,3 +38,8 @@ class TMessageLog:
 				y_offset -= 1
 				if y_offset < 0:
 					return
+
+	""" Empty the message log """
+	def clear(self) -> None:
+		self.messages = []
+		return None
