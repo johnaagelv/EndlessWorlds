@@ -43,3 +43,54 @@ Using the "redjack17.png" tilesheet (16 x 16) with charmap CP437 - which define 
 208: 9576, 9572, 9573, 9561, 9560, 9554, 9555, 9579, 9578, 9496, 9484, 9608, 9604, 9612, 9616, 9600,
 224:  945,  223,  915,  960,  931,  963,  181,  964,  934,  920,  937,  948, 8734,  966,  949, 8745,
 240: 8801,  177, 8805, 8804, 8992, 8993,  247, 8776,  176, 8729,  183, 8730, 8319,  178, 9632,  160
+
+# Items
+Played around with ECS on the client side to identify if and how this could be used on the server side.
+Decision is still unclear!
+
+## Consumables
+
+- type, "consumable"
+- name, food parcel, food ration, ...
+- position, location on the map/world (x, y, z, m)
+- value, the energy that it contains for consumption by an actor
+- weight, the burden carrying this item
+
+## Equippables
+
+- type, "equippable"
+- name, boots, gloves, helmet, jacket, trousers, ...
+- position, location on the map/world (x, y, z, m)
+- location, the body part(s) that will use this item
+- weight, the burden carrying this item
+- protection, the protection this item provides
+
+## Weapons
+
+- type, "weapon"
+- name, gun, rifle, shotgun, bow, axe, spear, club, staff, knife, sword, taser, ...
+- position, location on the map/world (x, y, z, m)
+- location, the body part(s) that will use this item
+- weight, the burden carrying this item
+- defense, the strength with which this weapon will absorb a hit
+- attack, the strength with which this weapon will apply to an opponent on a 100% hit
+
+## Equipments, handhelds
+
+- type, "handheld equipment"
+- name, "drill", "tablet", "scanner", "medkit", "
+- position, location on the map/world (x, y, z, m)
+- weight, the burden carrying this item
+
+## Equipments, operational
+
+- type, "operational equipment"
+- name, car, plane, bicycle, motorcycle, ...
+- position, location on the map/world (x, y, z, m)
+
+## Equipments, static
+
+- type, "static equipment"
+- name, food bank, computer, ...
+- position, location on the map/world (x, y, z, m)
+
