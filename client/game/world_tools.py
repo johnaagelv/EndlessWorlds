@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 logger = logging.getLogger("EWClient")
 
+import time
 from random import Random
 from tcod.ecs import Registry
 import game.components as gc
@@ -23,6 +24,7 @@ def new_world() -> Registry:
 	player = registry[object()]
 	player.components[gc.Position] = gc.Position(5, 5)
 	player.components[gc.Graphic] = gc.Graphic(ord("@"))
+	player.components[gc.ActorTimer] = gc.ActorTimer(time.time())
 	player.components[gc.Health] = gc.Health(240000, 62500, 125000, 250000)
 	player.components[gc.HealthImpacts] = gc.HealthImpacts(-100, -50, -1, [gc.Strength, gc.Energy])
 	player.components[gc.Energy] = gc.Energy(240000, 62500, 125000, 250000)
@@ -38,12 +40,13 @@ def new_world() -> Registry:
 	player.components[gc.Inventory] = gc.Inventory(inventory, 8)
 
 	""" Define NPCs incl. some related to the player """
-	for _ in range(rng.randint(9,99)):
+	for _ in range(rng.randint(5,10)):
 		npc = registry[object()]
 		npc.components[gc.Position] = gc.Position(rng.randint(1, 59), rng.randint(1, 40))
 		npc.components[gc.Graphic] = gc.Graphic(9787)
-		if rng.randint(0,100) > 40:
-			npc.components[gc.Relationship] = gc.Relationship(player, rng.randint(-9, 9))
+		npc.components[gc.ActorTimer] = gc.ActorTimer(time.time())
+#		if rng.randint(0,100) > 40:
+#			npc.components[gc.Relationship] = gc.Relationship(player, rng.randint(-9, 9))
 		npc.tags |= {gt.IsActor}
 
 	world = registry[object()]

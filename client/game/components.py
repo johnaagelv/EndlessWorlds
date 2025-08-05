@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 logger = logging.getLogger("EWClient")
 
+import time
 from typing import Final, List, Reversible, Self, Tuple
 import textwrap
 import attrs
@@ -250,3 +251,13 @@ class MessageLog:
 class Relationship:
 	item: tcod.ecs.Entity
 	value: int # bad > normal > good
+
+@attrs.define(frozen=False)
+class TargetPosition:
+	x: int
+	y: int
+
+@attrs.define(frozen=False)
+class ActorTimer:
+	start_time: float
+	

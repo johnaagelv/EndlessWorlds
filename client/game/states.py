@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 logger = logging.getLogger("EWClient")
 
+import time
 from typing import List
 import os.path
 import pickle
@@ -119,6 +120,35 @@ class InGame(State):
 		
 		g.messages.render(console, view_x, view_y, view_width, view_height)
 
+	""" Run brains """
+	def _run_brains(self) -> None:
+		rng = g.world[None].components[Random]
+		(player,) = g.world.Q.all_of(tags=[IsPlayer])
+		for npc in g.world.Q.all_of(tags=[IsActor]):
+			time_diff = (time.time() - npc.components[gc.ActorTimer].start_time) * 1e3
+			npc_movement = (0, 0)
+			if time_diff >= rng.randint(500, 1500):
+				npc.components[gc.ActorTimer] = gc.ActorTimer(time.time())
+				if gc.Relationship in npc.components:
+					x_diff = player.components[gc.Position].x > npc.components[gc.Position].x
+					y_diff = player.components[gc.Position].y > npc.components[gc.Position].y
+					npc_movement = (1 if x_diff else -1, 1 if y_diff else -1)
+					if npc.components[gc.Position].x == player.components[gc.Position].x and npc.components[gc.Position].y == player.components[gc.Position].y:
+						del(npc.components[gc.Relationship])
+				else:
+					if gc.TargetPosition in npc.components:
+						x_diff = npc.components[gc.TargetPosition].x > npc.components[gc.Position].x
+						y_diff = npc.components[gc.TargetPosition].y > npc.components[gc.Position].y
+						npc_movement = (1 if x_diff else -1, 1 if y_diff else -1)
+						if npc.components[gc.Position].x == npc.components[gc.TargetPosition].x and npc.components[gc.Position].y == npc.components[gc.TargetPosition].y:
+							del(npc.components[gc.TargetPosition])
+				if rng.randint(0, 100) > 95:
+					npc.components[gc.TargetPosition] = gc.TargetPosition(rng.randint(1, 79), rng.randint(1, 45))
+
+				
+			npc.components[gc.Position] += npc_movement
+		return None
+
 	""" Main game drawing method """
 	def on_draw(self, console: tcod.console.Console) -> None:
 		logger.info("InGame(State)->on_draw( console ) -> None")
@@ -128,6 +158,7 @@ class InGame(State):
 		self._draw_states(console)
 		self._draw_inventory(console)
 		self._draw_messages(console)
+		self._run_brains()
 
 	""" Affects other states """
 	def apply_impact(self, main_state, impact_state):
@@ -152,28 +183,22 @@ class InGame(State):
 		self.apply_impact(gc.Energy, gc.EnergyImpacts)
 		self.apply_impact(gc.Health, gc.HealthImpacts)
 		self.apply_impact(gc.Strength, gc.StrengthImpacts)
+		time_diff = (time.time() - player.components[gc.ActorTimer].start_time) * 1e3
 		match event:
 			case tcod.event.Quit():
 				# TODO: Ask user to confirm
 				raise SystemExit
 			case tcod.event.KeyDown(sym=sym) if sym in DIRECTION_KEYS:
-				player.components[gc.Position] += DIRECTION_KEYS[sym]
-				player.components[gc.Energy] += player.components[gc.EnergyUsage].value
-
-				for npc in g.world.Q.all_of(tags=[IsActor]):
-					npc_movement = (rng.randint(-1,1), rng.randint(-1,1))
-					if gc.Relationship in npc.components:
-						actor_relationship = npc.components[gc.Relationship].value
-						x_diff = player.components[gc.Position].x > npc.components[gc.Position].x
-						y_diff = player.components[gc.Position].y > npc.components[gc.Position].y
-						npc_movement = (1 if x_diff else -1, 1 if y_diff else -1)
-						
-					npc.components[gc.Position] += npc_movement
+				if time_diff >= 250.0:
+					player.components[gc.ActorTimer] = gc.ActorTimer(time.time())
+					player.components[gc.Position] += DIRECTION_KEYS[sym]
+					player.components[gc.Energy] += player.components[gc.EnergyUsage].value
 
 			case tcod.event.KeyDown(sym=tcod.event.KeySym.I):
 				return Push(InventoryMenu())
 
 			case tcod.event.KeyDown(sym=tcod.event.KeySym.COMMA):
+				player.components[gc.ActorTimer] = gc.ActorTimer(time.time())
 				# Manually pick up the item
 				inventory_max_count = player.components[gc.Inventory].slots
 				items = g.world.Q.all_of(components=[gc.Gold], tags=[player.components[gc.Position], IsItem]).get_entities()

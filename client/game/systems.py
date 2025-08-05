@@ -34,7 +34,7 @@ def apply_impact(main_state, impact_state):
 
 """ Global input of states """
 def main_input() -> None:
-	for event in tcod.event.wait(timeout=1.0):
+	for event in tcod.event.wait(timeout=0.1):
 		tile_event = g.context.convert_event(event)
 		if g.states:
 			apply_state_result(g.states[-1].on_event(tile_event))
