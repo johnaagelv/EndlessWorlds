@@ -68,7 +68,7 @@ Decision is still unclear!
 ## Weapons
 
 - type, "weapon"
-- name, gun, rifle, shotgun, bow, axe, spear, club, staff, knife, sword, taser, ...
+- name, gun, rifle, shotgun, bow, axe, spear, club, staff, knife, sword, taser, shield, armour, ...
 - position, location on the map/world (x, y, z, m)
 - location, the body part(s) that will use this item
 - weight, the burden carrying this item
@@ -87,10 +87,12 @@ Decision is still unclear!
 - type, "operational equipment"
 - name, car, plane, bicycle, motorcycle, ...
 - position, location on the map/world (x, y, z, m)
+- energy usage
+- 
 
 ## Equipments, static
 
 - type, "static equipment"
-- name, food bank, computer, ...
+- name, food bank, computer, energy generator, ...
 - position, location on the map/world (x, y, z, m)
-
+- operations, 
