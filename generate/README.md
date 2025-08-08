@@ -61,7 +61,7 @@ Decision is still unclear!
 - type, "equippable"
 - name, boots, gloves, helmet, jacket, trousers, ...
 - position, location on the map/world (x, y, z, m)
-- location, the body part(s) that will use this item
+- location, the body part(s) that will use this item (hands, arms, legs, feet, back, torso, head, neck, )
 - weight, the burden carrying this item
 - protection, the protection this item provides
 
@@ -77,14 +77,14 @@ Decision is still unclear!
 
 ## Equipments, handhelds
 
-- type, "handheld equipment"
+- type, "handheld"
 - name, "drill", "tablet", "scanner", "medkit", "
 - position, location on the map/world (x, y, z, m)
 - weight, the burden carrying this item
 
 ## Equipments, operational
 
-- type, "operational equipment"
+- type, "operational"
 - name, car, plane, bicycle, motorcycle, ...
 - position, location on the map/world (x, y, z, m)
 - energy usage
@@ -92,7 +92,7 @@ Decision is still unclear!
 
 ## Equipments, static
 
-- type, "static equipment"
+- type, "static"
 - name, food bank, computer, energy generator, ...
 - position, location on the map/world (x, y, z, m)
 - operations, 

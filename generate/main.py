@@ -21,7 +21,7 @@ class TWorld:
 
 	def save(self):
 		logger.info(f"TWorld->save()")
-		with open(self.name + '.dat', "wb") as f:
+		with open("worlds/" + self.name + '.dat', "wb") as f:
 			save_data = {
 				"name": self.name,
 				"entry": self.entry,
@@ -353,7 +353,7 @@ def gen_item(world: TWorld, map_idx: int, build: dict):
 def main(world_name: str, log_level: int):
 	logging.basicConfig(filename=LOG_FILENAME, format=LOG_FORMAT, filemode="w", level=log_level)
 	logging.info('World generator started')
-	with open(world_name + ".gen", "rt") as f:
+	with open("definitions/" + world_name + ".json", "rt") as f:
 		world_definition = json.load(f)
 		world = gen_world(world_definition)
 
