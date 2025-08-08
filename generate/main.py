@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from typing import Dict, List
+from __future__ import annotations
+
 import sys
 import json
 
