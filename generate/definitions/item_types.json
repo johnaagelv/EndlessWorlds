@@ -1,0 +1,17 @@
+{
+	"items": [
+		{
+			"name": "food parcel",
+			"energy": 1000,
+			"weight": 1,
+			"types": ["pickable", "consumable"]
+		},
+		{
+			"name": "backpack",
+			"slots": 16,
+			"weight": 50,
+			"types": ["pickable", "equippable", "container"],
+			"equippable": ["back"]
+		}
+	]
+}

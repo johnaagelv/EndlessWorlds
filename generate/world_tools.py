@@ -23,10 +23,14 @@ class TWorld:
 		logger.info(f"TWorld->__init__( world_name='{world_name}' )")
 		self.filename = world_name
 
-	def generate(self) -> None:
+	def generate(self) -> bool:
 		logger.info("generate()")
 		with open("definitions/" + self.filename + ".json", "rt") as f:
 			build = json.load(f)
+
+		# Check that a name is in there!		
+		if "name" not in build:
+			return False
 
 		self.name = build["name"]
 		self.entry = build["entry"]
@@ -56,6 +60,7 @@ class TWorld:
 					logger.error(f"ERROR: unhandled type {build[0]}")
 			
 		self.save()
+		return True
 
 	def save(self):
 		logger.info(f"TWorld->save()")
