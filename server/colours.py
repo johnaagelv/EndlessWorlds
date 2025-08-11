@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 # CSS3 specification
 aliceblue = (240, 248, 255)
 antiquewhite = (250, 235, 215)
