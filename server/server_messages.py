@@ -5,7 +5,7 @@ import json
 import io
 import struct
 import sys
-import lzma
+import socket
 import pickle
 import logging
 import random
@@ -17,13 +17,13 @@ class TMessage:
 	def __init__(self, selector, sock, addr, world: TWorld):
 		logger.debug(f"TMessage->__init__( selector, sock, addr, world )")
 		self.selector: selectors.DefaultSelector = selector
-		self.sock = sock
+		self.sock: socket.socket = sock
 		self.addr = addr
 		self.world: TWorld = world
-		self._recv_buffer = b""
-		self._send_buffer = b""
-		self._jsonheader_len = None
-		self.jsonheader = None
+		self._recv_buffer: bytes = b""
+		self._send_buffer: bytes = b""
+		self._jsonheader_len: int = -1
+		self.jsonheader: dict
 		self.request = None
 		self.response_created = False
 		self.map = None
@@ -56,7 +56,7 @@ class TMessage:
 				logger.warning("Peer closed.")
 
 	""" Write bytes to the connection from the send buffer """
-	def _write(self):
+	def _write(self) -> bool:
 		logger.debug("TMessage->_write()")
 		if self._send_buffer:
 			try:
@@ -69,6 +69,7 @@ class TMessage:
 				# Close when the buffer is drained. The response has been sent.
 				if sent and not self._send_buffer:
 					self.close()
+		return True
 
 	""" Transform data into JSON using the specified encoding """
 	def _json_encode(self, data, encoding):
@@ -126,6 +127,7 @@ class TMessage:
 			return self.read()
 		if mask & selectors.EVENT_WRITE:
 			return self.write()
+		return True
 
 	"""
 	Read a message from the client till the full message has been received
@@ -171,7 +173,7 @@ class TMessage:
 			logger.warning(f"Error: socket.close() exception for {self.addr}: {str(e)}")
 		finally:
 			# Delete reference to socket object for garbage collection
-			self.sock = None
+			del(self.sock)
 
 	def process_protoheader(self):
 		logger.debug("TMessage->process_protoheader()")
@@ -214,7 +216,7 @@ class TMessage:
 		else:
 			# Extract the request from the content
 			request = pickle.loads(data)
-#		return True
+		return True
 
 		request_cmd = request.get("cmd")
 		if request_cmd == "new":

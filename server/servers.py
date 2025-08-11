@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import socket
 import selectors
 import traceback
@@ -41,15 +43,12 @@ class TServer:
 		for key, mask in events:
 			logger.debug(f"-> {loggerEventTypes[mask]}")
 			if key.data is None:
-				self.accept_wrapper(key.fileobj)
+				self.accept_wrapper(key.fileobj) # type: ignore
 			else:
 				# Client connection established, so get and process the message
 				message: TMessage = key.data
 				try:
 					ready = message.dispatch(mask)
-#					logger.debug(f"Message is ready {ready}")
-#					if ready:
-#						message._set_selector_events_mask("w")
 				except Exception:
 					logger.warning(
 						f"Main: Error: Exception for {message.addr}:\n"
