@@ -30,7 +30,7 @@ def new_tile(
 	dark: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]],
 	light: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]],
 	gateway: bool,
-) -> np.array:
+) -> np.ndarray:
 	return np.array((walkable, transparent, dark, light, gateway), dtype=tile_dt)
 
 # Predefined symbol and colours for out of FOV

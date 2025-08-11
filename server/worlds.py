@@ -32,11 +32,11 @@ class TWorld:
 		logger.debug(f"TWorld->field_of_sense({fos_request!r})")
 		# Extract the fos parameters m, x, y, z, r
 		if fos_request is not None:
-			m = fos_request.get("m") # Map number
-		x = fos_request.get("x") # x coordinate on map m
-		y = fos_request.get("y") # y coordinate on map m
+			m: int = fos_request["m"] # Map number
+		x: int = fos_request["x"] # x coordinate on map m
+		y: int = fos_request["y"] # y coordinate on map m
 		# z = fos_request.get("z") # z coordinate = height on map m (not yet used)
-		r = fos_request.get("r") # r radius
+		r: int = fos_request["r"] # r radius
 		if visible:
 			x_min = 0
 			x_max = self.maps[m]["width"]

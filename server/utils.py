@@ -31,5 +31,5 @@ def get_config(key: str) -> Dict:
 		value = data[key]
 	except Exception as e:
 		logger.warning(f"Configuration key {key!r} not found in file 'server.json'")
-		value = None
+		value: dict = {}
 	return value
