@@ -12,6 +12,8 @@ import math
 import tile_types
 import tcod.tileset
 
+import item_types
+
 import numpy as np
 
 class TWorld:
@@ -55,6 +57,8 @@ class TWorld:
 				elif build[0] == 7:
 					self.gen_sym(map_idx, build)
 				elif build[0] == 8:
+					self.gen_item_tile(map_idx, build)
+				elif build[0] == 1000: # Items
 					self.gen_item(map_idx, build)
 				else:
 					logger.error(f"ERROR: unhandled type {build[0]}")
@@ -105,6 +109,8 @@ class TWorld:
 			"gateways": [],
 			"actions": [],
 			"visible": map_visibility,
+			"items": [],
+			"actors": []
 		}
 		return map
 
@@ -366,10 +372,10 @@ class TWorld:
 	"""
 	8. Generate a tile of an item with user actions
 	"""
-	def gen_item(self, map_idx: int, build: dict):
+	def gen_item_tile(self, map_idx: int, build: dict):
 		# Creates items with attached actions
 		# 0=item, 1=x, 2=y, 3=tile, 4=actions
-		logger.info(f"gen_item( {build!r} )")
+		logger.info(f"gen_item_tile( {build!r} )")
 		if len(build) < 5:
 			logger.error(f"- too few build parameters! {len(build)} given")
 			raise SystemError()
@@ -385,3 +391,20 @@ class TWorld:
 				"actions": user_actions,
 			}
 		)
+
+	"""
+	1000. Generate an item
+	"""
+	def gen_item(self, map_idx: int, build: dict) -> None:
+		# Creates an item
+		# 1000=item, x, y, item name, count to genrate of this item
+		logger.info(f"gen_item( {build!r} )")
+		count = build[4]
+		for _ in range(0, count):
+			self.maps[map_idx]["items"].append(
+				{
+					"x": build[1],
+					"y": build[2],
+					"item": item_types.items[build[3]]
+				}
+			)

@@ -93,6 +93,6 @@ Decision is still unclear!
 ## Equipments, static
 
 - type, "static"
-- name, food bank, computer, energy generator, ...
+- name, food dispencer, computer, energy generator, ...
 - position, location on the map/world (x, y, z, m)
 - operations, 
