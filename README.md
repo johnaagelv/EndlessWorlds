@@ -7,7 +7,7 @@ breathable atmosphere!
 
 The team will consist of 100 volunteers from all over the world and each will have the skills needed to survive on a foreign planet ... or die trying.
 
-A spaceship is being constructed to carry the team in suspended animation and carry resources for a one year. Within that time the survey team must
+A spaceship is being constructed to carry the team in suspended animation and carry resources for one year. Within that time the survey team must
 establish a self-sustained base of operation.
 
 Travel time to HR 8799 will take less than one year. On arrival the survey team and cargo will be offloaded in a secluded location, preferably near a sea,
