@@ -3,9 +3,14 @@ import json
 import socket
 import struct
 import sys
+import random
 
 from typing import Tuple
 import numpy as np
+
+hostname = socket.gethostname()
+print(hostname)
+print(socket.gethostbyname(hostname))
 
 graphic_dt = np.dtype(
 	[
@@ -52,7 +57,21 @@ PORT = 12345  # The port used by the server
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 	s.connect((HOST, PORT))
-	command = {"cmd":"new"}
+
+	command = {
+		"cmd":"fos",
+		"cid": 0, # must always be provided
+		"m": 0,
+		"x": 10,
+		"y": 10,
+		"z": 0,
+		"r": random.randint(2,8),
+	}
+
+	command = {
+		"cmd":"new", # if CID is not provided, then this is a new actor and will be placed in the world by the server
+	}
+
 	data = json.dumps(command, ensure_ascii=False).encode('utf-8')
 
 	jsonheader = {
@@ -66,7 +85,18 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 	message = message_hdr + jsonheader_bytes + data
 
 	s.sendall(message)
-	data = s.recv(2024)
+	message = b""
+	r = True
+	print("Receiving ...")
+	while r:
+		data = s.recv(65536)
+		if data:
+			print(f"- received {len(data)} bytes")
+			message += data
+		else:
+			r = False
+	
+	print(message)
 	s.close()
 
-print(f"Received {data!r}")
+#print(f"Received {message!r}")

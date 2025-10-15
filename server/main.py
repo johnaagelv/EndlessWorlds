@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import sys
 import utils
 import argparse
 
-from servers import TServer
+import game_server as server
 from worlds import TWorld
 
 import logging
 logger = logging.getLogger("EWlogger")
-LOG_FILENAME = "EW.log"
+LOG_FILENAME = "EWserver.log"
 LOG_FORMAT = "%(asctime)s %(levelname)-8s %(message)s"
 SERVER_PORT: int = 12345
 SERVER_HOST = '127.0.0.1'
@@ -28,10 +27,11 @@ def main(port: int, log_level: int, world_name: str):
 		world_name = world_configuration['name']
 
 	world = TWorld(world_name)
-	server = TServer(host, port, world)
+	server.init(host, port)
+
 	try:
 		while True:
-			server.run()
+			server.run(world)
 
 	except KeyboardInterrupt:
 		server.sel.close()
@@ -41,7 +41,7 @@ def main(port: int, log_level: int, world_name: str):
 if __name__ == "__main__":
 	port: int = SERVER_PORT
 	log_level: int = logging.INFO
-	world_name: str = "demo"
+	filename: str = "demo"
 
 	parser = argparse.ArgumentParser(
 		description="Runs a multiplayer Roguelike World server.",
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 	)
 	parser.add_argument("-p", "--port", help=f"the port number to use, default is {SERVER_PORT}")
 	parser.add_argument("-l", "--log_level", help="the logging level to use: 'info' (default) or 'debug'")
-	parser.add_argument("-w", "--world", help="name of the world to serve")
+	parser.add_argument("-w", "--world", help="filename of the world to serve")
 	args = parser.parse_args()
 	if args.port is not None:
 		port = int(args.port)
@@ -57,6 +57,6 @@ if __name__ == "__main__":
 		if args.log_level.lower() in log_levels.keys():
 			log_level = log_levels[args.log_level.lower()]
 	if args.world is not None:
-		world_name = args.world.lower()
+		filename = args.world.lower()
 
-	main(port, log_level, world_name)
+	main(port, log_level, filename)

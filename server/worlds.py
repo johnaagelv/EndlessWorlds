@@ -1,4 +1,8 @@
 from __future__ import annotations
+import uuid
+#import numpy as np
+
+#import tile_types
 
 from typing import Dict, List
 import pickle
@@ -6,14 +10,12 @@ import random
 import logging
 logger = logging.getLogger("EWlogger")
 
-import numpy as np
-
-import tile_types
 
 class TWorld:
 	maps: list = []
 	name: str
 	entry: list = []
+	actors: dict = {}
 
 	def __init__(self, world_name: str = 'world'):
 		logger.debug(f"TWorld->init({world_name})")
@@ -29,7 +31,7 @@ class TWorld:
 	# Get and return the field of sense
 	"""
 	def field_of_sense(self, fos_request: dict, visible: bool = False) -> dict:
-		logger.debug(f"TWorld->field_of_sense({fos_request!r})")
+		logger.info(f"TWorld->field_of_sense({fos_request!r})")
 		# Extract the fos parameters m, x, y, z, r
 		if fos_request is not None:
 			m: int = fos_request["m"] # Map number
@@ -64,7 +66,7 @@ class TWorld:
 	Get and return the map sizes for a new player
 	"""
 	def map_definitions(self) -> List:
-		logger.debug(f"TWorld->map_sizes()")
+		logger.debug("TWorld->map_sizes()")
 		map_sizes: list = []
 		for map_idx, m in enumerate(self.maps):
 			fos: dict | None = None
@@ -85,6 +87,29 @@ class TWorld:
 	Get one random entry point of the world for new player
 	"""
 	def entry_point(self) -> Dict:
-		logger.debug(f"TWorld->entry_point()")
+		logger.debug("TWorld->entry_point()")
 		# Random randint() method https://www.w3schools.com/python/ref_random_randint.asp
 		return self.entry[random.randint(0, len(self.entry)-1)] # Randint includes both start and stop values
+
+	def process_request(self, request) -> dict:
+		logger.info("TWorld->process_request()")
+		match request["cmd"]:
+			case "new":
+				cid = uuid.uuid4()
+				entry_point = self.entry_point()
+				self.actors[cid] = {
+					"x": entry_point[0],
+					"y": entry_point[1],
+					"z": entry_point[2],
+					"m": entry_point[3]
+				}
+				response = {
+					"cmd": "new",
+					"cid": cid,
+					"name": self.name,
+					"entry_point": entry_point,
+					"map_sizes": self.map_definitions()
+				}
+				return response
+			case _:
+				return self.field_of_sense(request, False)
