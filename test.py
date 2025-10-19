@@ -1,100 +1,96 @@
 #!/usr/bin/env python3
-import json
-import socket
-import struct
-import sys
 import random
+import selectors
+import socket
 
-from typing import Tuple
-import numpy as np
+from server.connection_handler import TConnectionHandler
+import logging
+logger = logging.getLogger("EWlogger")
+LOG_FILENAME = "EWtester.log"
+LOG_FORMAT = "%(asctime)s %(levelname)-8s %(message)s"
+logging.basicConfig(filename=LOG_FILENAME, format=LOG_FORMAT, filemode="w", level=logging.DEBUG)
 
 hostname = socket.gethostname()
-print(hostname)
-print(socket.gethostbyname(hostname))
-
-graphic_dt = np.dtype(
-	[
-		("ch", np.int32), # Unicode codepoint
-		("fg", "3B"), # 3 unsigned bytes, foreground RGB colours
-		("bg", "3B"), # Background RGB colours
-	]
-)
-
-tile_dt = np.dtype(
-	[
-		("walkable", bool), # True if walkable tile
-		("transparent", bool), # True if tile doesn't block FOV
-		("dark", graphic_dt), # Graphics outside of FOV
-		("light", graphic_dt), # Graphics inside of FOV
-	]
-)
-
-def new_tile(
-	*,
-	walkable: int,
-	transparent: int,
-	dark: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]],
-	light: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]]
-) -> np.ndarray:
-	return np.array((walkable, transparent, dark, light), dtype=tile_dt)
-
-floor = new_tile(
-	walkable=True,
-	transparent=True,
-	dark=(ord(" "), (255, 255, 255), (96, 64, 64)),
-	light=(ord(" "), (255, 255, 255), (128, 96, 96)),
-)
-
-wall = new_tile(
-	walkable=True,
-	transparent=True,
-	dark=(ord("#"), (255, 255, 255), (32, 32, 32)),
-	light=(ord("#"), (255, 255, 255), (64, 64, 64)),
-)
 
 HOST = "192.168.1.104"  # The server's hostname or IP address
 PORT = 12345  # The port used by the server
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-	s.connect((HOST, PORT))
+host = HOST
+port = PORT
+sel = selectors.DefaultSelector()
 
-	command = {
+"""
+Establish connection handler to the server
+"""
+def start_connection(request: dict):
+	# Accept a connection from a client
+	client_connection: socket.socket
+	client_address = (host, port)
+	client_connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	# Make sure the connection does not block
+	client_connection.setblocking(False)
+	client_connection.connect_ex(client_address)
+	# Initiate the message handler for this client connection
+	client_communicator = TConnectionHandler(sel, client_connection, host+":"+str(port))
+	client_communicator.request = request
+	client_communicator.jsonheader = {"content-type": "binary/binary"}
+	client_communicator.create_response()
+	# start monitoring the client connection for events
+	print("- starting client connection in WRITE mode ...")
+	sel.register(client_connection, selectors.EVENT_WRITE, data=client_communicator)
+
+
+def run() -> bool:
+	events = sel.select()
+	for key, mask in events:
+		if key.data is not None:
+			client_communicator: TConnectionHandler = key.data
+			try:
+				if mask == selectors.EVENT_READ:
+					# Has a request been received?
+					if client_communicator.dispatch(mask):
+						print("Response received ...")
+						response = client_communicator.request
+						print(response)
+						return False
+				else:
+					# Has the response been sent?
+					if client_communicator.dispatch(mask):
+						print("Request sent ...")
+						client_communicator.request = {}
+						print("- request cleared")
+						client_communicator._jsonheader_len = -1
+						client_communicator.jsonheader = None
+
+						client_communicator._set_selector_events_mask("r")
+					
+			except Exception:
+				print(
+					f"Main: Error: Exception for {client_communicator.addr}:"
+				)
+				client_communicator.close()
+	return True
+
+def close():
+	sel.close()
+
+def main():
+
+	request = {
 		"cmd":"fos",
-		"cid": 0, # must always be provided
+		"cid": "1234", # if CID is not provided, then this is a new actor and will be placed in the world by the server
 		"m": 0,
 		"x": 10,
 		"y": 10,
 		"z": 0,
 		"r": random.randint(2,8),
 	}
+	print("Starting connection ...")
+	start_connection(request)
 
-	command = {
-		"cmd":"new", # if CID is not provided, then this is a new actor and will be placed in the world by the server
-	}
+	print("Running ...")
+	while run():
+		pass
 
-	data = json.dumps(command, ensure_ascii=False).encode('utf-8')
-
-	jsonheader = {
-		"byteorder": sys.byteorder,
-		"content-type": "text/json",
-		"content-encoding": "utf-8",
-		"content-length": len(data),
-	}
-	jsonheader_bytes = json.dumps(jsonheader, ensure_ascii=False).encode("utf-8")
-	message_hdr = struct.pack(">H", len(jsonheader_bytes))
-	message = message_hdr + jsonheader_bytes + data
-
-	s.sendall(message)
-	message = b""
-	r = True
-	print("Receiving ...")
-	while r:
-		data = s.recv(65536)
-		if data:
-			print(f"- received {len(data)} bytes")
-			message += data
-		else:
-			r = False
-	
-	print(message)
-	s.close()
+if __name__ == "__main__":
+	main()

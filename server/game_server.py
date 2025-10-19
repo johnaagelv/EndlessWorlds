@@ -47,6 +47,7 @@ def accept_wrapper(sock: socket.socket):
 	client_connection: socket.socket
 	client_address: str
 	client_connection, client_address = sock.accept()
+	logger.debug(f"- client {client_address}")
 	# Make sure the connection does not block
 	client_connection.setblocking(False)
 	# Initiate the message handler for this client connection
@@ -96,5 +97,5 @@ def run(world: TWorld):
 				client_communicator.close()
 
 def close():
-	logger.debug("TServer->close()")
+	logger.debug("server->close()")
 	sel.close()

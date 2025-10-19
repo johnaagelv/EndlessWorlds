@@ -184,7 +184,6 @@ class TConnectionHandler:
 		logger.debug(f"- checking jsonheader {self.jsonheader}")
 		if self.jsonheader:
 			logger.debug(f"- checking request {self.request}")
-			print(f"{self.request.__getstate__()}")
 			if self.request == {}:
 				return self.process_request()
 		return False

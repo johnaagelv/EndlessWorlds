@@ -44,7 +44,7 @@ class TWorld:
 			y_min = max(y - r, 0)
 			y_max = min(y + r + 1, self.maps[m]["height"])
 
-		logger.debug(f"FOS of {x_min}:{x_max}, {y_min}:{y_max}")
+		logger.debug(f"- FOS of {x_min}:{x_max}, {y_min}:{y_max}")
 		fos = {
 			"x_min": x_min,
 			"x_max": x_max,
@@ -63,7 +63,7 @@ class TWorld:
 		logger.debug("TWorld->map_sizes()")
 		map_sizes: list = []
 		for map_idx, m in enumerate(self.maps):
-			fos: dict | None = None
+			fos: dict = {}
 			if m["visible"]:
 				fos = self.field_of_sense({"x":0, "y": 0, "z": 0, "m": map_idx, "r": 0}, True)
 			map_sizes.append(
