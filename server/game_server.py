@@ -8,6 +8,17 @@ from connection_handler import TConnectionHandler #, TSender
 from worlds import TWorld
 
 import logging
+
+from collections.abc import Callable
+from client_commands import new, fos
+type commandFn = Callable[[dict, TWorld], dict]
+
+# Registry of client commands
+client_commands: dict[str, commandFn] = {
+	"new": new.cmd_new,
+	"fos": fos.cmd_fos
+}
+
 logger = logging.getLogger("EWlogger")
 
 """
@@ -52,7 +63,7 @@ def run(world: TWorld):
 	# Get any events received by the game server
 	events = sel.select(timeout=None)
 	for key, mask in events:
-		logger.info(f"-> {loggerEventTypes[mask]}")
+		logger.debug(f"-> {loggerEventTypes[mask]}")
 		if key.data is None:
 			accept_wrapper(key.fileobj) # type: ignore
 		else:
@@ -60,14 +71,21 @@ def run(world: TWorld):
 			client_communicator: TConnectionHandler = key.data
 			try:
 				if mask == selectors.EVENT_READ:
+					# Has a request been received?
 					if client_communicator.dispatch(mask):
-						client_communicator.set_request(
-							world.process_request(
-								client_communicator.request
-							)
-						)
+						# Get the client command processor
+						client_command = client_commands.get(client_communicator.request["cmd"])
+						# Set default response if no client command processor found
+						response: dict = {}
+						if client_command is not None:
+							# Process the request
+							response = client_command(client_communicator.request, world)
+
+						client_communicator.prepare_response(response)
 				else:
+					# Has the response been sent?
 					if client_communicator.dispatch(mask):
+						# End of communication with the client
 						client_communicator.close()
 					
 			except Exception:

@@ -1,15 +1,9 @@
 from __future__ import annotations
-import uuid
-#import numpy as np
 
-#import tile_types
-
-from typing import Dict, List
 import pickle
 import random
 import logging
 logger = logging.getLogger("EWlogger")
-
 
 class TWorld:
 	maps: list = []
@@ -65,7 +59,7 @@ class TWorld:
 	"""
 	Get and return the map sizes for a new player
 	"""
-	def map_definitions(self) -> List:
+	def map_definitions(self) -> list:
 		logger.debug("TWorld->map_sizes()")
 		map_sizes: list = []
 		for map_idx, m in enumerate(self.maps):
@@ -86,30 +80,7 @@ class TWorld:
 	"""
 	Get one random entry point of the world for new player
 	"""
-	def entry_point(self) -> Dict:
+	def entry_point(self) -> dict:
 		logger.debug("TWorld->entry_point()")
 		# Random randint() method https://www.w3schools.com/python/ref_random_randint.asp
 		return self.entry[random.randint(0, len(self.entry)-1)] # Randint includes both start and stop values
-
-	def process_request(self, request) -> dict:
-		logger.info("TWorld->process_request()")
-		match request["cmd"]:
-			case "new":
-				cid = uuid.uuid4()
-				entry_point = self.entry_point()
-				self.actors[cid] = {
-					"x": entry_point[0],
-					"y": entry_point[1],
-					"z": entry_point[2],
-					"m": entry_point[3]
-				}
-				response = {
-					"cmd": "new",
-					"cid": cid,
-					"name": self.name,
-					"entry_point": entry_point,
-					"map_sizes": self.map_definitions()
-				}
-				return response
-			case _:
-				return self.field_of_sense(request, False)
