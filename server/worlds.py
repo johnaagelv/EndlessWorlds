@@ -51,11 +51,29 @@ class TWorld:
 			"y_min": y_min,
 			"y_max": y_max,
 			"view": self.maps[m]["tiles"][x_min:x_max, y_min:y_max],
-			"gateways": self.maps[m]["gateways"]
+			"gateways": self.maps[m]["gateways"],
 		}
-
 		return fos
-	
+
+	"""
+	Get and return the list of actors in the FOS
+	"""
+	def fos_actors(self, request: dict) -> list:
+		x: int = request["x"] # x coordinate on map m
+		y: int = request["y"] # y coordinate on map m
+		# z = fos_request.get("z") # z coordinate = height on map m (not yet used)
+		r: int = request["r"] # r radius
+		m: int = request["m"] # Map number
+		x_min = max(x - r, 0)
+		x_max = min(x + r + 1, self.maps[m]["width"])
+		y_min = max(y - r, 0)
+		y_max = min(y + r + 1, self.maps[m]["height"])
+		actors = []
+		for actor in self.actors:
+			if x_min <= actor['x'] <= x_max and y_min <= actor['y'] <= y_max:
+				actors.append(actor)
+		return actors
+
 	"""
 	Get and return the map sizes for a new player
 	"""
