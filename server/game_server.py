@@ -33,7 +33,9 @@ def init(server_host: str, server_port: int):
 	port = server_port
 	lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	# Binds address to the socket. The address contains the pair of hostname and the port number.
 	lsock.bind((host, port))
+	# Starts the TCP listener
 	lsock.listen()
 	lsock.setblocking(False)
 	sel.register(lsock, selectors.EVENT_READ, data=None)
@@ -46,6 +48,7 @@ def accept_wrapper(sock: socket.socket):
 	# Accept a connection from a client
 	client_connection: socket.socket
 	client_address: str
+	# Passively accepts the TCP client connection and blocks until the connection arrives
 	client_connection, client_address = sock.accept()
 	logger.debug(f"- client {client_address}")
 	# Make sure the connection does not block

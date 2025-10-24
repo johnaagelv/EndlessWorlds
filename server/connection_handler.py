@@ -32,6 +32,7 @@ class TConnectionHandler:
 		self.addr = addr
 		self.request = {}
 
+	# Switch selector mode
 	def _set_selector_events_mask(self, mode: str):
 		logger.debug(f"{__class__.__name__}->_set_selector_events_mask( {mode} )")
 		"""Set selector to listen for events: mode is 'r', 'w', or 'rw'."""
@@ -42,11 +43,12 @@ class TConnectionHandler:
 		else:
 			events = selectors.EVENT_READ | selectors.EVENT_WRITE
 		self.selector.modify(self.sock, events, data=self)
-	
-	def prepare_response(self, request: dict):
+
+	# Send a message	
+	def prepare_response(self, message: dict):
 		logger.debug(f"{__class__.__name__}->prepare_response( request )")
 #		logger.debug(request)
-		self.request = request
+		self.request = message
 		self.jsonheader = {"content-type": "binary/binary"}
 		self.create_response()
 		self._set_selector_events_mask("w")
@@ -87,7 +89,7 @@ class TConnectionHandler:
 	def _read(self):
 		logger.debug(f"{__class__.__name__}->_read()")
 		try:
-			data = self.sock.recv(8192)
+			data = self.sock.recv(65536)
 		except BlockingIOError:
 			# Ignore that resource temporarily unavailable (errno EWOULDBLOCK)
 			pass

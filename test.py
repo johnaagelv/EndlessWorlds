@@ -77,7 +77,7 @@ def close():
 def main():
 
 	request = {
-		"cmd":"fos",
+		"cmd":"new",
 		"cid": "1234", # if CID is not provided, then this is a new actor and will be placed in the world by the server
 		"m": 0,
 		"x": 10,
