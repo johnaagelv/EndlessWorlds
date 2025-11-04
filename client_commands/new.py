@@ -1,6 +1,6 @@
 from __future__ import annotations
 import uuid
-from worlds import TWorld
+from server.worlds import TWorld
 
 def cmd_new(request: dict, world: TWorld) -> dict:
 	cmd_keys = request.keys()

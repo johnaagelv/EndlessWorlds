@@ -1,5 +1,5 @@
 from __future__ import annotations
-from worlds import TWorld
+from server.worlds import TWorld
 
 def cmd_fos(request: dict, world: TWorld) -> dict:
 	response = world.field_of_sense(request, False)

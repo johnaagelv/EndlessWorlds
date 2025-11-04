@@ -4,68 +4,74 @@ import socket
 import selectors
 import traceback
 
-from connection_handler import TConnectionHandler #, TSender
-from worlds import TWorld
+from server.connection_handler import TConnectionHandler #, TSender
+from server.worlds import TWorld
+
+from message_packages.packages import message_packager
 
 import logging
 
-from collections.abc import Callable
-from client_commands import new, fos
-type commandFn = Callable[[dict, TWorld], dict]
-
-# Registry of client commands
-client_commands: dict[str, commandFn] = {
-	"new": new.cmd_new,
-	"fos": fos.cmd_fos
-}
+#from collections.abc import Callable
+from client_commands.commands import client_commands
 
 logger = logging.getLogger("EWlogger")
+
+"""
+Generate the message
+"""
+def generate_message(message_type: str, message: dict) -> bytes:
+	logger.debug("generate_message( message_type, message )")
+	packager = message_packager.get(message_type)
+	if packager:
+		return packager(message)
+	return b""
 
 """
 Game server - handles all connections between client and server
 """
 host: str
 port: int
-sel = selectors.DefaultSelector()
+server_selector = selectors.DefaultSelector()
+server_socket: socket.socket
 
 def init(server_host: str, server_port: int):
 	host = server_host
 	port = server_port
-	lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 	# Binds address to the socket. The address contains the pair of hostname and the port number.
-	lsock.bind((host, port))
+	server_socket.bind((host, port))
 	# Starts the TCP listener
-	lsock.listen()
-	lsock.setblocking(False)
-	sel.register(lsock, selectors.EVENT_READ, data=None)
+	server_socket.listen()
+	server_socket.setblocking(False)
+	# Start the selector event handler for read events from the server socket
+	server_selector.register(server_socket, selectors.EVENT_READ, data=None)
 
 """
-Establish connection handler for a client
+Accept a connection
+- establish a connection handler for the connection
+- register the connection and the connection handler with the server selector
 """
-def accept_wrapper(sock: socket.socket):
-	logger.debug("TServer->accept_wrapper( sock )")
-	# Accept a connection from a client
-	client_connection: socket.socket
-	client_address: str
-	# Passively accepts the TCP client connection and blocks until the connection arrives
-	client_connection, client_address = sock.accept()
+def accept_wrapper(event_socket: socket.socket):
+	logger.debug("server->accept_wrapper( event_socket )")
+	# Passively accepts the TCP client connection
+	client_connection, client_address = event_socket.accept()
 	logger.debug(f"- client {client_address}")
 	# Make sure the connection does not block
 	client_connection.setblocking(False)
 	# Initiate the message handler for this client connection
-	client_communicator = TConnectionHandler(sel, client_connection, client_address)
-	# start monitoring the client connection for events
-	sel.register(client_connection, selectors.EVENT_READ, data=client_communicator)
+	connection_handler = TConnectionHandler(server_selector, client_connection, client_address)
+	# start monitoring the client connection for read events
+	server_selector.register(client_connection, selectors.EVENT_READ, data=connection_handler)
 
 """
 Process events
 """
 def run(world: TWorld):
-	logger.debug("TServer->run()")
+	logger.debug("server->run( world )")
 	loggerEventTypes = ['EVENT_UNKNOWN','EVENT_READ','EVENT_WRITE']
 	# Get any events received by the game server
-	events = sel.select(timeout=None)
+	events = server_selector.select(timeout=None)
 	for key, mask in events:
 		logger.debug(f"-> {loggerEventTypes[mask]}")
 		if key.data is None:
@@ -75,17 +81,18 @@ def run(world: TWorld):
 			client_communicator: TConnectionHandler = key.data
 			try:
 				if mask == selectors.EVENT_READ:
-					# Has a request been received?
+					# Has a message been received?
 					if client_communicator.dispatch(mask):
 						# Get the client command processor
-						client_command = client_commands.get(client_communicator.request["cmd"])
-						# Set default response if no client command processor found
-						response: dict = {}
-						if client_command is not None:
-							# Process the request
-							response = client_command(client_communicator.request, world)
+						command_handler = client_commands.get(client_communicator.message["cmd"])
 
-						client_communicator.prepare_response(response)
+						if command_handler is not None:
+							# Process the message
+							client_communicator._buffer = generate_message(
+								message_type = "binary",
+								message = command_handler(client_communicator.message, world)
+							)
+							client_communicator.prepare_to_send()
 				else:
 					# Has the response been sent?
 					if client_communicator.dispatch(mask):
@@ -101,4 +108,4 @@ def run(world: TWorld):
 
 def close():
 	logger.debug("server->close()")
-	sel.close()
+	server_selector.close()

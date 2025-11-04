@@ -4,53 +4,48 @@ import selectors
 import json
 import io
 import struct
-import sys
 import socket
 import pickle
 import logging
+
 logger = logging.getLogger("EWlogger")
 
 """
 TConnectionHandler handles communication between client and server
 """
 class TConnectionHandler:
-	_buffer: bytes = b"" # Buffer for received/sent bytes
-	selector: selectors.BaseSelector
-#	sock: socket.socket
-	addr: str
-	request: dict
 	_jsonheader_len: int = -1
-	jsonheader: dict | None = None
+	jsonheader: dict = {}
+	_mode_switch_matrix: dict = {
+		"r": selectors.EVENT_READ,
+		"w": selectors.EVENT_WRITE,
+		"rw": selectors.EVENT_READ | selectors.EVENT_READ
+	}
 
 	"""
 	Initialize the communicator
 	"""
-	def __init__(self, selector: selectors.BaseSelector, sock: socket.socket, addr: str):
+	def __init__(self, primary_selector: selectors.BaseSelector, client_socket: socket.socket, addr: str):
 		logger.debug(f"{__class__.__name__}->__init__( selector, sock, addr )")
-		self.selector = selector
-		self.sock: socket.socket = sock
-		self.addr = addr
-		self.request = {}
-
-	# Switch selector mode
+		self.primary_selector = primary_selector
+		self.client_socket = client_socket
+		self.addr = addr # Client address as IP:PORT string
+		self.message: dict = {} # Message received or to be sent
+		self._buffer: bytes = b"" # Buffer for received and sent bytes
+		self.protoheader_state = False
+		self.jsonheader_state = False
+		self.content_state = False
+	
+	# Switch primary selector mode to ´r', 'w', or ´rw'
 	def _set_selector_events_mask(self, mode: str):
 		logger.debug(f"{__class__.__name__}->_set_selector_events_mask( {mode} )")
-		"""Set selector to listen for events: mode is 'r', 'w', or 'rw'."""
-		if mode == "r":
-			events = selectors.EVENT_READ
-		elif mode == "w":
-			events = selectors.EVENT_WRITE
-		else:
-			events = selectors.EVENT_READ | selectors.EVENT_WRITE
-		self.selector.modify(self.sock, events, data=self)
+		# Set selector to listen for events: mode is 'r', 'w', or 'rw'
+		event_mode = self._mode_switch_matrix[mode]
+		self.primary_selector.modify(self.client_socket, event_mode, data=self)
 
 	# Send a message	
-	def prepare_response(self, message: dict):
+	def prepare_to_send(self):
 		logger.debug(f"{__class__.__name__}->prepare_response( request )")
-#		logger.debug(request)
-		self.request = message
-		self.jsonheader = {"content-type": "binary/binary"}
-		self.create_response()
 		self._set_selector_events_mask("w")
 
 	"""
@@ -59,29 +54,29 @@ class TConnectionHandler:
 	def dispatch(self, mask: int) -> bool:
 		logger.debug(f"{__class__.__name__}->dispatch( {mask} )")
 		if mask == selectors.EVENT_READ:
-			return self.rx_dispatch()
+			return self.receive()
 		else:
-			return self.tx_dispatch()
+			return self.transmit()
 
 	"""
-	Close down the communication with the client
+	Close down the communication
 	"""
 	def close(self):
 		logger.debug(f"{__class__.__name__}->close()")
 		try:
-			self.selector.unregister(self.sock)
+			self.primary_selector.unregister(self.client_socket)
 		except Exception as e:
 			logger.warning(
 				f"Error: selector.unregister() exception for "
 				f"{self.addr}: {str(e)}"
 			)
 		try:
-			self.sock.close()
+			self.client_socket.close()
 		except OSError as e:
 			logger.warning(f"Error: socket.close() exception for {self.addr}: {str(e)}")
 		finally:
 			# Delete reference to socket object for garbage collection
-			del(self.sock)
+			del(self.client_socket)
 
 	"""
 	Read bytes from the connection into the buffer
@@ -89,7 +84,7 @@ class TConnectionHandler:
 	def _read(self):
 		logger.debug(f"{__class__.__name__}->_read()")
 		try:
-			data = self.sock.recv(65536)
+			data = self.client_socket.recv(65536)
 		except BlockingIOError:
 			# Ignore that resource temporarily unavailable (errno EWOULDBLOCK)
 			pass
@@ -98,13 +93,14 @@ class TConnectionHandler:
 				self._buffer += data
 			else:
 				logger.warning(f"{__class__.__name__} peer closed.")
-				exit()
+				self.close()
 
 	"""
 	Transform JSON into data using the specified encoding
 	"""
 	def _json_decode(self, json_bytes: bytes, encoding: str):
-		logger.debug(f"{__class__.__name__}->_json_decode( json_bytes, encoding )")
+		logger.debug(f"{__class__.__name__}->_json_decode( json_bytes, encoding {encoding} )")
+		logger.debug(f"- {json_bytes}")
 		tiow = io.TextIOWrapper(
 			io.BytesIO(json_bytes), encoding=encoding, newline=""
 		)
@@ -117,25 +113,25 @@ class TConnectionHandler:
 	"""
 	def process_request(self) -> bool:
 		logger.debug(f"{__class__.__name__}->process_request()")
-		content_len = 0
-		if self.jsonheader is not None:
+		header_keys = self.jsonheader.keys()
+		if "content-length" in header_keys:
 			content_len = self.jsonheader["content-length"]
-		if len(self._buffer) < content_len:
-			return False # Content not received in full yet, stop processing
-
-		# Content received, process
-		data = self._buffer[:content_len]
-		self._buffer = self._buffer[content_len:]
-		if self.jsonheader is not None:
-			if self.jsonheader["content-type"] == "text/json":
-				encoding = self.jsonheader["content-encoding"]
-				self.request = self._json_decode(data, encoding)
-				logger.debug(f"- request is {self.request}")
-			else:
-				# Extract the request from the content
-				self.request = pickle.loads(data)
-				logger.debug(f"- request is {self.request}")
-		return True
+			if len(self._buffer) >= content_len:
+				# Content received, process
+				logger.debug(f"- content ready {content_len}")
+				self.content_state = True
+				data = self._buffer[:content_len]
+				self._buffer = self._buffer[content_len:]
+				if self.jsonheader["content-type"] == "text/json":
+					encoding = self.jsonheader["content-encoding"]
+					self.message = self._json_decode(data, encoding)
+#					logger.debug(f"- request is {self.message}")
+				else:
+					# Extract the request from the content
+					self.message = pickle.loads(data)
+					logger.debug(f"- request is {self.message}")
+				return True
+		return False # Content not received in full yet, stop processing
 
 	"""
 	Process the json header when fully received
@@ -143,13 +139,13 @@ class TConnectionHandler:
 	def process_jsonheader(self):
 		logger.debug(f"{__class__.__name__}->process_jsonheader()")
 		hdrlen = self._jsonheader_len
-		if len(self._buffer) < hdrlen:
-			return None # Header not received in full yet, stop processing
-
-		# Header received, process		
-		self.jsonheader = self._json_decode(self._buffer[:hdrlen], "utf-8")
-		self._buffer = self._buffer[hdrlen:]
-		if self.jsonheader is not None:
+		if len(self._buffer) >= hdrlen:
+			# Header received, process
+			logger.debug("- jsonheader ready")
+			self.jsonheader_state = True
+			self.jsonheader = self._json_decode(self._buffer[:hdrlen], "utf-8")
+			self._buffer = self._buffer[hdrlen:]
+			# Check that required headers are received
 			for reqhdr in ("byteorder", "content-length", "content-type", "content-encoding",):
 				if reqhdr not in self.jsonheader:
 					logger.warning(f"Missing required header '{reqhdr}'.")
@@ -161,34 +157,35 @@ class TConnectionHandler:
 		logger.debug(f"{__class__.__name__}->process_protoheader()")
 		logger.debug(f"- buffer len {len(self._buffer)}")
 		hdrlen = 2
-		if len(self._buffer) < hdrlen:
-			return None # Protoheader not received in full yet, stop processing
-
-		logger.debug("- protoheader received, process")
-		self._jsonheader_len = struct.unpack(">H", self._buffer[:hdrlen])[0]
-		self._buffer = self._buffer[hdrlen:]
+		if len(self._buffer) >= hdrlen:
+			logger.debug("- protoheader ready")
+			self.protoheader_state = True
+			self._jsonheader_len = struct.unpack(">H", self._buffer[:hdrlen])[0]
+			self._buffer = self._buffer[hdrlen:]
 
 	"""
-	Dispatch the message event
-	Read a message from the client till the full message has been received
-	The message is read in several parts - the protoheader, the jsonheader, and the content
+	Receive the message from the sender
+	- read the message in parts till the full message has been received
 	"""
-	def rx_dispatch(self) -> bool:
-		logger.debug(f"{__class__.__name__}->rx_dispatch()")
+	def receive(self) -> bool:
+		logger.debug(f"{__class__.__name__}->receive()")
 		self._read()
-		logger.debug(f"- checking jsonheader {self._jsonheader_len}")
-		if self._jsonheader_len < 0:
+		if not self.protoheader_state:
 			self.process_protoheader()
-		logger.debug(f"- checking jsonheader {self._jsonheader_len}")
-		if self._jsonheader_len >= 0:
-			if self.jsonheader is None:
+		if self.protoheader_state:
+			if not self.jsonheader_state:
 				self.process_jsonheader()
-		logger.debug(f"- checking jsonheader {self.jsonheader}")
-		if self.jsonheader:
-			logger.debug(f"- checking request {self.request}")
-			if self.request == {}:
+		if self.jsonheader_state:
+			if not self.content_state:
 				return self.process_request()
 		return False
+
+	"""
+	Transmit the message to the recipient
+	"""
+	def transmit(self) -> bool:
+		logger.debug(f"{__class__.__name__}->transmit()")
+		return self._write()
 
 	"""
 	Write bytes to the connection from the buffer
@@ -198,7 +195,7 @@ class TConnectionHandler:
 		logger.debug(f"{__class__.__name__}->_write( {blen} bytes)")
 		if self._buffer:
 			try:
-				sent = self.sock.send(self._buffer)
+				sent = self.client_socket.send(self._buffer)
 			except BlockingIOError:
 				# Ignore that resource temporarily unavailable (errno EWOULDBLOCK)
 				pass
@@ -211,72 +208,8 @@ class TConnectionHandler:
 		return False
 
 	"""
-	Transform data into JSON using the specified encoding
+	Fill the buffer
 	"""
-	def _json_encode(self, data: dict, encoding: str):
-		logger.debug(f"{__class__.__name__}->_json_encode( data, encoding )")
-		return json.dumps(data, ensure_ascii=False).encode(encoding)
+	def buffer(self, data: bytes):
+		self._buffer = data
 
-	"""
-	Construct a message from the specified data elements
-	"""
-	def _create_message(self, *, content_bytes: bytes, content_type: str, content_encoding: str):
-		logger.debug(f"{__class__.__name__}->_create_message( *, content_bytes, content_type, content_encoding )")
-		jsonheader = {
-			"byteorder": sys.byteorder,
-			"content-type": content_type,
-			"content-encoding": content_encoding,
-			"content-length": len(content_bytes),
-		}
-		jsonheader_bytes = self._json_encode(jsonheader, "utf-8")
-		message_hdr = struct.pack(">H", len(jsonheader_bytes))
-		message = message_hdr + jsonheader_bytes + content_bytes
-		return message
-
-	"""
-	Generate a json message
-	"""
-	def _create_response_json_content(self):
-		logger.debug(f"{__class__.__name__}->_create_response_json_content()")
-		content_encoding = "utf-8"
-		response = {
-			"content_bytes": self._json_encode(self.request, content_encoding),
-			"content_type": "text/json",
-			"content_encoding": content_encoding,
-		}
-		return response
-
-	"""
-	Generate a binary message
-	"""
-	def _create_response_binary_content(self):
-		logger.debug(f"{__class__.__name__}->_create_response_binary_content()")
-		response = {
-			"content_bytes": pickle.dumps(self.request),
-			"content_type": "binary/custom-server-binary-type",
-			"content_encoding": "binary",
-		}
-		return response
-
-	"""
-	Generate the message
-	"""
-	def create_response(self):
-		logger.debug(f"{__class__.__name__}->create_response()")
-
-		if self.jsonheader is not None:
-			if self.jsonheader["content-type"] == "text/json":
-				response = self._create_response_json_content()
-			else:
-				response = self._create_response_binary_content()
-
-		message = self._create_message(**response)
-		self.response_created = True
-		self._buffer = message
-
-	"""
-	Dispatch the message event
-	"""
-	def tx_dispatch(self) -> bool:
-		logger.debug(f"{__class__.__name__}->dispatch( mask )")
-		return self._write()

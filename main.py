@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import utils
+import server.utils as utils
 import argparse
 
-import game_server as server
-from worlds import TWorld
+import server.game_server as server
+from server.worlds import TWorld
 
 import logging
 logger = logging.getLogger("EWlogger")
@@ -34,7 +34,7 @@ def main(port: int, log_level: int, world_name: str):
 			server.run(world)
 
 	except KeyboardInterrupt:
-		server.sel.close()
+		server.server_selector.close()
 		logging.info('World server stopped')
 	print("World server stopped")
 

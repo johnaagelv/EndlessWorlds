@@ -2,6 +2,7 @@
 import random
 import selectors
 import socket
+import time
 
 from server.connection_handler import TConnectionHandler
 import logging
@@ -22,7 +23,8 @@ sel = selectors.DefaultSelector()
 """
 Establish connection handler to the server
 """
-def start_connection(request: dict):
+def start_connection(request: dict, request_type: dict):
+	logger.debug("start_connection( request, request_type )")
 	# Accept a connection from a client
 	client_connection: socket.socket
 	client_address = (host, port)
@@ -32,13 +34,12 @@ def start_connection(request: dict):
 	client_connection.connect_ex(client_address)
 	# Initiate the message handler for this client connection
 	client_communicator = TConnectionHandler(sel, client_connection, host+":"+str(port))
-	client_communicator.request = request
-	client_communicator.jsonheader = {"content-type": "binary/binary"}
-	client_communicator.create_response()
+#	client_communicator.prepare_to_send(request, request_type)
+	client_communicator.message = request
+	client_communicator.jsonheader = request_type
+	client_communicator.generate_message("binary/binary")
 	# start monitoring the client connection for events
-	print("- starting client connection in WRITE mode ...")
 	sel.register(client_connection, selectors.EVENT_WRITE, data=client_communicator)
-
 
 def run() -> bool:
 	events = sel.select()
@@ -49,23 +50,23 @@ def run() -> bool:
 				if mask == selectors.EVENT_READ:
 					# Has a request been received?
 					if client_communicator.dispatch(mask):
-						print("Response received ...")
-						response = client_communicator.request
-						print(response)
+						result = client_communicator.message['cmd']
+						logger.debug(f"- response received ... {result}")
+						# Message has been received, return False to stop
 						return False
 				else:
 					# Has the response been sent?
 					if client_communicator.dispatch(mask):
-						print("Request sent ...")
-						client_communicator.request = {}
-						print("- request cleared")
+						logger.debug("- message sent ...")
+						client_communicator.message = {}
+#						logger.debug("- message cleared")
 						client_communicator._jsonheader_len = -1
-						client_communicator.jsonheader = None
+						client_communicator.jsonheader = {}
 
 						client_communicator._set_selector_events_mask("r")
 					
 			except Exception:
-				print(
+				logger.error(
 					f"Main: Error: Exception for {client_communicator.addr}:"
 				)
 				client_communicator.close()
@@ -75,6 +76,7 @@ def close():
 	sel.close()
 
 def main():
+	print("Client started")
 
 	request = {
 		"cmd":"new",
@@ -85,12 +87,34 @@ def main():
 		"z": 0,
 		"r": random.randint(2,8),
 	}
-	print("Starting connection ...")
-	start_connection(request)
+	request_type: dict = {"content-type": "binary/binary"}
+	logger.debug("- starting connection ...")
+	start_connection(request, request_type)
 
-	print("Running ...")
+	request = {
+		"cmd":"fos",
+		"cid": "1234", # if CID is not provided, then this is a new actor and will be placed in the world by the server
+		"m": 0,
+		"x": 10,
+		"y": 10,
+		"z": 0,
+		"r": random.randint(2,8),
+	}
+
+	logger.debug("- running ...")
+
+#	while True:
+
 	while run():
 		pass
+		
+#		time.sleep(10.0)
+
+	start_connection(request, request_type)
+	while run():
+		pass
+
+	print("Client stopped")
 
 if __name__ == "__main__":
 	main()

@@ -14,7 +14,7 @@ class TWorld:
 	def __init__(self, world_name: str = 'world'):
 		logger.debug(f"TWorld->init({world_name})")
 		self.name = world_name
-		with open(world_name + ".dat", "rb") as f:
+		with open("server/" + world_name + ".dat", "rb") as f:
 			load_data = pickle.load(f)
 
 		self.entry = load_data['entry']
