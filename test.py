@@ -2,9 +2,10 @@
 import random
 import selectors
 import socket
-import time
 
 from server.connection_handler import TConnectionHandler
+from message_tools.tools import generate_message
+
 import logging
 logger = logging.getLogger("EWlogger")
 LOG_FILENAME = "EWtester.log"
@@ -14,7 +15,7 @@ logging.basicConfig(filename=LOG_FILENAME, format=LOG_FORMAT, filemode="w", leve
 hostname = socket.gethostname()
 
 HOST = "192.168.1.104"  # The server's hostname or IP address
-PORT = 12345  # The port used by the server
+PORT = 25261  # The port used by the server
 
 host = HOST
 port = PORT
@@ -35,9 +36,11 @@ def start_connection(request: dict, request_type: dict):
 	# Initiate the message handler for this client connection
 	client_communicator = TConnectionHandler(sel, client_connection, host+":"+str(port))
 #	client_communicator.prepare_to_send(request, request_type)
-	client_communicator.message = request
-	client_communicator.jsonheader = request_type
-	client_communicator.generate_message("binary/binary")
+	client_communicator._buffer = generate_message(
+		message_type = "binary",
+		message = request
+	)
+
 	# start monitoring the client connection for events
 	sel.register(client_connection, selectors.EVENT_WRITE, data=client_communicator)
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 import uuid
-from server.worlds import TWorld
+from worlds.world import TWorld
 
 def cmd_new(request: dict, world: TWorld) -> dict:
 	cmd_keys = request.keys()
@@ -15,15 +15,15 @@ def cmd_new(request: dict, world: TWorld) -> dict:
 		]
 	else:
 		response["cid"] = uuid.uuid4()
-		response["entry_point"] = world.entry_point()
+		response["entry_point"] = world.get_world_entry_points()
 
 	world.actors[response["cid"]] = {
-		"x": response["entry_point"][0],
-		"y": response["entry_point"][1],
-		"z": response["entry_point"][2],
-		"m": response["entry_point"][3]
+		"x": int(response["entry_point"][0]),
+		"y": int(response["entry_point"][1]),
+		"z": int(response["entry_point"][2]),
+		"m": int(response["entry_point"][3])
 	}
 
 	response["name"] = world.name
-	response["map_sizes"] = world.map_definitions()
+	response["map_sizes"] = world.get_world_definition()
 	return response

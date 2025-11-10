@@ -4,10 +4,12 @@ import socket
 import selectors
 import traceback
 
-from server.connection_handler import TConnectionHandler #, TSender
-from server.worlds import TWorld
+from server.connection_handler import TConnectionHandler
+#from server.worlds import TWorld
+from worlds.world import TWorld
 
-from message_packages.packages import message_packager
+#from message_packages.packages import message_packager
+import message_tools.tools as message_tools
 
 import logging
 
@@ -16,25 +18,15 @@ from client_commands.commands import client_commands
 
 logger = logging.getLogger("EWlogger")
 
-"""
-Generate the message
-"""
-def generate_message(message_type: str, message: dict) -> bytes:
-	logger.debug("generate_message( message_type, message )")
-	packager = message_packager.get(message_type)
-	if packager:
-		return packager(message)
-	return b""
-
-"""
-Game server - handles all connections between client and server
-"""
 host: str
 port: int
 server_selector = selectors.DefaultSelector()
 server_socket: socket.socket
 
 def init(server_host: str, server_port: int):
+	"""
+	Game server - handles all connections between client and server
+	"""
 	host = server_host
 	port = server_port
 	server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -47,13 +39,13 @@ def init(server_host: str, server_port: int):
 	# Start the selector event handler for read events from the server socket
 	server_selector.register(server_socket, selectors.EVENT_READ, data=None)
 
-"""
-Accept a connection
-- establish a connection handler for the connection
-- register the connection and the connection handler with the server selector
-"""
 def accept_wrapper(event_socket: socket.socket):
-	logger.debug("server->accept_wrapper( event_socket )")
+	"""
+	Accept a connection
+	- establish a connection handler for the connection
+	- register the connection and the connection handler with the server selector
+	"""
+	logger.info("accept_wrapper( event_socket )")
 	# Passively accepts the TCP client connection
 	client_connection, client_address = event_socket.accept()
 	logger.debug(f"- client {client_address}")
@@ -64,16 +56,14 @@ def accept_wrapper(event_socket: socket.socket):
 	# start monitoring the client connection for read events
 	server_selector.register(client_connection, selectors.EVENT_READ, data=connection_handler)
 
-"""
-Process events
-"""
 def run(world: TWorld):
-	logger.debug("server->run( world )")
-	loggerEventTypes = ['EVENT_UNKNOWN','EVENT_READ','EVENT_WRITE']
+	"""
+	Run the game server with the specified world
+	"""
+	logger.info("run( world )")
 	# Get any events received by the game server
 	events = server_selector.select(timeout=None)
 	for key, mask in events:
-		logger.debug(f"-> {loggerEventTypes[mask]}")
 		if key.data is None:
 			accept_wrapper(key.fileobj) # type: ignore
 		else:
@@ -88,7 +78,7 @@ def run(world: TWorld):
 
 						if command_handler is not None:
 							# Process the message
-							client_communicator._buffer = generate_message(
+							client_communicator._buffer = message_tools.generate_message(
 								message_type = "binary",
 								message = command_handler(client_communicator.message, world)
 							)

@@ -3,22 +3,24 @@ from __future__ import annotations
 
 import server.utils as utils
 import argparse
+from pathlib import Path
 
 import server.game_server as server
-from server.worlds import TWorld
+#from server.worlds import TWorld
+from worlds.world import TWorld
 
 import logging
 logger = logging.getLogger("EWlogger")
-LOG_FILENAME = "EWserver.log"
-LOG_FORMAT = "%(asctime)s %(levelname)-8s %(message)s"
-SERVER_PORT: int = 12345
-SERVER_HOST = '127.0.0.1'
-log_levels = {'info': logging.INFO, 'debug': logging.DEBUG}
+LOG_FILENAME = Path("EWserver.log")
+LOG_LEVEL = logging.INFO
 
-def main(port: int, log_level: int, world_name: str):
-	print("World server started")
-	logging.basicConfig(filename=LOG_FILENAME, format=LOG_FORMAT, filemode="w", level=log_level)
-	logging.info('World server started')
+SERVER_PORT: int = 25261
+SERVER_HOST: str = "127.0.0.1"
+
+def main(port: int, log_level: int, world_name: Path):
+	logging.basicConfig(filename=LOG_FILENAME, format="%(asctime)s %(levelname)-8s %(message)s", filemode="w", level=log_level)
+	logger.info('World server started')
+	print('World server started')
 
 	host = utils.get_local_ip()
 
@@ -35,13 +37,15 @@ def main(port: int, log_level: int, world_name: str):
 
 	except KeyboardInterrupt:
 		server.server_selector.close()
-		logging.info('World server stopped')
-	print("World server stopped")
+
+	logger.info('World server stopped')
+	print('World server stopped')
 
 if __name__ == "__main__":
+	log_levels = {'info': logging.INFO, 'debug': logging.DEBUG}
 	port: int = SERVER_PORT
-	log_level: int = logging.INFO
-	filename: str = "demo"
+	log_level: int = LOG_LEVEL
+	filename = Path('data/demo.dat')
 
 	parser = argparse.ArgumentParser(
 		description="Runs a multiplayer Roguelike World server.",
@@ -50,6 +54,7 @@ if __name__ == "__main__":
 	parser.add_argument("-p", "--port", help=f"the port number to use, default is {SERVER_PORT}")
 	parser.add_argument("-l", "--log_level", help="the logging level to use: 'info' (default) or 'debug'")
 	parser.add_argument("-w", "--world", help="filename of the world to serve")
+
 	args = parser.parse_args()
 	if args.port is not None:
 		port = int(args.port)

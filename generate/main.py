@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import sys
 import argparse
 
 import world_tools as world_tools
@@ -36,7 +35,7 @@ if __name__ == "__main__":
 		description="Parses and generate world server information.",
 		epilog="Author: John Aage Andersen, Reddit: johnaagelv, 2025"
 	)
-	parser.add_argument("-f", "--filename", help=f"the filename (no ext) of the file holding the definitions", required=True)
+	parser.add_argument("-f", "--filename", help="the filename (no ext) of the file holding the definitions", required=True)
 	parser.add_argument("-l", "--log_level", help="the logging level to use: 'info' (default), 'warning', or 'debug'", choices=["info","warning","debug", None])
 	args = parser.parse_args()
 
