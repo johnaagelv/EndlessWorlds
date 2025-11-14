@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List
+#from typing import List
 import tcod.console
 import tcod.context
 import tcod.ecs
@@ -30,7 +30,7 @@ GAME_TITLE = "Endless Worlds, 2025"
 GAME_AUTHOR = "John Aage Andersen, Latvia"
 
 """ Game tileset to use """
-GAME_TILESET_FILENAME = "redjack17.png"
+GAME_TILESET_FILENAME = "client/redjack17.png"
 
 """ Log file configuration """
 LOG_FILENAME = "EWclient.log"

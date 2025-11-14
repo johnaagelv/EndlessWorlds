@@ -1,7 +1,5 @@
 """ This module contains the collection of systems in the game """
 from __future__ import annotations
-import logging
-logger = logging.getLogger("EWClient")
 
 import tcod.event
 import g
@@ -10,7 +8,9 @@ from game.state import Push, Pop, Reset
 from game.tags import IsPlayer
 from game.components import Health, HealthImpacts, Energy, EnergyImpacts, Strength, StrengthImpacts
 
-from tile_types import SHROUD
+from client.tile_types import SHROUD
+import logging
+logger = logging.getLogger("EWClient")
 
 """ Global draw of states """
 def main_draw() -> None:

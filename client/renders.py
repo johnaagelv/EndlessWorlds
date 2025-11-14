@@ -1,14 +1,14 @@
-from typing import Reversible, List
+from typing import Reversible
 import logging
-logger = logging.getLogger("EWClient")
 
 import textwrap
 import tcod
 import numpy as np
 import tile_types
 from entities import TActor
-from message_logs import TMessageLog, TLogMessage
-import colours
+from message_logs import TLogMessage
+import ui.colours as colours
+logger = logging.getLogger("EWClient")
 
 class TRender:
 	def __init__(self, config):
@@ -100,7 +100,7 @@ class TRender:
 		view_x = self.config['state_x']
 		view_y = self.config['state_y']
 		view_width = self.config['state_width']
-		view_height = self.config['state_height']
+		#view_height = self.config['state_height']
 		state_keys = actor.data['states'].keys()
 		for state_key in state_keys:
 			state = actor.data['states'][state_key]

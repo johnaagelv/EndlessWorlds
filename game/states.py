@@ -1,7 +1,6 @@
 """ Derived states used in the game """
 from __future__ import annotations
 import logging
-logger = logging.getLogger("EWClient")
 
 import time
 from typing import List
@@ -21,10 +20,11 @@ import game.components as gc
 from game.state import Pop, Push, Reset, State, StateResult
 import game.menus
 import game.world_tools
-import colours
+import ui.colours
 
 import numpy as np
-import tile_types
+import client.tile_types
+logger = logging.getLogger("EWClient")
 
 """ Primary in-game state """
 @attrs.define()
@@ -43,7 +43,7 @@ class InGame(State):
 		console.rgb[0:80,0:50] = np.select(
 			condlist=[visible, explored],
 			choicelist=[map['light'], map['dark']],
-			default=tile_types.SHROUD
+			default=client.tile_types.SHROUD
 		)
 
 	""" Draw all the items """
@@ -80,23 +80,23 @@ class InGame(State):
 			current_name = player.components[state_key].__class__.__name__
 			current_value = int(player.components[state_key].value / 1000)
 			bar_width = int(float(player.components[state_key].value) / 1000000 * view_width)
-			bar_filled = colours.bar_low
+			bar_filled = ui.colours.bar_low
 			if player.components[state_key].value > player.components[state_key].high:
-				bar_filled = colours.bar_high
+				bar_filled = ui.colours.bar_high
 			elif player.components[state_key].value > player.components[state_key].medium:
-				bar_filled = colours.bar_medium
+				bar_filled = ui.colours.bar_medium
 
-			console.draw_rect(x=view_x, y=view_y, width=view_width, height=1, ch=1, bg=colours.bar_empty)
+			console.draw_rect(x=view_x, y=view_y, width=view_width, height=1, ch=1, bg=ui.colours.bar_empty)
 			if bar_width > 0:
 				console.draw_rect(x=view_x, y=view_y, width=bar_width, height=1, ch=1, bg=bar_filled)
-			console.print(x=view_x + 1, y=view_y, text=current_name, fg=colours.bar_text)
+			console.print(x=view_x + 1, y=view_y, text=current_name, fg=ui.colours.bar_text)
 			state_x = view_width - 2 - (current_value > 9) - (current_value > 99) - (current_value > 999)
-			console.print(x=view_x + state_x, y=view_y, text=str(current_value), fg=colours.bar_text)
+			console.print(x=view_x + state_x, y=view_y, text=str(current_value), fg=ui.colours.bar_text)
 			view_y += 1
 		
 		# Draw other states, numeric
 		item = player.components[gc.Gold]
-		console.print(x=view_x, y=view_y, text=" Gold {:>13} ".format(item.value), fg=colours.gold, bg=colours.black)
+		console.print(x=view_x, y=view_y, text=" Gold {:>13} ".format(item.value), fg=ui.colours.gold, bg=ui.colours.black)
 
 	""" Draw the actor's states """
 	def _draw_inventory(self, console: tcod.console.Console) -> None:
@@ -108,7 +108,7 @@ class InGame(State):
 		items = inventory.Q.all_of(components=[gc.Food])
 		for item in items:
 			if gc.Food in item.components:
-				console.print(x=view_x, y=view_y, text=" Food {:>13} ".format(int(item.components[gc.Food].value/1000)), fg=colours.white, bg=colours.black)
+				console.print(x=view_x, y=view_y, text=" Food {:>13} ".format(int(item.components[gc.Food].value/1000)), fg=ui.colours.white, bg=ui.colours.black)
 
 
 	""" Draw the messages from the messagelog """
@@ -174,7 +174,7 @@ class InGame(State):
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		logger.info("InGame(State)->on_event( event ) -> StateResult")
 
-		rng = g.world[None].components[Random]
+		#rng = g.world[None].components[Random]
 
 		# Get the player
 		(player,) = g.world.Q.all_of(tags=[IsPlayer])
@@ -200,7 +200,7 @@ class InGame(State):
 			case tcod.event.KeyDown(sym=tcod.event.KeySym.COMMA):
 				player.components[gc.ActorTimer] = gc.ActorTimer(time.time())
 				# Manually pick up the item
-				inventory_max_count = player.components[gc.Inventory].slots
+				#inventory_max_count = player.components[gc.Inventory].slots
 				items = g.world.Q.all_of(components=[gc.Gold], tags=[player.components[gc.Position], IsItem]).get_entities()
 				if len(items) > 0:
 					item_amount = 0
@@ -208,7 +208,7 @@ class InGame(State):
 						player.components[gc.Gold] += item.components[gc.Gold].value
 						item_amount += item.components[gc.Gold].value
 						item.clear()
-					g.messages.add(f"Picked up {item_amount} gold", colours.white)
+					g.messages.add(f"Picked up {item_amount} gold", ui.colours.white)
 
 				items = g.world.Q.all_of(components=[gc.Food], tags=[player.components[gc.Position], IsConsumable]).get_entities()
 				if len(items) > 0:
@@ -223,7 +223,7 @@ class InGame(State):
 						inventory_item.components[gc.Food] += item.components[gc.Food].value
 						item_amount += item.components[gc.Food].value
 						item.clear()
-					g.messages.add(f"Picked up {int(item_amount/1000)} food energy", colours.white)
+					g.messages.add(f"Picked up {int(item_amount/1000)} food energy", ui.colours.white)
 				return None
 			
 			case tcod.event.KeyDown(sym=KeySym.ESCAPE):
@@ -239,10 +239,10 @@ class InventoryMenu(game.menus.ListMenu):
 		logger.info("InvetoryMenu(game.menus.ListMenu)->__init__() -> None")
 		menu_items: List = []
 		# Get the player
-		(player,) = g.world.Q.all_of(tags=[IsPlayer])
+		#(player,) = g.world.Q.all_of(tags=[IsPlayer])
 
-		inventory = player.components[gc.Inventory].registry
-		choices = inventory.Q.all_of(tags=[IsConsumable])
+		#inventory = player.components[gc.Inventory].registry
+		#choices = inventory.Q.all_of(tags=[IsConsumable])
 #		for item in choices:
 #			if gc.Food in item.components:
 #				current_name = "Food parcel"
@@ -258,7 +258,7 @@ class InventoryMenu(game.menus.ListMenu):
 	""" Inventory item has been selected, handle it """
 	def on_select(self) -> StateResult:
 		selected_item = (item for idx, item in enumerate(self.items) if idx == self.selected)
-		g.messages.add(f"Selected [{self.selected}], {selected_item}", colours.darkgreen)
+		g.messages.add(f"Selected [{self.selected}], {selected_item}", ui.colours.darkgreen)
 		return Pop()
 
 """ Known worlds menu """
@@ -283,7 +283,7 @@ class KnownWorldsMenu(game.menus.ListMenu):
 
 	def on_select(self) -> StateResult:
 		selected_item = (item for idx, item in enumerate(self.items) if idx == self.selected)
-		g.messages.add(f"Initiating world '{selected_item}'", colours.darkblue)
+		g.messages.add(f"Initiating world '{selected_item}'", ui.colours.darkblue)
 		return Reset(MainMenu())
 
 """ Main menu """
@@ -312,7 +312,7 @@ class MainMenu(game.menus.ListMenu):
 	def load_() -> StateResult:
 		logger.info("MainMenu(game.menus.ListMenu)->load_() -> StateResult")
 		g.messages.clear()
-		g.messages.add(f"Loading saved game", colours.darkgreen)
+		g.messages.add("Loading saved game", ui.colours.darkgreen)
 		with open("savefile.sav", "rb") as f:
 			g.world = pickle.loads(f.read())
 		return Reset(InGame())
@@ -321,7 +321,7 @@ class MainMenu(game.menus.ListMenu):
 	@staticmethod
 	def save_() -> StateResult:
 		logger.info("MainMenu(game.menus.ListMenu)->save_() -> StateResult")
-		g.messages.add(f"Saving game", colours.darkgreen)
+		g.messages.add("Saving game", ui.colours.darkgreen)
 		with open("savefile.sav", "wb") as f:
 			f.write(pickle.dumps(g.world))
 		return Reset(MainMenu())
@@ -342,7 +342,7 @@ class MainMenu(game.menus.ListMenu):
 	def new_game() -> StateResult:
 		logger.info("MainMenu(game.menus.ListMenu)->new_game() -> StateResult")
 		g.messages.clear()
-		g.messages.add(f"Starting a new game", colours.darkgreen)
+		g.messages.add("Starting a new game", ui.colours.darkgreen)
 		g.world = game.world_tools.new_world()
 		# Clear g.world for all states and add InGame states
 		return Reset(InGame())

@@ -1,7 +1,6 @@
 """ World tools to manage the ECS registry """
 from __future__ import annotations
 import logging
-logger = logging.getLogger("EWClient")
 
 import time
 from random import Random
@@ -10,8 +9,9 @@ import game.components as gc
 import game.tags as gt
 
 import numpy as np
-import tile_types
-import colours
+import client.tile_types
+import ui.colours
+logger = logging.getLogger("EWClient")
 
 def new_world() -> Registry:
 	logger.info("new_world() -> Registry")
@@ -52,7 +52,7 @@ def new_world() -> Registry:
 	world = registry[object()]
 	""" Initialize player memory """
 	world.components[gc.ExplorationMemory] = gc.ExplorationMemory(
-		np.full((80, 50), fill_value=tile_types.blank, order="F"),
+		np.full((80, 50), fill_value=client.tile_types.blank, order="F"),
 		np.full((80, 50), fill_value=False, order="F"),
 		np.full((80, 50), fill_value=False, order="F"),
 		[] # Gateways
@@ -62,7 +62,7 @@ def new_world() -> Registry:
 	for _ in range(rng.randint(1, 10)):
 		valuable = registry[object()]
 		valuable.components[gc.Position] = gc.Position(rng.randint(1, 59), rng.randint(1, 40))
-		valuable.components[gc.Graphic] = gc.Graphic(ord("$"), fg=colours.gold)
+		valuable.components[gc.Graphic] = gc.Graphic(ord("$"), fg=ui.colours.gold)
 		valuable.components[gc.Gold] = gc.Gold(rng.randint(1, 10), "gold")
 		valuable.tags |= {gt.IsItem}
 
@@ -70,7 +70,7 @@ def new_world() -> Registry:
 	for _ in range(rng.randint(1,10)):
 		valuable = registry[object()]
 		valuable.components[gc.Position] = gc.Position(rng.randint(1, 59), rng.randint(1, 40))
-		valuable.components[gc.Graphic] = gc.Graphic(9576, fg=colours.lightgoldenrodyellow)
+		valuable.components[gc.Graphic] = gc.Graphic(9576, fg=ui.colours.lightgoldenrodyellow)
 		valuable.components[gc.Food] = gc.Food(rng.randint(1000, 1234), "food")
 		valuable.tags |= {gt.IsItem, gt.IsConsumable}
 

@@ -1,7 +1,8 @@
 """ This module contains all components """
 from __future__ import annotations
-import logging
-logger = logging.getLogger("EWClient")
+import ui.colours as colours
+from game.tags import IsPlayer
+
 
 import time
 from typing import Final, List, Reversible, Self, Tuple
@@ -11,8 +12,9 @@ import tcod.ecs.callbacks
 from tcod.ecs import Entity, Registry
 import numpy as np
 import g
-from game.tags import IsPlayer
-import colours
+
+import logging
+logger = logging.getLogger("EWClient")
 
 """ Is a """
 @attrs.define(frozen=True)
