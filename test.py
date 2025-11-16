@@ -3,7 +3,7 @@ import random
 import selectors
 import socket
 
-from server.connection_handler import TConnectionHandler
+from connections.connection_handler import TConnectionHandler
 from message_tools.tools import generate_message
 
 import logging

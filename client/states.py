@@ -1,23 +1,26 @@
 from __future__ import annotations
 
+from typing import Tuple
+
 import attrs
 import tcod.console
 import tcod.event
 
 @attrs.define()
-class ExampleState:
+class ActorState:
 	"""
-	Example state for a player character (PC)
+	State for a player character (PC) or a non-player character (NPC)
 	- x, y are the coordinates in the current map
 	- is_alive is alive/dead indicator
 	"""
 	x: int
 	y: int
 	is_alive: bool = True
+	colour: Tuple[int, int, int] = (255, 255, 255)
 
 	def on_draw(self, console: tcod.console.Console) -> None:
 		""" ON_DRAW - draw this PC on the specified console during this draw cycle """
-		console.print(self.x, self.y, "@")
+		console.print(self.x, self.y, "@", fg=self.colour)
 	
 	def on_event(self, event: tcod.event.Event) -> None:
 		""" ON_EVENT - handle client event for this PC """

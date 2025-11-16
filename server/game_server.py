@@ -4,7 +4,7 @@ import socket
 import selectors
 import traceback
 
-from server.connection_handler import TConnectionHandler
+from connections.connection_handler import TConnectionHandler
 #from server.worlds import TWorld
 from worlds.world import TWorld
 

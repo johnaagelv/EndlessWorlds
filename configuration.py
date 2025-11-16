@@ -9,11 +9,15 @@ LOG_FILENAME_CLIENT = Path("EWclient.log")
 LOG_LEVEL_CLIENT = INFO
 CONSOLE_WIDTH = 80
 CONSOLE_HEIGHT = 50
+GAME_HOST = "192.168.1.104"
+GAME_PORT = 25261
 
 """ Server configuration """
 LOG_NAME_SERVER = "EWserver"
 LOG_FILENAME_SERVER = Path("EWserver.log")
 LOG_LEVEL_SERVER = INFO
+SERVER_HOST = "192.168.1.104"
+SERVER_PORT = 25261
 
 """ General configuration """
 APP_TITLE = "Endless Worlds, 2025 - A multiplayer multiworld roguelike"

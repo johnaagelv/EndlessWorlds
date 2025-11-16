@@ -7,7 +7,7 @@ import tcod.console
 import tcod.context
 import tcod.tileset
 
-from client.states import ExampleState
+from client.states import ActorState
 
 import logging
 logger = logging.getLogger(config.LOG_NAME_CLIENT)
@@ -24,7 +24,7 @@ def main(log_level: int) -> None:
 
 	console = tcod.console.Console(config.CONSOLE_WIDTH, config.CONSOLE_HEIGHT)
 
-	player = ExampleState(x=console.width // 2, y=console.height // 2)
+	player = ActorState(x=console.width // 2, y=console.height // 2)
 
 	with tcod.context.new(
 		console=console,
@@ -34,7 +34,7 @@ def main(log_level: int) -> None:
 			console.clear()
 			player.on_draw(console)
 			context.present(console)
-			for event in tcod.event.wait():
+			for event in tcod.event.wait(timeout=1.0):
 				player.on_event(event)
 
 	logger.info(f"{config.APP_TITLE} stopped")
