@@ -6,15 +6,15 @@ import g
 from game.states import StateResult, State
 from game.state import Push, Pop, Reset
 from game.tags import IsPlayer
-from game.components import Health, HealthImpacts, Energy, EnergyImpacts, Strength, StrengthImpacts
+#from game.components import Health, HealthImpacts, Energy, EnergyImpacts, Strength, StrengthImpacts
 
-from client.tile_types import SHROUD
+#from client.tile_types import SHROUD
 import logging
 logger = logging.getLogger("EWClient")
 
 """ Global draw of states """
 def main_draw() -> None:
-	logger.info('main_draw() -> None')
+	logger.debug('main_draw() -> None')
 	if not g.states:
 		return
 	g.console.clear()
@@ -41,7 +41,7 @@ def main_input() -> None:
 
 """ Apply state result to g.states """
 def apply_state_result(result: StateResult) -> None:
-	logger.info("apply_state_result( result: StateResult ) -> None")
+	logger.debug("apply_state_result( result: StateResult ) -> None")
 	match result:
 		case Push(state=state):
 			# Append a new state to g.states
@@ -61,13 +61,13 @@ def apply_state_result(result: StateResult) -> None:
 
 """ Return the state before the state in the stack if exists """
 def get_previous_state(state: State) -> State | None:
-	logger.info("get_previous_state( state: State ) -> State | None")
+	logger.debug("get_previous_state( state: State ) -> State | None")
 	current_index = next(index for index, value in enumerate(g.states) if value is state)
 	return g.states[current_index - 1] if current_index > 0 else None
 
 """ Previous states to be drawn """
 def draw_previous_state(state: State, console: tcod.console.Console, dim: bool = True) -> None:
-	logger.info("draw_previous_state( state: State, console: tcod.console.Console, dim: bool = True ) -> None")
+	logger.debug("draw_previous_state( state: State, console: tcod.console.Console, dim: bool = True ) -> None")
 	prev_state = get_previous_state(state)
 	if prev_state is None:
 		logger.info("- no previous state")

@@ -151,7 +151,7 @@ class InGame(State):
 
 	""" Main game drawing method """
 	def on_draw(self, console: tcod.console.Console) -> None:
-		logger.info("InGame(State)->on_draw( console ) -> None")
+		logger.debug("InGame(State)->on_draw( console ) -> None")
 		self._draw_map(console)
 		self._draw_items(console)
 		self._draw_actors(console)
@@ -172,7 +172,7 @@ class InGame(State):
 
 	""" Handle events for the in-game state (game ticks) """
 	def on_event(self, event: tcod.event.Event) -> StateResult:
-		logger.info("InGame(State)->on_event( event ) -> StateResult")
+		logger.debug("InGame(State)->on_event( event ) -> StateResult")
 
 		#rng = g.world[None].components[Random]
 
@@ -236,7 +236,7 @@ class InGame(State):
 class InventoryMenu(game.menus.ListMenu):
 	__slots__ = ()
 	def __init__(self) -> None:
-		logger.info("InvetoryMenu(game.menus.ListMenu)->__init__() -> None")
+		logger.debug("InvetoryMenu(game.menus.ListMenu)->__init__() -> None")
 		menu_items: List = []
 		# Get the player
 		#(player,) = g.world.Q.all_of(tags=[IsPlayer])
@@ -265,7 +265,7 @@ class InventoryMenu(game.menus.ListMenu):
 class KnownWorldsMenu(game.menus.ListMenu):
 	__slots__ = ()
 	def __init__(self) -> None:
-		logger.info("KnownWorldsMenu(game.menus.ListMenu)->__init__() -> None")
+		logger.debug("KnownWorldsMenu(game.menus.ListMenu)->__init__() -> None")
 
 		menu_items: List = []
 		known_worlds_filename = "known_worlds.json"
@@ -290,7 +290,7 @@ class KnownWorldsMenu(game.menus.ListMenu):
 class MainMenu(game.menus.ListMenu):
 	__slots__ = ()
 	def __init__(self) -> None:
-		logger.info("MainMenu(game.menus.ListMenu)->__init__() -> None")
+		logger.debug("MainMenu(game.menus.ListMenu)->__init__() -> None")
 		menu_items = [
 			game.menus.SelectItem("Choose world", None, self.choose_known_world),
 			game.menus.SelectItem("New game", None, self.new_game),
@@ -310,7 +310,7 @@ class MainMenu(game.menus.ListMenu):
 	""" Load the world from the savefile """
 	@staticmethod
 	def load_() -> StateResult:
-		logger.info("MainMenu(game.menus.ListMenu)->load_() -> StateResult")
+		logger.debug("MainMenu(game.menus.ListMenu)->load_() -> StateResult")
 		g.messages.clear()
 		g.messages.add("Loading saved game", ui.colours.darkgreen)
 		with open("savefile.sav", "rb") as f:
@@ -320,7 +320,7 @@ class MainMenu(game.menus.ListMenu):
 	""" Save the world and clear the world """
 	@staticmethod
 	def save_() -> StateResult:
-		logger.info("MainMenu(game.menus.ListMenu)->save_() -> StateResult")
+		logger.debug("MainMenu(game.menus.ListMenu)->save_() -> StateResult")
 		g.messages.add("Saving game", ui.colours.darkgreen)
 		with open("savefile.sav", "wb") as f:
 			f.write(pickle.dumps(g.world))
@@ -329,18 +329,18 @@ class MainMenu(game.menus.ListMenu):
 	""" User selected to continue """
 	@staticmethod
 	def continue_() -> StateResult:
-		logger.info("MainMenu(game.menus.ListMenu)->continue_() -> StateResult")
+		logger.debug("MainMenu(game.menus.ListMenu)->continue_() -> StateResult")
 		return Reset(InGame())
 
 	""" User selected to choose a World """
 	def choose_known_world(self) -> StateResult:
-		logger.info("MainMenu(game.menus.ListMenu)->choose_known_world() -> StateResult")
+		logger.debug("MainMenu(game.menus.ListMenu)->choose_known_world() -> StateResult")
 		return Reset(KnownWorldsMenu())
 
 	""" User selected to start a new game """
 	@staticmethod
 	def new_game() -> StateResult:
-		logger.info("MainMenu(game.menus.ListMenu)->new_game() -> StateResult")
+		logger.debug("MainMenu(game.menus.ListMenu)->new_game() -> StateResult")
 		g.messages.clear()
 		g.messages.add("Starting a new game", ui.colours.darkgreen)
 		g.world = game.world_tools.new_world()
@@ -350,5 +350,5 @@ class MainMenu(game.menus.ListMenu):
 	""" User selected to quit the game """
 	@staticmethod
 	def quit() -> StateResult:
-		logger.info("MainMenu(game.menus.ListMenu)->quit() -> StateResult")
+		logger.debug("MainMenu(game.menus.ListMenu)->quit() -> StateResult")
 		raise SystemExit

@@ -1,63 +1,45 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import configuration as config
+
 import tcod.console
 import tcod.context
 import tcod.tileset
 
-import g
-import game.states
-import game.systems
-
-from game.components import MessageLog
-
-import sys
+from client.states import ExampleState
 
 import logging
-logger = logging.getLogger("EWClient")
+logger = logging.getLogger(config.LOG_NAME_CLIENT)
 
-def main(log_level) -> None:
-	logging.basicConfig(filename=g.LOG_FILENAME, format=g.LOG_FORMAT, filemode="w", level=log_level)
-	logger.info('World client started')
+def main(log_level: int) -> None:
+	logging.basicConfig(filename=config.LOG_FILENAME_CLIENT, format=config.LOG_FORMAT, filemode="w", level=log_level)
+	logger.info(f"{config.APP_TITLE} started")
 
-	""" Start the message log """
-	g.messages = MessageLog()
-
-	logger.debug("Loading tileset {g.GAME_TILESET_FILENAME}")
+	# Load the tileset to use for console presentation
 	tileset = tcod.tileset.load_tilesheet(
-		g.GAME_TILESET_FILENAME, columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
+		config.GAME_TILESET_FILENAME, columns=16, rows=16, charmap=tcod.tileset.CHARMAP_CP437
 	)
 	tcod.tileset.procedural_block_elements(tileset=tileset)
 
-	logger.debug("Starting main menu state")
-	g.states = [game.states.MainMenu()]
+	console = tcod.console.Console(config.CONSOLE_WIDTH, config.CONSOLE_HEIGHT)
 
-	logger.debug("Starting main console")
-	g.console = tcod.console.Console(g.SCREEN_WIDTH, g.SCREEN_HEIGHT, order="F")
+	player = ExampleState(x=console.width // 2, y=console.height // 2)
 
-	logger.debug("Starting main context")
 	with tcod.context.new(
-		console=g.console,
+		console=console,
 		tileset=tileset,
-		title=g.GAME_TITLE,
-	) as g.context:
-		logger.debug('Starting main game loop')
-		while g.states:
-			game.systems.main_draw()
-			game.systems.main_input()
+	) as context:
+		while player.is_alive:
+			console.clear()
+			player.on_draw(console)
+			context.present(console)
+			for event in tcod.event.wait():
+				player.on_event(event)
 
-	logger.info('World client stopped')
+	logger.info(f"{config.APP_TITLE} stopped")
 
 if __name__ == "__main__":
-	log_level = logging.INFO
-	try:
-		if len(sys.argv) >= 2:
-			log_level = logging.DEBUG
-		if len(sys.argv) > 2:
-			raise SystemError()
-	except Exception as e:
-		print(f"Usage: {sys.argv[0]} <log_level>")
-		print("  <log_level> may be DEBUG")
-		sys.exit(1)
-
+	log_level = config.LOG_LEVEL_CLIENT
+	# TODO: Use argparser here for log_level as parameter (see the server.py)
 	main(log_level)
