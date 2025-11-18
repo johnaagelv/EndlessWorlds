@@ -7,7 +7,10 @@ import tcod.console
 import tcod.context
 import tcod.tileset
 
-from client.states import ActorState
+import client.g as g
+import client.game.states
+import client.game.world_tools
+import client.game.state_tools
 
 import logging
 logger = logging.getLogger(config.LOG_NAME_CLIENT)
@@ -22,20 +25,15 @@ def main(log_level: int) -> None:
 	)
 	tcod.tileset.procedural_block_elements(tileset=tileset)
 
-	console = tcod.console.Console(config.CONSOLE_WIDTH, config.CONSOLE_HEIGHT)
-
-	player = ActorState(x=console.width // 2, y=console.height // 2)
+	g.console = tcod.console.Console(config.CONSOLE_WIDTH, config.CONSOLE_HEIGHT)
+	g.states = [client.game.states.MainMenu()]
+	g.world = client.game.world_tools.new_world()
 
 	with tcod.context.new(
-		console=console,
+		console=g.console,
 		tileset=tileset,
-	) as context:
-		while player.is_alive:
-			console.clear()
-			player.on_draw(console)
-			context.present(console)
-			for event in tcod.event.wait(timeout=1.0):
-				player.on_event(event)
+	) as g.context:
+		client.game.state_tools.main_loop()
 
 	logger.info(f"{config.APP_TITLE} stopped")
 
