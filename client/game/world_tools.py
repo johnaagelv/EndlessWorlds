@@ -5,7 +5,12 @@ from tcod.ecs import Registry
 from client.game.components import Energy, Graphic, Health, IsPlaying, Position
 from client.game.tags import IsActor, IsPlayer
 
+import client.configuration as config
+import logging
+logger = logging.getLogger(config.LOG_NAME_CLIENT)
+
 def new_world() -> Registry:
+	logger.debug("new_world() -> Registry")
 	world = Registry()
 	rng = world[object()].components[Random] = Random()  # noqa: F841
 	player = world[object()]

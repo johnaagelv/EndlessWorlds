@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import configuration as config
-
 import tcod.console
 import tcod.context
 import tcod.tileset
@@ -12,6 +10,7 @@ import client.game.states
 import client.game.world_tools
 import client.game.state_tools
 
+import client.configuration as config
 import logging
 logger = logging.getLogger(config.LOG_NAME_CLIENT)
 
@@ -25,10 +24,14 @@ def main(log_level: int) -> None:
 	)
 	tcod.tileset.procedural_block_elements(tileset=tileset)
 
+	# Activate the global console
 	g.console = tcod.console.Console(config.CONSOLE_WIDTH, config.CONSOLE_HEIGHT)
+	# Activate the global state stack
 	g.states = [client.game.states.MainMenu()]
+	# Activate the global registry
 	g.world = client.game.world_tools.new_world()
 
+	# RUN
 	with tcod.context.new(
 		console=g.console,
 		tileset=tileset,

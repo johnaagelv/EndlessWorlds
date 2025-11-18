@@ -6,8 +6,13 @@ import tcod.event
 
 from client.game.state import Push, Pop, Reset, State, StateResult
 
+import client.configuration as config
+import logging
+logger = logging.getLogger(config.LOG_NAME_CLIENT)
+
 def main_draw() -> None:
 	""" Main draw of the active game state (last in g.states stack) """
+	logger.debug("main_draw() -> None")
 	if not g.states:
 		return
 	g.console.clear()
@@ -16,6 +21,7 @@ def main_draw() -> None:
 
 def apply_state_result(result: StateResult) -> None:
 	""" Apply a StateResult to the g.states stack """
+	logger.debug("apply_state_result( result ) -> None")
 	match result:
 		case Push(state=state):
 			# Switch to a new game state
@@ -36,6 +42,7 @@ def apply_state_result(result: StateResult) -> None:
 
 def main_loop() -> None:
 	""" Run the active game state forever """
+	logger.debug("main_loop() -> None")
 	while g.states:
 		main_draw()
 		for event in tcod.event.wait():
@@ -45,11 +52,13 @@ def main_loop() -> None:
 
 def get_previous_state(state: State) -> State | None:
 	""" Return the game state before this state if it exists """
+	logger.debug("get_previous_state( state ) -> State")
 	current_index = next(index for index, value in enumerate(g.states) if value is state)
 	return g.states[current_index - 1] if current_index > 0 else None
 
 def draw_previous_state(state: State, console: tcod.console.Console, dim: bool = True) -> None:
 	""" Draw previous states, optionally dimming all but the active state """
+	logger.debug("draw_previous_state( state, console, dim ) -> None")
 	prev_state = get_previous_state(state)
 	if prev_state is None:
 		return
