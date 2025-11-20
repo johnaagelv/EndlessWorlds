@@ -8,7 +8,7 @@ from tcod.event import KeySym
 import client.g as g
 
 from client.constants import DIRECTION_KEYS
-from client.game.state import Push, Reset, State, StateResult
+from client.game.state import Pop, Push, Reset, State, StateResult  # noqa: F401
 from client.game.components import Graphic, Position
 from client.game.tags import IsPlayer
 import client.game.world_tools
@@ -20,7 +20,7 @@ class InGame(State):
 
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		""" Handle events for the in-game state """
-		(player,) = g.world.Q.all_of(tags=[IsPlayer])
+		(player,) = g.game.Q.all_of(tags=[IsPlayer])
 		match event:
 			case tcod.event.KeyDown(sym=sym) if sym in DIRECTION_KEYS:
 				player.components[Position] += DIRECTION_KEYS[sym]
@@ -35,7 +35,7 @@ class InGame(State):
 		# TODO: Draw the map
 
 		# Draw the entities
-		for entity in g.world.Q.all_of(components=[Position, Graphic]):
+		for entity in g.game.Q.all_of(components=[Position, Graphic]):
 			pos = entity.components[Position]
 			if not (0 <= pos.x < console.width and 0 <= pos.y < console.height):
 				continue
@@ -44,8 +44,11 @@ class InGame(State):
 			console.rgb[["ch", "fg"]][pos.y, pos.x] = graphic.face, graphic.colour
 		
 		# Draw any messages
-		if text := g.world[None].components.get(("Text", str)):
+		if text := g.game[None].components.get(("Text", str)):
 			console.print(x=0, y=console.height - 1, text=text, fg=(255, 255, 255), bg=(0, 0, 0))
+
+	def on_connect(self, command: dict) -> StateResult:
+		...
 
 class MainMenu(client.game.menus.ListMenu):
 	""" Main/escape menu """
@@ -54,11 +57,15 @@ class MainMenu(client.game.menus.ListMenu):
 	def __init__(self) -> None:
 		""" Initialize the main menu """
 		items = [
-			client.game.menus.SelectItem("New game", self.new_game),
-			client.game.menus.SelectItem("Quit", self.quit),
+			client.game.menus.SelectItem("Choose world", self.choose_world, 0),
+			client.game.menus.SelectItem("New game", self.new_game, 100),
 		]
 		if hasattr(g, "world"):
-			items.insert(0, client.game.menus.SelectItem("Continue", self.continue_))
+			# Add the continue menu item
+			items.append(client.game.menus.SelectItem("Continue", self.continue_, 800))
+
+		# Add the quit menu item
+		items.append(client.game.menus.SelectItem("Quit", self.quit, 900))
 
 		super().__init__(
 			items=tuple(items),
@@ -68,17 +75,43 @@ class MainMenu(client.game.menus.ListMenu):
 		)
 
 	@staticmethod
-	def continue_() -> StateResult:
+	def continue_(id: int) -> StateResult:
 		""" Return to the game """
 		return Reset(InGame())
 	
 	@staticmethod
-	def new_game() -> StateResult:
+	def new_game(id: int) -> StateResult:
 		""" Begin a new game """
-		g.world = client.game.world_tools.new_world()
+		g.game = client.game.world_tools.new_game()
 		return Reset(InGame())
 
 	@staticmethod
-	def quit() -> StateResult:
+	def choose_world(id: int) -> StateResult:
+		""" Choose a world """
+		return Push(WorldMenu())
+
+	@staticmethod
+	def quit(id: int) -> StateResult:
 		""" Close the program """
 		raise SystemExit()
+
+class WorldMenu(client.game.menus.ListMenu):
+	""" World menu """
+	__slots__ = ()
+
+	def __init__(self) -> None:
+		items = [
+			client.game.menus.SelectItem("Demo", self.load_world, 0),
+		]
+		super().__init__(
+			items=tuple(items),
+			selected=0,
+			x=7,
+			y=7,
+		)
+
+	@staticmethod
+	def load_world(id: int) -> StateResult:
+		""" Load a world from a world server """
+		client.game.world_tools.load_world()
+		return Reset(MainMenu())

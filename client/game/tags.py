@@ -10,3 +10,6 @@ IsActor: Final = "IsActor"
 
 IsItem: Final = "IsItem"
 """ Entity is an item """
+
+IsWorld: Final = "IsWorld"
+""" Entity is a world """

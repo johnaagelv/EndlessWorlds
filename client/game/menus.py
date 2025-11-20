@@ -37,16 +37,17 @@ class SelectItem(MenuItem):
 	A click-/selectable menu item
 	"""
 	label: str # the menu item label
-	callback: Callable[[], StateResult] # Callable function returning a state result
+	callback: Callable[[int], StateResult] # Callable function returning a state result
+	id: int # ID of the menu item
 
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		""" Handle events selecting this menu item """
 		logger.debug("SelectItem->on_event( event ) -> StateResult")
 		match event:
 			case tcod.event.KeyDown(sym=sym) if sym in {KeySym.RETURN, KeySym.RETURN2, KeySym.KP_ENTER}:
-				return self.callback()
+				return self.callback(self.id)
 			case tcod.event.MouseButtonUp(button=tcod.event.MouseButton.LEFT):
-				return self.callback()
+				return self.callback(self.id)
 			case _:
 				# This menu item was not selected
 				return None
@@ -112,3 +113,7 @@ class ListMenu(State):
 		client.game.state_tools.draw_previous_state(self, console)
 		for i, item in enumerate(self.items):
 			item.on_draw(console, x=self.x, y=self.y + i, highlight=i == self.selected)
+
+	def on_connect(self, command: dict) -> StateResult:
+		...
+

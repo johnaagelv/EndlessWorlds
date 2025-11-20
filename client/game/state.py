@@ -13,9 +13,15 @@ class State(Protocol):
 	__slots__ = ()
 
 	def on_draw(self, console: tcod.console.Console) -> None:
+		""" Draw the state """
 		...
 	
 	def on_event(self, event: tcod.event.Event) -> StateResult:
+		""" Process event for the state """
+		...
+
+	def on_connect(self, command: dict) -> StateResult:
+		""" Connect with server for command processing """
 		...
 
 @attrs.define()

@@ -4,6 +4,7 @@ from __future__ import annotations
 import tcod.console
 import tcod.context
 import tcod.tileset
+from tcod.ecs import Registry
 
 import client.g as g
 import client.game.states
@@ -26,10 +27,10 @@ def main(log_level: int) -> None:
 
 	# Activate the global console
 	g.console = tcod.console.Console(config.CONSOLE_WIDTH, config.CONSOLE_HEIGHT)
+	# Initialize the registry
+	g.game = Registry()
 	# Activate the global state stack
 	g.states = [client.game.states.MainMenu()]
-	# Activate the global registry
-	g.world = client.game.world_tools.new_world()
 
 	# RUN
 	with tcod.context.new(
@@ -42,5 +43,6 @@ def main(log_level: int) -> None:
 
 if __name__ == "__main__":
 	log_level = config.LOG_LEVEL_CLIENT
+	log_level = logging.DEBUG
 	# TODO: Use argparser here for log_level as parameter (see the server.py)
 	main(log_level)

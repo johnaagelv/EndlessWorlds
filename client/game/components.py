@@ -13,8 +13,8 @@ logger = logging.getLogger(config.LOG_NAME_CLIENT)
 @attrs.define(frozen=True)
 class Position:
 	""" Position of an entity """
-	x: int
-	y: int
+	x: int # x coordinate of a position
+	y: int # y coordinate of a position
 
 	def __add__(self, direction: tuple[int, int]) -> Self:
 		""" Add vector to this position """
@@ -50,3 +50,14 @@ Energy: Final = ("Energy", int)
 
 IsPlaying: Final = ("IsPlaying", bool)
 """ Playing indicator """
+
+Map: Final = ("Map", int)
+""" Map index of current position of an entity """
+
+Vision: Final = ("Vision", int)
+""" Vision radius of an actor """
+
+@attrs.define()
+class World:
+	""" World """
+	maps: list[dict] = []
