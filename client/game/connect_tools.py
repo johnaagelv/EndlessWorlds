@@ -69,10 +69,8 @@ def query_server(request: dict) -> dict:
 						if client_communicator.dispatch(mask):
 							logger.debug("- message sent ...")
 							client_communicator.message = {}
-	#						logger.debug("- message cleared")
 							client_communicator._jsonheader_len = -1
 							client_communicator.jsonheader = {}
-
 							client_communicator._set_selector_events_mask("r")
 						
 				except Exception:

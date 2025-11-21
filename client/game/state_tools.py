@@ -5,10 +5,7 @@ import client.g as g
 import tcod.event
 
 from client.game.state import Push, Pop, Reset, State, StateResult
-from client.game.components import Map, Position, Vision, World
-from client.game.tags import IsPlayer, IsWorld
 
-import client.game.connect_tools
 import client.configuration as config
 import logging
 logger = logging.getLogger(config.LOG_NAME_CLIENT)
@@ -52,7 +49,7 @@ def main_loop() -> None:
 			tile_event = g.context.convert_event(event)
 			if g.states:
 				apply_state_result(g.states[-1].on_event(tile_event))
-		do_fos_query()
+				apply_state_result(g.states[-1].on_connect())
 
 def get_previous_state(state: State) -> State | None:
 	""" Return the game state before this state if it exists """
@@ -70,18 +67,3 @@ def draw_previous_state(state: State, console: tcod.console.Console, dim: bool =
 	if dim and state is g.states[-1]:
 		console.rgb["fg"] //= 4
 		console.rgb["bg"] //= 4
-
-def do_fos_query() -> None:
-	world = g.game.Q.all_of(tags=[IsWorld]).get_entities()
-	if len(world) == 0:
-		#(player,) = g.game.Q.all_of(tags=[IsPlayer])
-		request = {
-			"cmd":"fos",
-			"cid": "1234", # if CID is not provided, then this is a new actor and will be placed in the world by the server
-			"m": 0,
-			"x": 10,
-			"y": 10,
-			"z": 0,
-			"r": 4,
-		}
-		result = client.game.connect_tools.query_server(request)

@@ -7,6 +7,10 @@ import attrs
 import tcod.console
 import tcod.event
 
+import client.configuration as config
+import logging
+logger = logging.getLogger(config.LOG_NAME_CLIENT)
+
 class State(Protocol):
 	""" Abstract game state class """
 
@@ -14,15 +18,18 @@ class State(Protocol):
 
 	def on_draw(self, console: tcod.console.Console) -> None:
 		""" Draw the state """
-		...
+		logger.debug("State->on_draw( console ) -> None")
+		return None
 	
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		""" Process event for the state """
-		...
+		logger.debug("State->on_event( event ) -> StateResult")
+		return None
 
-	def on_connect(self, command: dict) -> StateResult:
+	def on_connect(self) -> StateResult:
 		""" Connect with server for command processing """
-		...
+		logger.debug("State->on_connect() -> StateResult")
+		return None
 
 @attrs.define()
 class Push:

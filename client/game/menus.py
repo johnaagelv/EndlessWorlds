@@ -113,7 +113,3 @@ class ListMenu(State):
 		client.game.state_tools.draw_previous_state(self, console)
 		for i, item in enumerate(self.items):
 			item.on_draw(console, x=self.x, y=self.y + i, highlight=i == self.selected)
-
-	def on_connect(self, command: dict) -> StateResult:
-		...
-
