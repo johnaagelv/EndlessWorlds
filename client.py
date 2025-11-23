@@ -26,7 +26,7 @@ def main(log_level: int) -> None:
 	tcod.tileset.procedural_block_elements(tileset=tileset)
 
 	# Activate the global console
-	g.console = tcod.console.Console(config.CONSOLE_WIDTH, config.CONSOLE_HEIGHT)
+	g.console = tcod.console.Console(config.CONSOLE_WIDTH, config.CONSOLE_HEIGHT, order="F")
 	# Initialize the registry
 	g.game = Registry()
 	# Activate the global state stack

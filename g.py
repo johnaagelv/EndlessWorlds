@@ -1,5 +1,4 @@
 """ This module stores globally mutable variables used by this program """
-
 from __future__ import annotations
 
 #from typing import List
@@ -7,8 +6,8 @@ import tcod.console
 import tcod.context
 import tcod.ecs
 
-import game.state
-from game.components import MessageLog
+#import game.state
+#from game.components import MessageLog
 
 """ The window managed by tcod """
 context: tcod.context.Context

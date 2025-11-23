@@ -28,6 +28,7 @@ class TWorld:
 			self.entry_points = data["entry"]
 			self.actors = {}
 			self.dummy = []
+		logger.debug(self.entry_points)
 
 	def get_world_definition(self) -> list:
 		"""

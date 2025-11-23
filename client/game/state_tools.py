@@ -49,7 +49,7 @@ def main_loop() -> None:
 			tile_event = g.context.convert_event(event)
 			if g.states:
 				apply_state_result(g.states[-1].on_event(tile_event))
-				apply_state_result(g.states[-1].on_connect())
+				g.states[-1].on_connect()
 
 def get_previous_state(state: State) -> State | None:
 	""" Return the game state before this state if it exists """

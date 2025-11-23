@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import numpy as np
+import client.tile_types as tile_types
 from typing import Final, Self
-
+import client.g as g
 import attrs
 import tcod.ecs.callbacks
 from tcod.ecs import Entity
+
+from client.game.tags import IsPlayer, IsWorld
 
 import client.configuration as config
 import logging
@@ -18,9 +22,20 @@ class Position:
 
 	def __add__(self, direction: tuple[int, int]) -> Self:
 		""" Add vector to this position """
-		logger.debug("Position->__add__( direction ) -> Self")
+		logger.debug(f"Position->__add__( {direction} ) -> Self")
+		(world,) = g.game.Q.all_of(tags=[IsWorld])
+		(player,) = g.game.Q.all_of(tags=[IsPlayer])
 		x, y = direction
-		return self.__class__(self.x + x, self.y + y)
+		if 0 <= self.x + x < world.components[World].maps[player.components[Map]]["width"]:
+			x = self.x + x
+		else:
+			x = self.x
+		if 0 <= self.y + y < world.components[World].maps[player.components[Map]]["height"]:
+			y = self.y + y
+		else:
+			y = self.y
+
+		return self.__class__(x, y)
 	
 @tcod.ecs.callbacks.register_component_changed(component=Position)
 def on_position_changed(entity: Entity, old: Position | None, new: Position | None) -> None:
@@ -60,4 +75,46 @@ Vision: Final = ("Vision", int)
 @attrs.define()
 class World:
 	""" World """
+	definitions: list[dict] = []
 	maps: list[dict] = []
+
+	def start_map(self, map_idx: int) -> None:
+		logger.debug("World->start_map( map_idx ) -> None")
+		if not self.maps[map_idx]['loaded']:
+			map_definition: dict = self.definitions[map_idx]
+
+			map_width = int(map_definition["width"])
+			map_height = int(map_definition["height"])
+			map_visible = map_definition["visible"]
+			self.maps[map_idx] = {
+				"loaded": True,
+				"name": map_definition["name"],
+				"width": map_width,
+				"height": map_height,
+				"tiles": np.full((map_width, map_height), fill_value=tile_types.blank, order="F"),
+				"visible": np.full((map_width, map_height), fill_value=map_visible, order="F"),
+				"explored": np.full((map_width, map_height), fill_value=map_visible, order="F"),
+			}
+
+			if map_visible:
+				fos: dict = map_definition["fos"]
+				temp = fos.get("view")
+				view = np.array(temp)
+				self.maps[map_idx]["tiles"][0:map_width, 0:map_height] = view
+
+	def render(self, map_idx, console: tcod.console.Console, view_port: tuple) -> None:
+		logger.debug(f"World->render( map_idx {map_idx}, console )")
+
+		visible_tiles = self.maps[map_idx]['visible']
+		explored_tiles = self.maps[map_idx]['explored']
+		light_tiles = self.maps[map_idx]['tiles']['light']
+		dark_tiles = self.maps[map_idx]['tiles']['dark']
+
+		view_x1, view_x2, view_y1, view_y2 = view_port
+
+		console.rgb[0:config.VIEW_PORT_WIDTH, 0:config.VIEW_PORT_HEIGHT] = np.select(
+			condlist=[visible_tiles[view_x1:view_x2, view_y1:view_y2], explored_tiles[view_x1:view_x2, view_y1:view_y2]],
+			choicelist=[light_tiles[view_x1:view_x2, view_y1:view_y2], dark_tiles[view_x1:view_x2, view_y1:view_y2]],
+			default=tile_types.SHROUD
+		)
+

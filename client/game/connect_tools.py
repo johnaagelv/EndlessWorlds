@@ -49,6 +49,8 @@ def start_connection(request: dict):
 	g.sel.register(client_connection, selectors.EVENT_WRITE, data=client_communicator)
 
 def query_server(request: dict) -> dict:
+	logger.debug(" ")
+	logger.debug("query_server( request )")
 	start_connection(request)
 	query_on = True
 	while query_on:
@@ -60,9 +62,9 @@ def query_server(request: dict) -> dict:
 					if mask == selectors.EVENT_READ:
 						# Has a request been received?
 						if client_communicator.dispatch(mask):
-							result = client_communicator.message['cmd']
-							logger.debug(f"- response received ... {result}")
-							# Message has been received, return False to stop
+							result = client_communicator.message
+							logger.debug("- response received ...")
+							# Message has been received, set False to stop
 							query_on = False
 					else:
 						# Has the response been sent?

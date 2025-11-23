@@ -1,5 +1,6 @@
 from __future__ import annotations
 import uuid
+import random
 from worlds.world import TWorld
 
 def cmd_new(request: dict, world: TWorld) -> dict:
@@ -15,7 +16,9 @@ def cmd_new(request: dict, world: TWorld) -> dict:
 		]
 	else:
 		response["cid"] = uuid.uuid4()
-		response["entry_point"] = world.get_world_entry_points()
+		entry_points = world.get_world_entry_points()
+
+		response["entry_point"] = entry_points[random.randint(0,len(entry_points))]
 
 	world.actors[response["cid"]] = {
 		"x": int(response["entry_point"][0]),
