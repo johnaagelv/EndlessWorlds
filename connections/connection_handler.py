@@ -204,7 +204,9 @@ class TConnectionHandler:
 				# Close when the buffer is drained. The response has been sent.
 				if sent and not self._buffer:
 #					self.close()
+					logger.debug("- return True")
 					return True
+		logger.debug("- return False")
 		return False
 
 	"""

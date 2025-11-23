@@ -14,7 +14,7 @@ import message_tools.tools as message_tools
 import logging
 
 #from collections.abc import Callable
-from client_commands.commands import client_commands
+from server.client_commands.commands import client_commands
 
 logger = logging.getLogger("EWlogger")
 

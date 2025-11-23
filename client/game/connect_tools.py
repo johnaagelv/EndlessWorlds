@@ -50,7 +50,7 @@ def start_connection(request: dict):
 
 def query_server(request: dict) -> dict:
 	logger.debug(" ")
-	logger.debug("query_server( request )")
+	logger.debug(f"query_server( request {request['cmd']})")
 	start_connection(request)
 	query_on = True
 	while query_on:

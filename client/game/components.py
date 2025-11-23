@@ -25,17 +25,18 @@ class Position:
 		logger.debug(f"Position->__add__( {direction} ) -> Self")
 		(world,) = g.game.Q.all_of(tags=[IsWorld])
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
+		map_idx = player.components[Map]
+		map = world.components[World].maps[map_idx]
 		x, y = direction
-		if 0 <= self.x + x < world.components[World].maps[player.components[Map]]["width"]:
-			x = self.x + x
+		new_x = self.x + x
+		new_y = self.y + y
+		if map["tiles"][new_x, new_y]["walkable"] and 0 <= new_x < map["width"] and 0 <= new_y < map["height"]:
+			pass
 		else:
-			x = self.x
-		if 0 <= self.y + y < world.components[World].maps[player.components[Map]]["height"]:
-			y = self.y + y
-		else:
-			y = self.y
+			new_x = self.x
+			new_y = self.y
 
-		return self.__class__(x, y)
+		return self.__class__(new_x, new_y)
 	
 @tcod.ecs.callbacks.register_component_changed(component=Position)
 def on_position_changed(entity: Entity, old: Position | None, new: Position | None) -> None:

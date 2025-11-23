@@ -8,13 +8,12 @@ from tcod.event import KeySym
 import client.g as g
 
 from client.constants import DIRECTION_KEYS, ACTION_KEYS
-from client.game.state import Push, Reset, State, StateResult
+from client.game.state import Pop, Push, Reset, State, StateResult
 from client.game.components import Graphic, Position, Map, Vision, World
 from client.game.tags import IsPlayer, IsWorld
 import client.game.world_tools
 import client.game.menus
 import client.game.connect_tools
-
 import client.configuration as config
 import logging
 logger = logging.getLogger(config.LOG_NAME_CLIENT)
@@ -33,7 +32,11 @@ class InGame(State):
 				return None
 			
 			case tcod.event.KeyDown(sym=sym) if sym in ACTION_KEYS:
-				action =ACTION_KEYS[sym]
+				match sym:
+					case KeySym.D:
+						return Push(Drop())
+					case KeySym.COMMA:
+						return Push(Pickup())
 				return None
 			
 			case tcod.event.KeyDown(sym=KeySym.ESCAPE):
@@ -86,6 +89,7 @@ class InGame(State):
 	def on_connect(self) -> None:
 		""" Connect to the server for information"""
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
+#		(world,) = g.game.Q.all_of(tags=[IsWorld])
 
 		fos_request = {
 			"cmd": "fos", "cid": "1234",
@@ -96,7 +100,8 @@ class InGame(State):
 			"r": player.components[Vision]
 		}
 		result = client.game.connect_tools.query_server(fos_request)
-		# logger.debug(result)
+		logger.debug(result)
+#		world.components[World].maps[player.components[Map]] = result["view"]
 		return None
 
 class MainMenu(client.game.menus.ListMenu):
@@ -144,3 +149,24 @@ class MainMenu(client.game.menus.ListMenu):
 		""" Close the program """
 		logger.debug('MainMenu->quit( id ) -> StateResult')
 		raise SystemExit
+
+@attrs.define()
+class Pickup(State):
+	def on_event(self, event: tcod.event.Event) -> StateResult:
+		""" Handle events for picking up items from player location """
+		logger.debug('Pickup->on_event( event ) -> StateResult')
+		return Pop()
+	
+	def on_draw(self, console: tcod.console.Console) -> None:
+		...
+
+@attrs.define()
+class Drop(State):
+	def on_event(self, event: tcod.event.Event) -> StateResult:
+		""" Handle events for dropping items from the inventory """
+		logger.debug("Drop->on_event( event ) -> StateResult")
+		return Pop()
+	
+	def on_draw(self, console: tcod.console.Console) -> None:
+		""" Present the inventory for item drop """
+		...

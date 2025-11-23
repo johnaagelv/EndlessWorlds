@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-import client_commands.new as new
-import client_commands.fos as fos
+import server.client_commands.new as new
+import server.client_commands.fos as fos
 
 from worlds.world import TWorld
 
