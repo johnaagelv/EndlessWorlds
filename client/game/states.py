@@ -3,13 +3,13 @@ from __future__ import annotations
 import attrs
 import tcod.console
 import tcod.event
-from tcod.event import KeySym
+from tcod.event import KeySym, Modifier
 
 import client.g as g
 
-from client.constants import DIRECTION_KEYS, ACTION_KEYS
+from client.constants import DIRECTION_KEYS, ACTION_KEYS, STAIR_KEYS
 from client.game.state import Pop, Push, Reset, State, StateResult
-from client.game.components import Graphic, Position, Map, Vision, World
+from client.game.components import Graphic, Position, Vision, World
 from client.game.tags import IsPlayer, IsWorld
 import client.game.world_tools
 import client.game.menus
@@ -26,19 +26,36 @@ class InGame(State):
 		""" Handle events for the in-game state """
 		logger.debug('InGame->on_event( event ) -> StateResult')
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
+		(world,) = g.game.Q.all_of(tags=[IsWorld])
+#		map = world.components[World].maps[player.components[Position].m]
 		match event:
 			case tcod.event.KeyDown(sym=sym) if sym in DIRECTION_KEYS:
 				player.components[Position] += DIRECTION_KEYS[sym]
 				return None
 			
-			case tcod.event.KeyDown(sym=sym) if sym in ACTION_KEYS:
-				match sym:
-					case KeySym.D:
+			case tcod.event.KeyDown(sym=sym, mod=mod) if (sym, mod) in STAIR_KEYS:
+				action = STAIR_KEYS[sym, mod]
+				match action:
+					case "up":
+						print(f"up: {world.components[World].in_gateway(player.components[Position].x, player.components[Position].y, player.components[Position].m)}")
+						if world.components[World].in_gateway(player.components[Position].x, player.components[Position].y, player.components[Position].m):
+							gateway = world.components[World].go_gateway(player.components[Position].x, player.components[Position].y, player.components[Position].m, "up")
+							# Move to x, y coordinate in map number m
+							player.components[Position] = Position(gateway["gateway"]["x"], gateway["gateway"]["y"], gateway["gateway"]["m"])
+					case "down":
+						if world.components[World].in_gateway(player.components[Position].x, player.components[Position].y, player.components[Position].m):
+							gateway = world.components[World].go_gateway(player.components[Position].x, player.components[Position].y, player.components[Position].m, "down")
+							# Move to x, y coordinate in map number m
+							player.components[Position] = Position(gateway["gateway"]["x"], gateway["gateway"]["y"], gateway["gateway"]["m"])
+
+			case tcod.event.KeyDown(sym=sym, mod=mod) if (sym, mod) in ACTION_KEYS:
+				match (sym, mod):
+					case (KeySym.D, Modifier.NONE):
 						return Push(Drop())
-					case KeySym.COMMA:
+					case (KeySym.COMMA, Modifier.NONE):
 						return Push(Pickup())
 				return None
-			
+
 			case tcod.event.KeyDown(sym=KeySym.ESCAPE):
 				return Push(MainMenu())
 
@@ -55,7 +72,7 @@ class InGame(State):
 		(world,) = g.game.Q.all_of(tags=[IsWorld])
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
 
-		map_idx = player.components[Map]
+		map_idx = player.components[Position].m
 
 		view_width = config.VIEW_PORT_WIDTH
 		view_height = config.VIEW_PORT_HEIGHT
@@ -96,7 +113,7 @@ class InGame(State):
 			"x": player.components[Position].x,
 			"y": player.components[Position].y,
 			"z": 0,
-			"m": player.components[Map],
+			"m": player.components[Position].m,
 			"r": player.components[Vision]
 		}
 		result = client.game.connect_tools.query_server(fos_request)
@@ -141,7 +158,7 @@ class MainMenu(client.game.menus.ListMenu):
 		g.game = client.game.world_tools.new_game()
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
 		(world,) = g.game.Q.all_of(tags=[IsWorld])
-		world.components[World].start_map( player.components[Map])
+		world.components[World].start_map( player.components[Position].m)
 		return Reset(InGame())
 
 	@staticmethod
@@ -158,7 +175,8 @@ class Pickup(State):
 		return Pop()
 	
 	def on_draw(self, console: tcod.console.Console) -> None:
-		...
+		""" Present the items on player location available for pickup """
+		return None
 
 @attrs.define()
 class Drop(State):
@@ -169,4 +187,4 @@ class Drop(State):
 	
 	def on_draw(self, console: tcod.console.Console) -> None:
 		""" Present the inventory for item drop """
-		...
+		return None

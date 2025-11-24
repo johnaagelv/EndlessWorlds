@@ -4,7 +4,7 @@ import numpy as np
 
 from random import Random
 from tcod.ecs import Registry
-from client.game.components import Energy, Graphic, Health, IsPlaying, Position, World, Map, Vision
+from client.game.components import Energy, Graphic, Health, IsPlaying, Position, World, Vision
 from client.game.tags import IsActor, IsPlayer, IsWorld
 
 import client.game.connect_tools
@@ -53,14 +53,13 @@ def new_game() -> Registry:
 	logger.debug(f"{world.components[World].maps[2]}")
 
 	player = game[object()]
-	player.components[Position] = Position(result['entry_point'][0], result['entry_point'][1])
+	player.components[Position] = Position(result['entry_point'][0], result['entry_point'][1], result['entry_point'][3])
 	player.components[Graphic] = Graphic(ord("@"))
 	player.components[Health] = 500
 	player.components[Energy] = 500
 	player.components[IsPlaying] = True
 	player.tags |= {IsPlayer, IsActor}
 
-	player.components[Map] = result['entry_point'][3]
 	player.components[Vision] = 4
 
 	return game

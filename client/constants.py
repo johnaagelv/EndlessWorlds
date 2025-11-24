@@ -1,7 +1,7 @@
 """ Global client constants """
 from __future__ import annotations
 from typing import Final
-from tcod.event import KeySym
+from tcod.event import KeySym, Modifier
 
 DIRECTION_KEYS: Final = {
 	# Arrow keys
@@ -35,60 +35,47 @@ DIRECTION_KEYS: Final = {
 	KeySym.PERIOD: (0, 0), # Wait
 }
 
+STAIR_KEYS: Final = {
+	(KeySym.COMMA, Modifier.LSHIFT): "up",
+	(KeySym.COMMA, Modifier.RSHIFT): "up",
+	(KeySym.PERIOD, Modifier.LSHIFT): "down",
+	(KeySym.PERIOD, Modifier.RSHIFT): "down",
+}
+
 ACTION_KEYS: Final = {
-	KeySym.Q: ord("q"), # 
-	KeySym.W: ord("w"), # Wear/wield
-	KeySym.E: ord("e"), # Eat
-	KeySym.R: ord("r"), # Remove
-	KeySym.T: ord("t"), # 
-	KeySym.I: ord("i"), # Inventory
-	KeySym.O: ord("o"), # 
-	KeySym.P: ord("p"), # 
-	KeySym.A: ord("a"), # Activate
-	KeySym.S: ord("s"), # 
-	KeySym.D: ord("d"), # Drink
-	KeySym.F: ord("f"), # 
-	KeySym.G: ord("g"), # 
-	KeySym.Z: ord("z"), # 
-	KeySym.X: ord("x"), # 
-	KeySym.C: ord("c"), # 
-	KeySym.V: ord("v"), # 
-	KeySym.M: ord("m"), # 
-	KeySym.COMMA: ord(","), # Pick up
-	KeySym.LESS: ord("<"), # Down
-	KeySym.GREATER: ord(">"), # Up
-	KeySym.N1: ord("1"), # Lift floor 1
-	KeySym.N2: ord("2"), # Lift floor 2
-	KeySym.N3: ord("3"), # Lift floor 3
-	KeySym.N4: ord("4"), # Lift floor 4
-	KeySym.N5: ord("5"), # Lift floor 5
-	KeySym.N6: ord("6"), # Lift floor 6
-	KeySym.N7: ord("7"), # Lift floor 7
-	KeySym.N8: ord("8"), # Lift floor 8
-	KeySym.N9: ord("9"), # Lift floor 9
-	KeySym.LEFTBRACKET: ord("["), #
-	KeySym.RIGHTBRACKET: ord("]"), #
-	KeySym.LEFTBRACE: ord("{"), #
-	KeySym.RIGHTBRACE: ord("}"), #
-	KeySym.LEFTPAREN: ord("("), #
-	KeySym.RIGHTPAREN: ord(")"), #
-	KeySym.SEMICOLON: ord(";"), #
-	KeySym.COLON: ord(":"), #
-	KeySym.APOSTROPHE: ord("!"), #
-	KeySym.AT: ord("@"), #
-	KeySym.ASTERISK: ord("*"), #
-	KeySym.DOLLAR: ord("$"), #
-	KeySym.HASH: ord("#"), #
-	KeySym.PERCENT: ord("%"), #
-	KeySym.AMPERSAND: ord("&"), #
-	KeySym.CARET: ord("^"), #
-	KeySym.UNDERSCORE: ord("_"), #
-	KeySym.EQUALS: ord("="), #
-	KeySym.PLUS: ord("+"), #
-	KeySym.MINUS: ord("-"), #
-	KeySym.TILDE: ord("~"), #
-	KeySym.SLASH: ord("/"), #
-	KeySym.BACKSLASH: ord("\\"), #
-	KeySym.PIPE: ord("|"), #
-	KeySym.QUESTION: ord("?"), #
+	(KeySym.Q, Modifier.NONE): ord("q"), # 
+	(KeySym.W, Modifier.NONE): ord("w"), # Wear/wield
+	(KeySym.E, Modifier.NONE): ord("e"), # Eat
+	(KeySym.R, Modifier.NONE): ord("r"), # Remove
+	(KeySym.T, Modifier.NONE): ord("t"), # 
+	(KeySym.I, Modifier.NONE): ord("i"), # Inventory
+	(KeySym.O, Modifier.NONE): ord("o"), # 
+	(KeySym.P, Modifier.NONE): ord("p"), # 
+	(KeySym.A, Modifier.NONE): ord("a"), # Activate
+	(KeySym.S, Modifier.NONE): ord("s"), # 
+	(KeySym.D, Modifier.NONE): ord("d"), # Drink
+	(KeySym.F, Modifier.NONE): ord("f"), # 
+	(KeySym.G, Modifier.NONE): ord("g"), # 
+	(KeySym.Z, Modifier.NONE): ord("z"), # 
+	(KeySym.X, Modifier.NONE): ord("x"), # 
+	(KeySym.C, Modifier.NONE): ord("c"), # 
+	(KeySym.V, Modifier.NONE): ord("v"), # 
+	(KeySym.M, Modifier.NONE): ord("m"), # 
+	(KeySym.COMMA, Modifier.NONE): ord(","), # Pick up
+	(KeySym.N1, Modifier.NONE): ord("1"), # Lift floor 1
+	(KeySym.N2, Modifier.NONE): ord("2"), # Lift floor 2
+	(KeySym.N3, Modifier.NONE): ord("3"), # Lift floor 3
+	(KeySym.N4, Modifier.NONE): ord("4"), # Lift floor 4
+	(KeySym.N5, Modifier.NONE): ord("5"), # Lift floor 5
+	(KeySym.N6, Modifier.NONE): ord("6"), # Lift floor 6
+	(KeySym.N7, Modifier.NONE): ord("7"), # Lift floor 7
+	(KeySym.N8, Modifier.NONE): ord("8"), # Lift floor 8
+	(KeySym.N9, Modifier.NONE): ord("9"), # Lift floor 9
+	(KeySym.LEFTBRACKET, Modifier.NONE): ord("["), #
+	(KeySym.RIGHTBRACKET, Modifier.NONE): ord("]"), #
+	(KeySym.SEMICOLON, Modifier.NONE): ord(";"), #
+	(KeySym.EQUALS, Modifier.NONE): ord("="), #
+	(KeySym.MINUS, Modifier.NONE): ord("-"), #
+	(KeySym.SLASH, Modifier.NONE): ord("/"), #
+	(KeySym.BACKSLASH, Modifier.NONE): ord("\\"), #
 }

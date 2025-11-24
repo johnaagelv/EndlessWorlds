@@ -19,14 +19,15 @@ class Position:
 	""" Position of an entity """
 	x: int # x coordinate of a position
 	y: int # y coordinate of a position
+	m: int # m coordinate of a position, which is the map
 
 	def __add__(self, direction: tuple[int, int]) -> Self:
 		""" Add vector to this position """
 		logger.debug(f"Position->__add__( {direction} ) -> Self")
 		(world,) = g.game.Q.all_of(tags=[IsWorld])
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
-		map_idx = player.components[Map]
-		map = world.components[World].maps[map_idx]
+#		map_idx = player.components[Map]
+		map = world.components[World].maps[self.m]
 		x, y = direction
 		new_x = self.x + x
 		new_y = self.y + y
@@ -36,7 +37,7 @@ class Position:
 			new_x = self.x
 			new_y = self.y
 
-		return self.__class__(new_x, new_y)
+		return self.__class__(new_x, new_y, self.m)
 	
 @tcod.ecs.callbacks.register_component_changed(component=Position)
 def on_position_changed(entity: Entity, old: Position | None, new: Position | None) -> None:
@@ -119,3 +120,22 @@ class World:
 			default=tile_types.SHROUD
 		)
 
+	def in_gateway(self, x: int, y: int, m: int) -> bool:
+		logger.debug(f"World->in_gateway( x={x}, y={y}, m={m} )")
+		return self.maps[m]["tiles"][x, y]["gateway"]
+
+	def go_gateway(self, x: int, y: int, m: int, direction = None) -> dict:
+		logger.debug(f"TWorld->go_gateway( x={x}, y={y}, m={m}, direction={direction} )")
+		gateway_fallback = {
+			"gateway": {
+				"x": x,
+				"y": y,
+				"m": m,
+				"h": ""
+			}
+		}
+		if direction is None:
+			gateway = next((item for item in self.maps[m]["gateways"] if item["x"] == x and item["y"] == y), gateway_fallback)
+		else:
+			gateway = next((item for item in self.maps[m]["gateways"] if item["x"] == x and item["y"] == y and item['action'] == direction), gateway_fallback)
+		return gateway
