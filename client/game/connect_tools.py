@@ -31,7 +31,7 @@ def generate_binary_message(data: dict) -> bytes:
 	return message_hdr + jsonheader_bytes + content_bytes
 
 def start_connection(request: dict):
-	logger.debug("start_connection( request, request_type )")
+	logger.debug("start_connection( request )")
 	# Accept a connection from a client
 	host = "192.168.1.104"
 	port = 25261

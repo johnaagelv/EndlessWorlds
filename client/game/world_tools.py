@@ -50,7 +50,7 @@ def new_game() -> Registry:
 	world.components[World].maps = [map_template] * len(map_sizes)
 	world.components[World].definitions = map_sizes
 
-	logger.debug(f"{world.components[World].maps[2]}")
+#	logger.debug(f"{world.components[World].maps[2]}")
 
 	player = game[object()]
 	player.components[Position] = Position(result['entry_point'][0], result['entry_point'][1], result['entry_point'][3])

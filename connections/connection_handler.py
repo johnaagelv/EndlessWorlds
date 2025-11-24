@@ -129,7 +129,7 @@ class TConnectionHandler:
 				else:
 					# Extract the request from the content
 					self.message = pickle.loads(data)
-					logger.debug(f"- request is {self.message}")
+#					logger.debug(f"- request is {self.message}")
 				return True
 		return False # Content not received in full yet, stop processing
 

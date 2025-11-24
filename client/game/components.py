@@ -81,7 +81,7 @@ class World:
 	maps: list[dict] = []
 
 	def start_map(self, map_idx: int) -> None:
-		logger.debug("World->start_map( map_idx ) -> None")
+		logger.debug(f"World->start_map( map_idx {map_idx} ) -> None")
 		if not self.maps[map_idx]['loaded']:
 			map_definition: dict = self.definitions[map_idx]
 
@@ -122,6 +122,8 @@ class World:
 
 	def in_gateway(self, x: int, y: int, m: int) -> bool:
 		logger.debug(f"World->in_gateway( x={x}, y={y}, m={m} )")
+		is_gateway = self.maps[m]["tiles"][x, y]["gateway"]
+		logger.debug(f"- is_gateway: {is_gateway}")
 		return self.maps[m]["tiles"][x, y]["gateway"]
 
 	def go_gateway(self, x: int, y: int, m: int, direction = None) -> dict:

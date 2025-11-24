@@ -43,6 +43,7 @@ class InGame(State):
 							# Move to x, y coordinate in map number m
 							player.components[Position] = Position(gateway["gateway"]["x"], gateway["gateway"]["y"], gateway["gateway"]["m"])
 					case "down":
+						print(f"down: {world.components[World].in_gateway(player.components[Position].x, player.components[Position].y, player.components[Position].m)}")
 						if world.components[World].in_gateway(player.components[Position].x, player.components[Position].y, player.components[Position].m):
 							gateway = world.components[World].go_gateway(player.components[Position].x, player.components[Position].y, player.components[Position].m, "down")
 							# Move to x, y coordinate in map number m
