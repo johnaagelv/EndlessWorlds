@@ -18,7 +18,7 @@ def cmd_new(request: dict, world: TWorld) -> dict:
 		response["cid"] = uuid.uuid4()
 		entry_points = world.get_world_entry_points()
 
-		response["entry_point"] = entry_points[random.randint(0,len(entry_points))]
+		response["entry_point"] = entry_points[random.randint(0,len(entry_points)-1)]
 
 	world.actors[response["cid"]] = {
 		"x": int(response["entry_point"][0]),

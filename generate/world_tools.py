@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-import logging
-logger = logging.getLogger("EWGenerate")
-
-from typing import List
 import json
 import pickle
 import random
@@ -15,11 +11,13 @@ import tcod.tileset
 import item_types
 
 import numpy as np
+import logging
+logger = logging.getLogger("EWGenerate")
 
 class TWorld:
-	maps: List = []
+	maps: list = []
 	name: str
-	entry: List
+	entry: list
 
 	def __init__(self, world_name: str) -> None:
 		logger.info(f"TWorld->__init__( world_name='{world_name}' )")
@@ -67,7 +65,7 @@ class TWorld:
 		return True
 
 	def save(self):
-		logger.info(f"TWorld->save()")
+		logger.info("TWorld->save()")
 		with open("worlds/" + self.filename + '.dat', "wb") as f:
 			save_data = {
 				"name": self.name,
@@ -80,7 +78,7 @@ class TWorld:
 		logger.info(f"get_tile_by_name( {name} )")
 		try:
 			tile = tile_types.tiles[name]
-		except:
+		except Exception:
 			logger.warning(
 				f"- tile {name} not found among tile types! Using tile 'blank' instead!"
 			)
@@ -98,7 +96,7 @@ class TWorld:
 		map_visibility = build[5]
 		try:
 			random.seed(build[6])
-		except:
+		except Exception:
 			pass
 
 		map = {
@@ -196,7 +194,7 @@ class TWorld:
 		tile_y = build[2]
 		target_x = build[4]
 		target_y = build[5]
-		target_z = build[6]
+#		target_z = build[6]
 		target_m = build[7]
 		user_action = None
 		target_host: str = ""
@@ -233,18 +231,18 @@ class TWorld:
 		tile_chance2 = 0.5
 		try:
 			map_tile3 = self.get_tile_by_name(build[7])
-		except:
+		except Exception:
 			map_tile3 = self.get_tile_by_name('blank')
 		try:
-			logger.info(f"- parse tile chances from 7")
+			logger.info("- parse tile chances from 7")
 			tile_chance1 = float(int(build[7]) / 100)
 			tile_chance2 = float(int(build[8]) / 100)
-		except:
+		except Exception:
 			try:
-				logger.info(f"- parse tile chances from 8")
+				logger.info("- parse tile chances from 8")
 				tile_chance1 = float(int(build[8]) / 100)
 				tile_chance2 = float(int(build[9]) / 100)
-			except:
+			except Exception:
 				pass
 		logger.info(f"- tile chances {tile_chance1}, {tile_chance2}")
 		x1 = build[1]
@@ -280,7 +278,7 @@ class TWorld:
 		w2 = build[6]
 		try:
 			random.seed(build[8])
-		except:
+		except Exception:
 			pass
 		if abs(x1 - x2) > abs(y1 - y2): # x axis is longest
 			y_step = abs(y1 - y2) / abs(x1 - x2)
@@ -399,7 +397,9 @@ class TWorld:
 		# Creates an item
 		# 1000=item, x, y, item name, count to genrate of this item
 		logger.info(f"gen_item( {build!r} )")
-		count = build[4]
+		count = 1
+		if len(build) > 4:
+			count = build[4]
 		for _ in range(0, count):
 			self.maps[map_idx]["items"].append(
 				{

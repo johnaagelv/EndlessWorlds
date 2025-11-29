@@ -46,7 +46,8 @@ class TWorld:
 				"width": self.get_map_width(map_index),
 				"height": self.get_map_height(map_index),
 				"visible": map["visible"],
-				"fos": fos
+				"fos": fos,
+				"gateways": self.get_map_gateways(map_index)
 			})
 		return map_sizes
 
@@ -87,7 +88,7 @@ class TWorld:
 		logger.debug(f"TWorld->get_map_height({map_index})")
 		return self.maps[map_index]["height"]
 
-	def get_map_gateways(self, map_index: int) -> int:
+	def get_map_gateways(self, map_index: int) -> dict:
 		"""
 		Get map gateways
 		- retrieves and returns the gateways of the specified map

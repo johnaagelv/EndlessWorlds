@@ -42,7 +42,7 @@ class SelectItem(MenuItem):
 
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		""" Handle events selecting this menu item """
-		logger.debug("SelectItem->on_event( event ) -> StateResult")
+#		logger.debug("SelectItem->on_event( event ) -> StateResult")
 		match event:
 			case tcod.event.KeyDown(sym=sym) if sym in {KeySym.RETURN, KeySym.RETURN2, KeySym.KP_ENTER}:
 				return self.callback(self.id)
@@ -54,7 +54,7 @@ class SelectItem(MenuItem):
 
 	def on_draw(self, console: tcod.console.Console, x: int, y: int, highlight: bool) -> None:
 		""" Render this menu items label """
-		logger.debug("SelectItem->on_draw( console, x, y, highlight ) -> None")
+#		logger.debug("SelectItem->on_draw( console, x, y, highlight ) -> None")
 		console.print(x, y, self.label, fg=(255, 255, 255), bg=(64, 64, 64) if highlight else (0, 0, 0))
 
 @attrs.define()
@@ -70,7 +70,7 @@ class ListMenu(State):
 
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		"""Handle events for menus."""
-		logger.debug("ListMenu->on_event( event ) -> StateResult")
+#		logger.debug("ListMenu->on_event( event ) -> StateResult")
 		match event:
 			case tcod.event.Quit():
 				raise SystemExit
@@ -97,19 +97,19 @@ class ListMenu(State):
 
 	def activate_selected(self, event: tcod.event.Event) -> StateResult:
 		""" Call the selected menu item """
-		logger.debug("ListMenu->activate_selected( event ) -> StateResult")
+#		logger.debug("ListMenu->activate_selected( event ) -> StateResult")
 		if self.selected is not None:
 			return self.items[self.selected].on_event(event)
 		return None
 
 	def on_cancel(self) -> StateResult:
 		""" Handle escape or right click being pressed on the list menu """	
-		logger.debug("ListMenu->on_cancel() -> StateResult")
+#		logger.debug("ListMenu->on_cancel() -> StateResult")
 		return Pop()
 
 	def on_draw(self, console: tcod.console.Console) -> None:
 		""" Render this list menu and its menu items """
-		logger.debug("ListMenu->on_draw( console ) -> None")
+#		logger.debug("ListMenu->on_draw( console ) -> None")
 		client.game.state_tools.draw_previous_state(self, console)
 		for i, item in enumerate(self.items):
 			item.on_draw(console, x=self.x, y=self.y + i, highlight=i == self.selected)

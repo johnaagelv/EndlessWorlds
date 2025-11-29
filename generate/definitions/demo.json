@@ -399,7 +399,7 @@
 			[1, 28, 23, 22, 1, "spaceship deck", true, 1],
 
 			[1, 29, 16, 8, 6, "spaceship deck", true, 1],
-			[1000, 30, 17, "food dispenserl"],
+			[1000, 30, 17, "food dispenser"],
 			[1000, 30, 21, "backpack dispenser"],
 			[8, 30, 15, "spaceship cabin door", ["open", "close"]],
 

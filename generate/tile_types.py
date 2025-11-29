@@ -82,21 +82,21 @@ tiles["stairway_down"] = new_tile(
 	transparent=True,
 	dark=(62, (192, 192, 192), (0, 0, 0)),
 	light=(62, (255, 255, 255), (0, 0, 0)),
-	gateway=False,
+	gateway=True,
 )
 tiles["stairway_up"] = new_tile(
 	walkable=True,
 	transparent=True,
 	dark=(60, (192, 192, 192), (0, 0, 0)),
 	light=(60, (255, 255, 255), (0, 0, 0)),
-	gateway=False,
+	gateway=True,
 )
 tiles["stairway"] = new_tile(
 	walkable=True,
 	transparent=True,
 	dark=(ord('X'), (192, 192, 192), (0, 0, 0)),
 	light=(ord('X'), (255, 255, 255), (0, 0, 0)),
-	gateway=False,
+	gateway=True,
 )
 tiles["grass1"] = new_tile(
 	walkable=True,
@@ -201,7 +201,7 @@ tiles["spaceship stairs"] = new_tile(
 	transparent=True,
 	dark=(88, colour.darkgray, colour.spaceship_deck),
 	light=(88, colour.darkgray, colour.spaceship_deck),
-	gateway=False,
+	gateway=True,
 )
 tiles["popsicle"] = new_tile(
 	walkable=False,
