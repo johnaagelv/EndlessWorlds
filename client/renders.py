@@ -7,7 +7,7 @@ import numpy as np
 import tile_types
 from entities import TActor
 from message_logs import TLogMessage
-import ui.colours as colours
+import client.ui.colours as colours
 logger = logging.getLogger("EWClient")
 
 class TRender:

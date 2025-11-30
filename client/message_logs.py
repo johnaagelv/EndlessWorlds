@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import List, Tuple, Reversible
 import textwrap
 import tcod.console
-import ui.colours as colours
+import client.ui.colours as colours
 
 class TLogMessage:
 	def __init__(self, text: str, fg: Tuple[int, int, int]):

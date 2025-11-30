@@ -3,7 +3,6 @@ from __future__ import annotations
 import numpy as np
 
 from random import Random
-#import tcod.console
 from tcod.ecs import Registry
 import client.tile_types as tile_types
 import client.g as g
@@ -13,11 +12,9 @@ from client.game.tags import IsActor, IsPlayer, IsState, IsWorld
 import client.game.connect_tools
 
 import client.configuration as config
-import logging
-logger = logging.getLogger(config.LOG_NAME_CLIENT)
+import client.ui.configuration as ui
 
 def new_game() -> Registry:
-#	logger.debug("new_world() -> Registry")
 	game = Registry()
 
 	rng = game[object()].components[Random] = Random()  # noqa: F841
@@ -39,7 +36,6 @@ def new_game() -> Registry:
 		"gateways": list
 	}
 	map_template["loaded"] = False
-#	logger.debug(f"- map sizes = {len(map_sizes)}")
 
 	world = game[object()]
 	world.components[World] = World()
@@ -64,13 +60,10 @@ def new_game() -> Registry:
 	return game
 
 def start_map(map_idx: int) -> None:
-#	logger.debug(f"start_map( map_idx {map_idx} ) -> None")
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
-#	logger.debug(f"- map {map_idx} keys: {maps.maps[map_idx].keys()}")
 	if not maps.maps[map_idx]['loaded']:
 		definition = maps.defs[map_idx]
-#		logger.debug(f"- def: {definition}")
 		map_width = int(definition["width"])
 		map_height = int(definition["height"])
 		map_visible = definition["visible"]
@@ -93,14 +86,11 @@ def start_map(map_idx: int) -> None:
 			maps.maps[map_idx]["tiles"][0:map_width, 0:map_height] = view
 
 def in_gateway(x: int, y: int, map_idx: int) -> bool:
-#	logger.debug(f"in_gateway( x={x}, y={y}, m={map_idx} )")
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
-#	logger.debug(f"- tile({x},{y}): {maps.maps[map_idx]['tiles'][x, y]}")
 	return maps.maps[map_idx]["tiles"][x, y]["gateway"]
 
 def go_gateway(x: int, y: int, map_idx: int, direction = None) -> dict:
-#	logger.debug(f"go_gateway( x={x}, y={y}, m={map_idx}, direction={direction} )")
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
 	gateway_fallback = {
@@ -122,8 +112,8 @@ def get_view_port(pos: Position) -> tuple:
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
 
-	view_width = config.VIEW_PORT_WIDTH
-	view_height = config.VIEW_PORT_HEIGHT
+	view_width = ui.VIEW_PORT_WIDTH
+	view_height = ui.VIEW_PORT_HEIGHT
 
 	width = maps.maps[pos.m]["width"]
 	height = maps.maps[pos.m]["height"]

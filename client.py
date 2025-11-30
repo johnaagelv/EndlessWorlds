@@ -4,7 +4,6 @@ from __future__ import annotations
 import tcod.console
 import tcod.context
 import tcod.tileset
-from tcod.ecs import Registry
 
 import client.g as g
 import client.game.states
@@ -25,10 +24,6 @@ def main(log_level: int) -> None:
 	)
 	tcod.tileset.procedural_block_elements(tileset=tileset)
 
-	# Activate the global console
-	g.console = tcod.console.Console(config.CONSOLE_WIDTH, config.CONSOLE_HEIGHT, order="F")
-	# Initialize the registry
-	g.game = Registry()
 	# Activate the global state stack
 	g.states = [client.game.states.MainMenu()]
 

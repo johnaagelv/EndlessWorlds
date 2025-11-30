@@ -6,13 +6,8 @@ import tcod.event
 
 from client.game.state import Push, Pop, Reset, State, StateResult
 
-import client.configuration as config
-import logging
-logger = logging.getLogger(config.LOG_NAME_CLIENT)
-
 def main_draw() -> None:
 	""" Main draw of the active game state (last in g.states stack) """
-#	logger.debug("main_draw() -> None")
 	if not g.states:
 		return
 	g.console.clear()
@@ -21,7 +16,6 @@ def main_draw() -> None:
 
 def apply_state_result(result: StateResult) -> None:
 	""" Apply a StateResult to the g.states stack """
-#	logger.debug("apply_state_result( result ) -> None")
 	match result:
 		case Push(state=state):
 			# Switch to a new game state
@@ -42,7 +36,6 @@ def apply_state_result(result: StateResult) -> None:
 
 def main_loop() -> None:
 	""" Run the active game state forever """
-#	logger.debug("main_loop() -> None")
 	while g.states:
 		main_draw()
 		for event in tcod.event.wait():

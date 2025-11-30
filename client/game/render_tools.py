@@ -7,14 +7,11 @@ import tcod.console
 from client.game.components import Graphic, Maps, Position, state_name, state_value, state_max
 from client.game.tags import IsActor, IsState, IsWorld
 import client.tile_types as tile_types
-import ui.colours as colours
-import client.configuration as config
-import logging
-logger = logging.getLogger(config.LOG_NAME_CLIENT)
+import client.ui.colours as colours
+import client.ui.configuration as config
 
 def player_states(player: Entity, console: tcod.console.Console) -> None:
 	""" Render all the player states such as health, energy, ... """
-#	logger.debug("player_states( player, console ) -> None")
 	view_x = config.STATE_PORT_X
 	view_y = config.STATE_PORT_Y
 	view_width = config.STATE_PORT_WIDTH
@@ -53,7 +50,6 @@ def player_states(player: Entity, console: tcod.console.Console) -> None:
 
 def world_map(map_idx, console: tcod.console.Console, view_port: tuple) -> None:
 	""" Render the world map in the view port and render the name of the map """
-#	logger.debug(f"world_map( map_idx {map_idx}, console )")
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
 
@@ -73,7 +69,6 @@ def world_map(map_idx, console: tcod.console.Console, view_port: tuple) -> None:
 
 
 def entities(map_idx: int, console: tcod.console.Console, view_port: tuple) -> None:
-	logger.debug(f"entities( map_idx {map_idx}, console )")
 	view_x1, view_x2, view_y1, view_y2 = view_port
 	# Render all entities with a position and a face/presentation
 	for entity in g.game.Q.all_of(tags=[IsActor],components=[Position, Graphic]):
