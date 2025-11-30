@@ -3,12 +3,12 @@ from __future__ import annotations
 import numpy as np
 
 from random import Random
-import tcod.console
+#import tcod.console
 from tcod.ecs import Registry
 import client.tile_types as tile_types
 import client.g as g
-from client.game.components import Energy, Graphic, Health, IsPlaying, Maps, Position, World, Vision
-from client.game.tags import IsActor, IsPlayer, IsWorld
+from client.game.components import Graphic, IsPlaying, Maps, Position, World, Vision, state_name, state_value, state_max, state_usage
+from client.game.tags import IsActor, IsPlayer, IsState, IsWorld
 
 import client.game.connect_tools
 
@@ -49,11 +49,17 @@ def new_game() -> Registry:
 	player = game[object()]
 	player.components[Position] = Position(result['entry_point'][0], result['entry_point'][1], result['entry_point'][3])
 	player.components[Graphic] = Graphic(ord("@"))
-	player.components[Health] = 500
-	player.components[Energy] = 500
 	player.components[IsPlaying] = True
 	player.tags |= {IsPlayer, IsActor}
 	player.components[Vision] = 4
+
+	for player_state in config.PLAYER_STATES:
+		state = game[object()]
+		state.components[state_name] = player_state[0]
+		state.components[state_value] = player_state[1]
+		state.components[state_max] = player_state[2]
+		state.components[state_usage] = player_state[3]
+		state.tags |= {IsState}
 
 	return game
 
