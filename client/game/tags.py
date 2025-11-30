@@ -13,3 +13,12 @@ IsItem: Final = "IsItem"
 
 IsWorld: Final = "IsWorld"
 """ Entity is a world """
+
+IsState: Final = "IsState"
+"""
+Entity is a state with:
+- name
+- value
+- max
+- usage
+"""
