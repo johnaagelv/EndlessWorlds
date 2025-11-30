@@ -26,7 +26,6 @@ class InGame(State):
 
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		""" Handle events for the in-game state """
-#		logger.debug(f"InGame->on_event( {event!r} ) -> StateResult")
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
 		match event:
 		
@@ -61,7 +60,6 @@ class InGame(State):
 
 	def on_draw(self, console: tcod.console.Console) -> None:
 		""" Draw the stancard screen """
-#		logger.debug('InGame->on_draw( console ) -> None')
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
 		pos = player.components[Position]
 
@@ -87,7 +85,6 @@ class InGame(State):
 
 	def on_connect(self) -> None:
 		""" Connect to the server for information"""
-#		logger.debug("InGame->on_connect")
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
 		pos = player.components[Position]
 		(world,) = g.game.Q.all_of(tags=[IsWorld])
@@ -102,7 +99,6 @@ class InGame(State):
 			"r": player.components[Vision]
 		}
 		result = client.game.connect_tools.query_server(fos_request)
-#		logger.debug(f"- FOS result: {result.keys()}")
 		temp = np.array(result['view'])
 		maps.maps[pos.m]["tiles"][result["x_min"]:result["x_max"],result["y_min"]:result["y_max"]] = temp
 		world.components[Maps] = Maps(maps.maps, maps.defs)
@@ -114,7 +110,6 @@ class MainMenu(client.game.menus.ListMenu):
 
 	def __init__(self) -> None:
 		""" Initialize the main menu """
-#		logger.debug('MainMenu->__init__() -> None')
 		items = [
 			client.game.menus.SelectItem("New game", self.new_game, 100),
 		]
@@ -135,13 +130,11 @@ class MainMenu(client.game.menus.ListMenu):
 	@staticmethod
 	def continue_(id: int) -> StateResult:
 		""" Return to the game """
-#		logger.debug('MainMenu->continue_( id ) -> None')
 		return Reset(InGame())
 	
 	@staticmethod
 	def new_game(id: int) -> StateResult:
 		""" Begin a new game """
-#		logger.debug('MainMenu->new_game( id ) -> None')
 		g.game = world_tools.new_game()
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
 		world_tools.start_map( player.components[Position].m )
@@ -150,14 +143,12 @@ class MainMenu(client.game.menus.ListMenu):
 	@staticmethod
 	def quit(id: int) -> StateResult:
 		""" Close the program """
-#		logger.debug('MainMenu->quit( id ) -> StateResult')
 		raise SystemExit
 
 @attrs.define()
 class Pickup(State):
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		""" Handle events for picking up items from player location """
-#		logger.debug('Pickup->on_event( event ) -> StateResult')
 		return Pop()
 	
 	def on_draw(self, console: tcod.console.Console) -> None:
@@ -168,7 +159,6 @@ class Pickup(State):
 class Drop(State):
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		""" Handle events for dropping items from the inventory """
-#		logger.debug("Drop->on_event( event ) -> StateResult")
 		return Pop()
 	
 	def on_draw(self, console: tcod.console.Console) -> None:

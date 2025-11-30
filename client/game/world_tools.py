@@ -60,6 +60,7 @@ def new_game() -> Registry:
 	return game
 
 def start_map(map_idx: int) -> None:
+	""" Start a map from the definition when it hasnt been loaded fully yet """
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
 	if not maps.maps[map_idx]['loaded']:
@@ -86,11 +87,13 @@ def start_map(map_idx: int) -> None:
 			maps.maps[map_idx]["tiles"][0:map_width, 0:map_height] = view
 
 def in_gateway(x: int, y: int, map_idx: int) -> bool:
+	""" Return true when the location has a gateway """
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
 	return maps.maps[map_idx]["tiles"][x, y]["gateway"]
 
 def go_gateway(x: int, y: int, map_idx: int, direction = None) -> dict:
+	""" Return the gateway at the current location """
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
 	gateway_fallback = {
