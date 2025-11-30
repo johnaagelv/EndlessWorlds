@@ -51,15 +51,21 @@ def on_position_changed(entity: Entity, old: Position | None, new: Position | No
 
 @attrs.define(frozen=True)
 class Graphic:
-	""" An entities face and colour """
+	""" An entity face and colour """
 	face: int = ord("!")
 	colour: tuple[int, int, int] = (255, 255, 255)
 
-Health: Final = ("Health", int)
-""" Amount of health """
-
-Energy: Final = ("Energy", int)
-""" Amount of energy """
+state_name: Final = ("Name", str)
+state_value: Final = ("Value", int)
+state_max: Final = ("Max", int)
+state_usage: Final = ("Usage", int)
+"""
+Player states, such as Energy, Health, etc are implemented as:
+- state_name, the name of this state
+- state_value, the current value of this state
+- state_max, max value of this state
+- state_usage, how much usage per tick
+"""
 
 IsPlaying: Final = ("IsPlaying", bool)
 """ Playing indicator """
