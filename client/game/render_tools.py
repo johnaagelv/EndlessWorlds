@@ -4,22 +4,56 @@ import numpy as np
 from tcod.ecs import Entity
 import client.g as g
 import tcod.console
-from client.game.components import Energy, Graphic, Health, IsPlaying, Maps, Position, World, Vision
-from client.game.tags import IsActor, IsPlayer, IsWorld
+from client.game.components import Graphic, Maps, Position, state_name, state_value, state_max
+from client.game.tags import IsActor, IsState, IsWorld
 import client.tile_types as tile_types
+import ui.colours as colours
 import client.configuration as config
 import logging
 logger = logging.getLogger(config.LOG_NAME_CLIENT)
 
 def player_states(player: Entity, console: tcod.console.Console) -> None:
-	health = player.components[Health]
-	energy = player.components[Energy]
-	x, y = 61, 1
-	console.print(x=x, y=y, text=f"Health {health}", fg=(255, 255, 255), bg=(0, 0, 0))
-	console.print(x=x, y=y+1, text=f"Energy {energy}", fg=(255, 255, 255), bg=(0, 0, 0))
+	""" Render all the player states such as health, energy, ... """
+#	logger.debug("player_states( player, console ) -> None")
+	view_x = config.STATE_PORT_X
+	view_y = config.STATE_PORT_Y
+	view_width = config.STATE_PORT_WIDTH
+	for player_state in g.game.Q.all_of(tags=[IsState]):
+		current_value = int(player_state.components[state_value] / 1000)
+		max_value = int(player_state.components[state_max] / 1000)
+		bar_width = int(float(player_state.components[state_value]) / player_state.components[state_max] * view_width)
+		bar_level = float(current_value / max_value)
+		bar_filled = colours.bar_low
+		if bar_level > 0.3:
+			bar_filled = colours.bar_high
+		elif bar_level > 0.2:
+			bar_filled = colours.bar_medium
+		
+		console.draw_rect(
+			x = view_x,
+			y = view_y,
+			width = view_width,
+			height = 1,
+			ch = 1,
+			bg = colours.bar_empty
+		)
+		if bar_width > 0:
+			console.draw_rect(
+				x = view_x,
+				y = view_y,
+				width = bar_width,
+				height = 1,
+				ch = 1,
+				bg = bar_filled
+			)
+		console.print(view_x, view_y, text=f"{player_state.components[state_name]}", fg=colours.bar_text)
+		state_x = view_width - 2 - (current_value > 9) - (current_value > 99) - (current_value > 999)
+		console.print(view_x + state_x, view_y, text=f"{current_value}", fg=colours.bar_text)
+		view_y += 1
 
 def world_map(map_idx, console: tcod.console.Console, view_port: tuple) -> None:
-#	logger.debug(f"World->render( map_idx {map_idx}, console )")
+	""" Render the world map in the view port and render the name of the map """
+#	logger.debug(f"world_map( map_idx {map_idx}, console )")
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
 
@@ -28,16 +62,18 @@ def world_map(map_idx, console: tcod.console.Console, view_port: tuple) -> None:
 	light_tiles = maps.maps[map_idx]['tiles']['light']
 	dark_tiles = maps.maps[map_idx]['tiles']['dark']
 
+	# Transfer the tiles within the view port to the console
 	view_x1, view_x2, view_y1, view_y2 = view_port
-
 	console.rgb[0:config.VIEW_PORT_WIDTH, 0:config.VIEW_PORT_HEIGHT] = np.select(
 		condlist=[visible_tiles[view_x1:view_x2, view_y1:view_y2], explored_tiles[view_x1:view_x2, view_y1:view_y2]],
 		choicelist=[light_tiles[view_x1:view_x2, view_y1:view_y2], dark_tiles[view_x1:view_x2, view_y1:view_y2]],
 		default=tile_types.SHROUD
 	)
+	console.print(x=config.WORLD_PORT_X, y=config.WORLD_PORT_Y, text=f"{maps.maps[map_idx]['name']}", fg=colours.bar_text)
+
 
 def entities(map_idx: int, console: tcod.console.Console, view_port: tuple) -> None:
-	logger.debug(f"World->render( map_idx {map_idx}, console )")
+	logger.debug(f"entities( map_idx {map_idx}, console )")
 	view_x1, view_x2, view_y1, view_y2 = view_port
 	# Render all entities with a position and a face/presentation
 	for entity in g.game.Q.all_of(tags=[IsActor],components=[Position, Graphic]):
