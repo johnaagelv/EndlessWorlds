@@ -3,7 +3,7 @@ from pathlib import Path
 from logging import DEBUG, INFO, WARNING, FATAL, ERROR  # noqa: F401
 
 """ Client configuration """
-GAME_TILESET_FILENAME = Path("client/data/redjack17.png") #Path("client/data/Alloy_curses_12x12.png")
+GAME_TILESET_FILENAME = Path("client/ui/redjack17.png") #Path("client/data/Alloy_curses_12x12.png")
 LOG_NAME_CLIENT = "EWclient"
 LOG_FILENAME_CLIENT = Path("EWclient.log")
 LOG_LEVEL_CLIENT = INFO
