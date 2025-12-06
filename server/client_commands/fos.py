@@ -13,4 +13,5 @@ def cmd_fos(request: dict, world: TWorld) -> dict:
 	response = world.get_map_field_of_sense(request['m'], request['x'], request['y'], request['r'])
 	response["cid"] = request["cid"]
 	response["cmd"] = request["cmd"]
+	response["face"] = request["face"]
 	return response
