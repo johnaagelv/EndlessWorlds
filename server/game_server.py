@@ -45,7 +45,7 @@ def accept_wrapper(event_socket: socket.socket):
 	- establish a connection handler for the connection
 	- register the connection and the connection handler with the server selector
 	"""
-	logger.info("accept_wrapper( event_socket )")
+#	logger.info("accept_wrapper( event_socket )")
 	# Passively accepts the TCP client connection
 	client_connection, client_address = event_socket.accept()
 	logger.debug(f"- client {client_address}")
@@ -60,7 +60,7 @@ def run(world: TWorld):
 	"""
 	Run the game server with the specified world
 	"""
-	logger.info("run( world )")
+#	logger.info("run( world )")
 	# Get any events received by the game server
 	events = server_selector.select(timeout=None)
 	for key, mask in events:
@@ -97,5 +97,5 @@ def run(world: TWorld):
 				client_communicator.close()
 
 def close():
-	logger.debug("server->close()")
+#	logger.debug("server->close()")
 	server_selector.close()
