@@ -51,7 +51,7 @@ def new_game() -> Registry:
 	player.components[Graphic] = Graphic(face)
 	player.components[IsPlaying] = True
 	player.tags |= {IsPlayer, IsActor}
-	player.components[Vision] = 4
+	player.components[Vision] = 8
 	player.components[actor_cid] = result["cid"]
 
 	for player_state in config.PLAYER_STATES:
