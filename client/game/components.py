@@ -67,6 +67,8 @@ Player states, such as Energy, Health, etc are implemented as:
 - state_usage, how much usage per tick
 """
 
+actor_cid: Final = ("cid", str)
+
 IsPlaying: Final = ("IsPlaying", bool)
 """ Playing indicator """
 

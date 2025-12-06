@@ -4,8 +4,8 @@ import numpy as np
 from tcod.ecs import Entity
 import client.g as g
 import tcod.console
-from client.game.components import Graphic, Maps, Position, state_name, state_value, state_max
-from client.game.tags import IsActor, IsState, IsWorld
+from client.game.components import actor_cid, Graphic, Maps, Position, state_name, state_value, state_max
+from client.game.tags import IsPlayer, IsState, IsWorld
 import client.tile_types as tile_types
 import client.ui.colours as colours
 import client.ui.configuration as config
@@ -71,14 +71,16 @@ def world_map(map_idx, console: tcod.console.Console, view_port: tuple) -> None:
 def entities(map_idx: int, console: tcod.console.Console, view_port: tuple) -> None:
 	view_x1, view_x2, view_y1, view_y2 = view_port
 	# Render all entities with a position and a face/presentation
-	for entity in g.game.Q.all_of(tags=[IsActor],components=[Position, Graphic]):
-		pos = entity.components[Position]
-		if not (view_x1 <= pos.x < view_x2 and view_y1 <= pos.y < view_y2):
-			continue
-		graphic = entity.components[Graphic]
-		x = pos.x - view_x1, 
-		y = pos.y - view_y1,
-		console.rgb[["ch", "fg"]][x, y] = graphic.face, graphic.colour
+	(player,) = g.game.Q.all_of(tags=[IsPlayer])
+	cid = player.components[actor_cid]
+	(world,) = g.game.Q.all_of(tags=[IsWorld])
+	maps = world.components[Maps]
+	for actor in maps.maps[map_idx]["actors"]:
+		if actor["cid"] != cid:
+			x = actor["x"] - view_x1
+			y = actor["y"] - view_y1
+			console.rgb[["ch", "fg"]][x, y] = ord("@"), (255, 255, 255)
+
 
 def player(player: Entity, console: tcod.console.Console, view_port: tuple) -> None:
 	# Render player entity as the last to ensure it is in front

@@ -6,7 +6,7 @@ from random import Random
 from tcod.ecs import Registry
 import client.tile_types as tile_types
 import client.g as g
-from client.game.components import Graphic, IsPlaying, Maps, Position, World, Vision, state_name, state_value, state_max, state_usage
+from client.game.components import actor_cid, Graphic, IsPlaying, Maps, Position, World, Vision, state_name, state_value, state_max, state_usage
 from client.game.tags import IsActor, IsPlayer, IsState, IsWorld
 
 import client.game.connect_tools
@@ -33,7 +33,8 @@ def new_game() -> Registry:
 		"tiles": np.ndarray,
 		"visible": np.ndarray,
 		"explored": np.ndarray,
-		"gateways": list
+		"gateways": list,
+		"actors": list,
 	}
 	map_template["loaded"] = False
 
@@ -48,6 +49,7 @@ def new_game() -> Registry:
 	player.components[IsPlaying] = True
 	player.tags |= {IsPlayer, IsActor}
 	player.components[Vision] = 4
+	player.components[actor_cid] = result["cid"]
 
 	for player_state in config.PLAYER_STATES:
 		state = game[object()]
