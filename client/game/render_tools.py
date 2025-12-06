@@ -79,7 +79,7 @@ def entities(map_idx: int, console: tcod.console.Console, view_port: tuple) -> N
 		if actor["cid"] != cid:
 			x = actor["x"] - view_x1
 			y = actor["y"] - view_y1
-			console.rgb[["ch", "fg"]][x, y] = ord("@"), (255, 255, 255)
+			console.rgb[["ch", "fg"]][x, y] = actor['face'], (255, 255, 255)
 
 
 def player(player: Entity, console: tcod.console.Console, view_port: tuple) -> None:
