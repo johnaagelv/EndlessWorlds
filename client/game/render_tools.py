@@ -77,9 +77,10 @@ def entities(map_idx: int, console: tcod.console.Console, view_port: tuple) -> N
 	maps = world.components[Maps]
 	for actor in maps.maps[map_idx]["actors"]:
 		if actor["cid"] != cid:
-			x = actor["x"] - view_x1
-			y = actor["y"] - view_y1
-			console.rgb[["ch", "fg"]][x, y] = actor['face'], (255, 255, 255)
+			if maps.maps[map_idx]["visible"][actor["x"],actor["y"]]:
+				x = actor["x"] - view_x1
+				y = actor["y"] - view_y1
+				console.rgb[["ch", "fg"]][x, y] = actor['face'], (255, 255, 255)
 
 
 def player(player: Entity, console: tcod.console.Console, view_port: tuple) -> None:
