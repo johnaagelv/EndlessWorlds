@@ -16,6 +16,7 @@ import client.ui.configuration as ui
 
 def new_game() -> Registry:
 	game = Registry()
+	faces = [64, 9786, 9787]
 
 	rng = game[object()].components[Random] = Random()  # noqa: F841
 
@@ -45,7 +46,7 @@ def new_game() -> Registry:
 
 	player = game[object()]
 	player.components[Position] = Position(result['entry_point'][0], result['entry_point'][1], result['entry_point'][3])
-	player.components[Graphic] = Graphic(ord("@"))
+	player.components[Graphic] = Graphic(faces[rng.randint(0,2)])
 	player.components[IsPlaying] = True
 	player.tags |= {IsPlayer, IsActor}
 	player.components[Vision] = 4
