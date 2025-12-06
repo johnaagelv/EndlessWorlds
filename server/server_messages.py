@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-import uuid
 import selectors
 import json
 import io
@@ -9,15 +7,14 @@ import struct
 import sys
 import socket
 import pickle
-import logging
-import random
-logger = logging.getLogger("EWlogger")
 
-from worlds import TWorld
+from worlds.world import TWorld
+
+import logging
+logger = logging.getLogger("EWlogger")
 
 class TMessage:
 	def __init__(self, selector, sock, addr, world: TWorld):
-		logger.debug(f"TMessage->__init__( selector, sock, addr, world )")
 		self.selector: selectors.DefaultSelector = selector
 		self.sock: socket.socket = sock
 		self.addr = addr
@@ -32,7 +29,6 @@ class TMessage:
 
 	""" Switch to the specified mode """
 	def _set_selector_events_mask(self, mode):
-		logger.debug("TMessage->_set_selector_events_mask( mode )")
 		if mode == "r":
 			events = selectors.EVENT_READ
 		elif mode == "w":
@@ -45,7 +41,6 @@ class TMessage:
 
 	""" Read bytes from the connection into the receive buffer """
 	def _read(self):
-		logger.debug("TMessage->_read()")
 		try:
 			data = self.sock.recv(4096)
 		except BlockingIOError:
@@ -59,7 +54,6 @@ class TMessage:
 
 	""" Write bytes to the connection from the send buffer """
 	def _write(self) -> bool:
-		logger.debug("TMessage->_write()")
 		if self._send_buffer:
 			try:
 				sent = self.sock.send(self._send_buffer)
@@ -75,12 +69,10 @@ class TMessage:
 
 	""" Transform data into JSON using the specified encoding """
 	def _json_encode(self, data, encoding):
-		logger.debug("TMessage->_json_encode( data, encoding )")
 		return json.dumps(data, ensure_ascii=False).encode(encoding)
 
 	""" Transform JSON into data using the specified encoding """
 	def _json_decode(self, json_bytes, encoding):
-		logger.debug("TMessage->_json_decode( json_bytes, encoding )")
 		tiow = io.TextIOWrapper(
 			io.BytesIO(json_bytes), encoding=encoding, newline=""
 		)
@@ -90,7 +82,6 @@ class TMessage:
 
 	""" Construct a message from the specified data elements """
 	def _create_message(self, *, content_bytes, content_type, content_encoding):
-		logger.debug("TMessage->_create_message( *, content_bytes, content_type, content_encoding )")
 		jsonheader = {
 			"byteorder": sys.byteorder,
 			"content-type": content_type,
@@ -104,7 +95,6 @@ class TMessage:
 
 	""" Construct response content """
 	def _create_response_json_content(self):
-		logger.debug("TMessage->_create_response_json_content()")
 		content_encoding = "utf-8"
 		response = {
 			"content_bytes": self._json_encode(self.request, content_encoding),
@@ -114,7 +104,6 @@ class TMessage:
 		return response
 
 	def _create_response_binary_content(self):
-		logger.debug("TMessage->_create_response_binary_content()")
 		response = {
 			"content_bytes": pickle.dumps(self.request),
 			"content_type": "binary/custom-server-binary-type",
@@ -124,7 +113,6 @@ class TMessage:
 
 	""" Dispatch the message event """
 	def dispatch(self, mask) -> bool:
-		logger.debug("TMessage->dispatch( mask )")
 		if mask & selectors.EVENT_READ:
 			return self.read()
 		if mask & selectors.EVENT_WRITE:
@@ -136,7 +124,6 @@ class TMessage:
 	The message is read in several parts - the protoheader, the jsonheader, and the content
 	"""
 	def read(self) -> bool:
-		logger.debug("TMessage->read()")
 		self._read()
 
 		if self._jsonheader_len is None:
@@ -153,14 +140,12 @@ class TMessage:
 
 	""" Write a message to the client till the full message has been sent """
 	def write(self) -> bool:
-		logger.debug("TMessage->write()")
 		if self.request:
 			if not self.response_created:
 				self.create_response()
 		return self._write()
 
 	def close(self):
-		logger.debug("TMessage->close()")
 		try:
 			self.selector.unregister(self.sock)
 		except Exception as e:
@@ -178,7 +163,6 @@ class TMessage:
 			del(self.sock)
 
 	def process_protoheader(self):
-		logger.debug("TMessage->process_protoheader()")
 		hdrlen = 2
 		if len(self._recv_buffer) < hdrlen:
 			return None # Protoheader not received in full yet, stop processing
@@ -188,7 +172,6 @@ class TMessage:
 		self._recv_buffer = self._recv_buffer[hdrlen:]
 
 	def process_jsonheader(self):
-		logger.debug("TMessage->process_jsonheader()")
 		hdrlen = self._jsonheader_len
 		if len(self._recv_buffer) < hdrlen:
 			return None # Header not received in full yet, stop processing
@@ -201,7 +184,6 @@ class TMessage:
 				logger.warning(f"Missing required header '{reqhdr}'.")
 
 	def process_request(self) -> bool:
-		logger.debug("TMessage->process_request()")
 		content_len = self.jsonheader["content-length"]
 		if len(self._recv_buffer) < content_len:
 			return False # Content not received in full yet, stop processing
@@ -220,30 +202,7 @@ class TMessage:
 			request = pickle.loads(data)
 		return True
 
-		request_cmd = request.get("cmd")
-		if request_cmd == "new":
-			# Gather the NEW GAME information and return it
-			cid = f"CID#{uuid.uuid4()}"
-#			self.world.add_actor(cid, self.addr)
-
-			self.request = {
-				"cmd": request_cmd,
-				"cid": cid,
-				"name": self.world.name,
-				"entry_point": self.world.entry_point(), # One entry point of the world
-				"map_sizes" : self.world.map_definitions(), # All map sizes to ensure the client is prepared
-			}
-		elif request_cmd == "fos":
-			# Gather the FOS view and return it
-			self.request = {
-				"cmd": request_cmd,
-				"fos": self.world.field_of_sense(fos_request=request),
-			}
-		# Set selector to listen for write events, we're done reading.
-		self._set_selector_events_mask("w")
-
 	def create_response(self):
-		logger.debug("TMessage->create_response()")
 
 		if self.jsonheader["content-type"] == "text/json":
 			response = self._create_response_json_content()
