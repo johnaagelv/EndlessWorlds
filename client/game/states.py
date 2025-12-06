@@ -9,7 +9,7 @@ from tcod.event import KeySym, Modifier
 import client.g as g
 from client.constants import DIRECTION_KEYS, ACTION_KEYS, STAIR_KEYS
 from client.game.state import Pop, Push, Reset, State, StateResult
-from client.game.components import actor_cid, Maps, Position, Vision
+from client.game.components import actor_cid, Graphic, Maps, Position, Vision
 from client.game.tags import IsPlayer, IsWorld
 import client.game.world_tools as world_tools
 import client.game.entity_tools as entity_tools
@@ -98,7 +98,8 @@ class InGame(State):
 			"y": pos.y,
 			"z": 0,
 			"m": pos.m,
-			"r": player.components[Vision]
+			"r": player.components[Vision],
+			"face": player.components[Graphic]
 		}
 		result = client.game.connect_tools.query_server(fos_request)
 		temp = np.array(result['view'])
