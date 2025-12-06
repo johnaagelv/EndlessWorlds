@@ -16,13 +16,15 @@ import client.ui.configuration as ui
 
 def new_game() -> Registry:
 	game = Registry()
-	faces = [64, 9786, 9787]
-
 	rng = game[object()].components[Random] = Random()  # noqa: F841
+
+	faces = [64, 9786, 9787]
+	face = faces[rng.randint(0,2)]
 
 	result = client.game.connect_tools.query_server(
 		{
 			"cmd": "new",
+			"face": face,
 		}
 	)
 
@@ -46,7 +48,7 @@ def new_game() -> Registry:
 
 	player = game[object()]
 	player.components[Position] = Position(result['entry_point'][0], result['entry_point'][1], result['entry_point'][3])
-	player.components[Graphic] = Graphic(faces[rng.randint(0,2)])
+	player.components[Graphic] = Graphic(face)
 	player.components[IsPlaying] = True
 	player.tags |= {IsPlayer, IsActor}
 	player.components[Vision] = 4

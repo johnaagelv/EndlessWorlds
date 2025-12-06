@@ -133,7 +133,7 @@ class TWorld:
 		for actor_cid in self.actors:
 			actor = self.actors[actor_cid]
 			if x_min <= actor["x"] <= x_max and y_min <= actor["y"] <= y_max and actor["m"] == map_index:
-				actors.append({"cid": actor_cid, "x": actor['x'], "y": actor['y']})
+				actors.append({"cid": actor_cid, "x": actor['x'], "y": actor['y'], "face": actor["face"]})
 		return actors
 		#return [actor for actor in self.actors if x_min <= actor[0]["x"] <= x_max and y_min <= actor[0]["y"] <= y_max and actor["m"] == map_index]
 

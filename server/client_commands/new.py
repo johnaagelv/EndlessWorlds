@@ -24,7 +24,8 @@ def cmd_new(request: dict, world: TWorld) -> dict:
 		"x": int(response["entry_point"][0]),
 		"y": int(response["entry_point"][1]),
 		"z": int(response["entry_point"][2]),
-		"m": int(response["entry_point"][3])
+		"m": int(response["entry_point"][3]),
+		"face": request["face"],
 	}
 
 	response["name"] = world.name
