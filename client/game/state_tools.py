@@ -38,7 +38,7 @@ def main_loop() -> None:
 	""" Run the active game state forever """
 	while g.states:
 		main_draw()
-		for event in tcod.event.wait(timeout=1.0):
+		for event in tcod.event.wait(timeout=0.25):
 			tile_event = g.context.convert_event(event)
 			if g.states:
 				apply_state_result(g.states[-1].on_event(tile_event))
