@@ -96,7 +96,6 @@ class InGame(State):
 			"cid": cid,
 			"x": pos.x,
 			"y": pos.y,
-			"z": 0,
 			"m": pos.m,
 			"r": player.components[Vision],
 			"face": player.components[Graphic]
