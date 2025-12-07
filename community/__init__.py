@@ -1,0 +1,1 @@
+""" Community package - a full community as NPCs """
