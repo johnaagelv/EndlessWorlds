@@ -9,7 +9,7 @@ from tcod.event import KeySym, Modifier
 import client.g as g
 from client.constants import DIRECTION_KEYS, ACTION_KEYS, STAIR_KEYS
 from client.game.state import Pop, Push, Reset, State, StateResult
-from client.game.components import actor_cid, Graphic, Maps, Position, Vision
+from client.game.components import CID, Graphic, Maps, Position, Vision
 from client.game.tags import IsPlayer, IsWorld
 import client.game.world_tools as world_tools
 import client.game.entity_tools as entity_tools
@@ -87,7 +87,7 @@ class InGame(State):
 		""" Connect to the server for information"""
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
 		pos = player.components[Position]
-		cid = player.components[actor_cid]
+		cid = player.components[CID]
 		(world,) = g.game.Q.all_of(tags=[IsWorld])
 		maps = world.components[Maps]
 

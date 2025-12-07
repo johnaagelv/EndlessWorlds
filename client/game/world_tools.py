@@ -6,7 +6,7 @@ from random import Random
 from tcod.ecs import Registry
 import client.tile_types as tile_types
 import client.g as g
-from client.game.components import actor_cid, Graphic, IsPlaying, Maps, Position, World, Vision, state_name, state_value, state_max, state_usage
+from client.game.components import CID, Graphic, IsPlaying, Maps, Position, World, Vision, StateName, StateValue, StateMax, StateUsage
 from client.game.tags import IsActor, IsPlayer, IsState, IsWorld
 
 import client.game.connect_tools
@@ -52,14 +52,14 @@ def new_game() -> Registry:
 	player.components[IsPlaying] = True
 	player.tags |= {IsPlayer, IsActor}
 	player.components[Vision] = 8
-	player.components[actor_cid] = result["cid"]
+	player.components[CID] = result["cid"]
 
-	for player_state in config.PLAYER_STATES:
+	for actor_state in config.PLAYER_STATES:
 		state = game[object()]
-		state.components[state_name] = player_state[0]
-		state.components[state_value] = player_state[1]
-		state.components[state_max] = player_state[2]
-		state.components[state_usage] = player_state[3]
+		state.components[StateName] = actor_state[0]
+		state.components[StateValue] = actor_state[1]
+		state.components[StateMax] = actor_state[2]
+		state.components[StateUsage] = actor_state[3]
 		state.tags |= {IsState}
 
 	return game
