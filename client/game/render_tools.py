@@ -4,7 +4,7 @@ import numpy as np
 from tcod.ecs import Entity
 import client.g as g
 import tcod.console
-from client.game.components import actor_cid, Graphic, Maps, Position, state_name, state_value, state_max
+from client.game.components import CID, Graphic, Maps, Position, StateName, StateValue, StateMax
 from client.game.tags import IsPlayer, IsState, IsWorld
 import client.tile_types as tile_types
 import client.ui.colours as colours
@@ -16,9 +16,9 @@ def player_states(player: Entity, console: tcod.console.Console) -> None:
 	view_y = config.STATE_PORT_Y
 	view_width = config.STATE_PORT_WIDTH
 	for player_state in g.game.Q.all_of(tags=[IsState]):
-		current_value = int(player_state.components[state_value] / 1000)
-		max_value = int(player_state.components[state_max] / 1000)
-		bar_width = int(float(player_state.components[state_value]) / player_state.components[state_max] * view_width)
+		current_value = int(player_state.components[StateValue] / 1000)
+		max_value = int(player_state.components[StateMax] / 1000)
+		bar_width = int(float(player_state.components[StateValue]) / player_state.components[StateMax] * view_width)
 		bar_level = float(current_value / max_value)
 		bar_filled = colours.bar_low
 		if bar_level > 0.3:
@@ -43,7 +43,7 @@ def player_states(player: Entity, console: tcod.console.Console) -> None:
 				ch = 1,
 				bg = bar_filled
 			)
-		console.print(view_x, view_y, text=f"{player_state.components[state_name]}", fg=colours.bar_text)
+		console.print(view_x, view_y, text=f"{player_state.components[StateName]}", fg=colours.bar_text)
 		state_x = view_width - 2 - (current_value > 9) - (current_value > 99) - (current_value > 999)
 		console.print(view_x + state_x, view_y, text=f"{current_value}", fg=colours.bar_text)
 		view_y += 1
@@ -72,7 +72,7 @@ def entities(map_idx: int, console: tcod.console.Console, view_port: tuple) -> N
 	view_x1, view_x2, view_y1, view_y2 = view_port
 	# Render all entities with a position and a face/presentation
 	(player,) = g.game.Q.all_of(tags=[IsPlayer])
-	cid = player.components[actor_cid]
+	cid = player.components[CID]
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
 	for actor in maps.maps[map_idx]["actors"]:

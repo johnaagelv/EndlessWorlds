@@ -55,10 +55,10 @@ class Graphic:
 	face: int = ord("!")
 	colour: tuple[int, int, int] = (255, 255, 255)
 
-state_name: Final = ("Name", str)
-state_value: Final = ("Value", int)
-state_max: Final = ("Max", int)
-state_usage: Final = ("Usage", int)
+StateName: Final = ("Name", str)
+StateValue: Final = ("Value", int)
+StateMax: Final = ("Max", int)
+StateUsage: Final = ("Usage", int)
 """
 Player states, such as Energy, Health, etc are implemented as:
 - state_name, the name of this state
@@ -67,7 +67,7 @@ Player states, such as Energy, Health, etc are implemented as:
 - state_usage, how much usage per tick
 """
 
-actor_cid: Final = ("cid", str)
+CID: Final = ("cid", str)
 
 IsPlaying: Final = ("IsPlaying", bool)
 """ Playing indicator """
