@@ -54,7 +54,7 @@ def new_game() -> Registry:
 	player.components[Vision] = 8
 	player.components[CID] = result["cid"]
 
-	for actor_state in config.PLAYER_STATES:
+	for actor_state in config.ACTOR_STATES:
 		state = game[object()]
 		state.components[StateName] = actor_state[0]
 		state.components[StateValue] = actor_state[1]

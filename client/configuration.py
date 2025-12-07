@@ -12,14 +12,15 @@ GAME_PORT = 25261
 
 """ Player configuration """
 """
-Player states, where:
+Actor states, where:
 - name, used for presenting
 - value, current value of the state
 - max, maximum value of the state
 - usage, use of the state per tick
 """
-PLAYER_STATES = [
+ACTOR_STATES = [
 	["Health", 500000, 1000000, -1],
+	["Strength", 500000, 1000000, -1],
 	["Energy", 500000, 1000000, -1]
 ]
 
