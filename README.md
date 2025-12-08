@@ -12,4 +12,7 @@ establish a self-sustained base of operation.
 
 Travel time to HR 8799 will take less than one year. On arrival the survey team and cargo will be offloaded in a secluded location, preferably near a sea,
 after which the spaceship will return to Earth.
-# 2. ...
+# 2. Tasks
+- Set up the base
+- Explore the surroundings
+- Investigate food sources
