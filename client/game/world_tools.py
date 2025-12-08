@@ -20,11 +20,13 @@ def new_game() -> Registry:
 
 	faces = [64, 9786, 9787]
 	face = faces[rng.randint(0,2)]
+	skin: tuple = (randint(64, 255), randint(64, 255), randint(64, 255))
 
 	result = client.game.connect_tools.query_server(
 		{
 			"cmd": "new",
-			"face": face,
+			"face": face, # Unicode for the face
+			"skin": skin, # Colour, tuple, for the skin colour
 		}
 	)
 
@@ -48,7 +50,7 @@ def new_game() -> Registry:
 
 	player = game[object()]
 	player.components[Position] = Position(result['entry_point'][0], result['entry_point'][1], result['entry_point'][3])
-	player.components[Graphic] = Graphic(face, (randint(64,255),randint(64,255),randint(64,255)))
+	player.components[Graphic] = Graphic(face, skin)
 	player.components[IsPlaying] = True
 	player.tags |= {IsPlayer, IsActor}
 	player.components[Vision] = 8

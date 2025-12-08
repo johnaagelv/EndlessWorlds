@@ -48,10 +48,12 @@ def new_game(actor_count: int) -> Registry:
 		actor = game[object()]
 		actor.components[Name] = generate_name()
 		face = faces[rng.randint(0,len(faces) - 1)]
+		skin: tuple = (randint(64, 255), randint(64, 255), randint(64, 255))
 		result = community.game.connect_tools.query_server(
 			{
 				"cmd": "new",
 				"face": face,
+				"skin": skin,
 			}
 		)
 		if i == 0:
@@ -73,7 +75,7 @@ def new_game(actor_count: int) -> Registry:
 		
 		actor.components[CID] = result["cid"]
 		actor.components[Position] = Position(result['entry_point'][0], result['entry_point'][1], result['entry_point'][3])
-		actor.components[Graphic] = Graphic(face, (randint(64,255),randint(64,255),randint(64,255)))
+		actor.components[Graphic] = Graphic(face, skin)
 		actor.components[IsPlaying] = True
 		actor.tags |= {IsPlayer, IsActor}
 		actor.components[Vision] = rng.randint(6,16)
