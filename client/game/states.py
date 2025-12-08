@@ -98,7 +98,7 @@ class InGame(State):
 			"y": pos.y,
 			"m": pos.m,
 			"r": player.components[Vision],
-			"face": player.components[Graphic].face
+#			"face": player.components[Graphic].face
 		}
 		result = client.game.connect_tools.query_server(fos_request)
 		temp = np.array(result['view'])
