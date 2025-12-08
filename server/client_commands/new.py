@@ -26,6 +26,7 @@ def cmd_new(request: dict, world: TWorld) -> dict:
 		"z": int(response["entry_point"][2]),
 		"m": int(response["entry_point"][3]),
 		"face": request["face"],
+		"skin": request["skin"], # skin colour of the actor
 	}
 
 	response["name"] = world.name
