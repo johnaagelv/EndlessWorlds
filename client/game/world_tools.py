@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from random import Random
+from random import Random, randint
 from tcod.ecs import Registry
 import client.tile_types as tile_types
 import client.g as g
@@ -48,7 +48,7 @@ def new_game() -> Registry:
 
 	player = game[object()]
 	player.components[Position] = Position(result['entry_point'][0], result['entry_point'][1], result['entry_point'][3])
-	player.components[Graphic] = Graphic(face)
+	player.components[Graphic] = Graphic(face, (randint(64,255),randint(64,255),randint(64,255)))
 	player.components[IsPlaying] = True
 	player.tags |= {IsPlayer, IsActor}
 	player.components[Vision] = 8

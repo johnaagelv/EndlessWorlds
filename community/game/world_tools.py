@@ -73,7 +73,7 @@ def new_game(actor_count: int) -> Registry:
 		
 		actor.components[CID] = result["cid"]
 		actor.components[Position] = Position(result['entry_point'][0], result['entry_point'][1], result['entry_point'][3])
-		actor.components[Graphic] = Graphic(face)
+		actor.components[Graphic] = Graphic(face, (randint(64,255),randint(64,255),randint(64,255)))
 		actor.components[IsPlaying] = True
 		actor.tags |= {IsPlayer, IsActor}
 		actor.components[Vision] = rng.randint(6,16)
