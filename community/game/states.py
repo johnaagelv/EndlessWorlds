@@ -8,7 +8,7 @@ import tcod.event
 
 import community.g as g
 from community.game.state import Pop, Reset, State, StateResult
-from community.game.components import CID, Graphic, Maps, Position, Vision
+from community.game.components import CID, Maps, Position, Vision
 from community.game.tags import IsPlayer, IsWorld
 import community.game.world_tools as world_tools
 import community.game.menus
