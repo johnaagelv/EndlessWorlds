@@ -29,7 +29,7 @@ def get_config(key: str) -> Dict:
 		data = json.load(f)
 	try:
 		value = data[key]
-	except Exception as e:
+	except Exception:
 		logger.warning(f"Configuration key {key!r} not found in file 'server.json'")
 		value: dict = {}
 	return value
