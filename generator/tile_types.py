@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Tuple
 import numpy as np
 
-import colours as colour
+import generator.colours as colour
 
 graphic_dt = np.dtype(
 	[

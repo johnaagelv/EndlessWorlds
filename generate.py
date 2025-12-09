@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 
-import world_tools as world_tools
+import generator.world_tools as world_tools
 
 import logging
 logger = logging.getLogger("EWGenerate")

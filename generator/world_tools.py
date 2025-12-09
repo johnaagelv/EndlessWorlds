@@ -8,7 +8,7 @@ import math
 import tile_types
 import tcod.tileset
 
-import item_types
+import generator.item_types as item_types
 
 import numpy as np
 import logging

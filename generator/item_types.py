@@ -1,5 +1,5 @@
 from __future__ import annotations
-import colours as colour
+import generator.colours as colour
 items: dict = {}
 
 items["food parcel"] = {

@@ -46,10 +46,10 @@ Using the "redjack17.png" tilesheet (16 x 16) with charmap CP437 - which define 
 
 # Items
 Played around with ECS on the client side to identify if and how this could be used on the server side.
-Decision is still unclear!
+The client side can use the ECS, but the server side has no need to be burdened with this additional
+feature.
 
 ## Consumables
-
 - type, "consumable"
 - name, food parcel, food ration, ...
 - position, location on the map/world (x, y, z, m)
@@ -57,7 +57,6 @@ Decision is still unclear!
 - weight, the burden carrying this item
 
 ## Equippables
-
 - type, "equippable"
 - name, boots, gloves, helmet, jacket, trousers, ...
 - position, location on the map/world (x, y, z, m)
@@ -66,7 +65,6 @@ Decision is still unclear!
 - protection, the protection this item provides
 
 ## Weapons
-
 - type, "weapon"
 - name, gun, rifle, shotgun, bow, axe, spear, club, staff, knife, sword, taser, shield, armour, ...
 - position, location on the map/world (x, y, z, m)
@@ -75,23 +73,19 @@ Decision is still unclear!
 - defense, the strength with which this weapon will absorb a hit
 - attack, the strength with which this weapon will apply to an opponent on a 100% hit
 
-## Equipments, handhelds
-
+## Equipments, handheld
 - type, "handheld"
 - name, "drill", "tablet", "scanner", "medkit", "
 - position, location on the map/world (x, y, z, m)
 - weight, the burden carrying this item
 
 ## Equipments, operational
-
 - type, "operational"
 - name, car, plane, bicycle, motorcycle, ...
 - position, location on the map/world (x, y, z, m)
 - energy usage
-- 
 
 ## Equipments, static
-
 - type, "static"
 - name, food dispencer, computer, energy generator, ...
 - position, location on the map/world (x, y, z, m)
