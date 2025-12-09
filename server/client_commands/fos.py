@@ -1,6 +1,6 @@
 from __future__ import annotations
 #from server.worlds import TWorld
-from worlds.world import TWorld
+from server.world import TWorld
 
 def cmd_fos(request: dict, world: TWorld) -> dict:
 	world.actors[request["cid"]] |= request

@@ -6,7 +6,7 @@ import traceback
 
 from connections.connection_handler import TConnectionHandler
 #from server.worlds import TWorld
-from worlds.world import TWorld
+from server.world import TWorld
 
 #from message_packages.packages import message_packager
 import message_tools.tools as message_tools

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from worlds import TWorld
+from server.world import TWorld
 
 def cmd_nop(request: dict, world: TWorld) -> dict:
 	response: dict = {"cmd": "nop"}

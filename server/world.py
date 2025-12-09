@@ -17,7 +17,7 @@ class TWorld:
 	maps: list[dict]
 	entry_points: list
 	actors: dict
-	dummy: list
+	items: list
 
 	def __init__(self, filename: Path):
 		logger.info(f"TWorld->__init__({filename})")
@@ -27,7 +27,7 @@ class TWorld:
 			self.maps = data["maps"]
 			self.entry_points = data["entry"]
 			self.actors = {}
-			self.dummy = []
+			self.items = []
 		logger.debug(self.entry_points)
 
 	def get_world_definition(self) -> list:
@@ -35,7 +35,7 @@ class TWorld:
 		Get world definition
 		- collects and returns the name, size, visibility, and may include the FOS, of all the maps
 		"""
-		logger.debug("TWorld->get_world_definition()")
+		logger.info("TWorld->get_world_definition()")
 		map_sizes: list = []
 		for map_index, map in enumerate(self.maps):
 			fos: dict = {}
@@ -47,7 +47,8 @@ class TWorld:
 				"height": self.get_map_height(map_index),
 				"visible": map["visible"],
 				"fos": fos,
-				"gateways": self.get_map_gateways(map_index)
+				"gateways": self.get_map_gateways(map_index),
+				"items": self.get_map_items(map_index),
 			})
 		return map_sizes
 
@@ -56,7 +57,7 @@ class TWorld:
 		Get world entry points
 		- retrieves and returns the world entry points, where a new player can be located
 		"""
-		logger.debug("TWorld->get_world_entry_points()")
+		logger.info("TWorld->get_world_entry_points()")
 		return self.entry_points
 
 	# NOTE: get_map_by_index is not used!
@@ -95,6 +96,14 @@ class TWorld:
 		"""
 		logger.debug(f"TWorld->get_map_gateways({map_index})")
 		return self.maps[map_index]["gateways"]
+	
+	def get_map_items(self, map_index: int) -> list:
+		"""
+		Get map items
+		- retrieves and returns the items of the specified map
+		"""
+		logger.debug(f"TWorld->get_map_items({map_index})")
+		return self.maps[map_index]['items']
 
 	def get_map_tile_slice(self, map_index: int, x_min: int = 0, x_max: int = 0, y_min: int = 0, y_max: int = 0) -> list:
 		"""
@@ -122,6 +131,14 @@ class TWorld:
 			y_min = max(y - r, 0)
 			y_max = min(y + r + 1, map_height)
 		return x_min, x_max, y_min, y_max
+	
+	def get_items_in_field_of_sense(self, map_index: int, x_min: int, x_max: int, y_min: int, y_max: int) -> list:
+		"""
+		Get items in field of sense (fos)
+		- retrieves and returns a list of the itmes within the specified map slice
+		"""
+		logger.debug("TWorld->get_items_in_field_of_sense(...)")
+		return [item for item in self.maps[map_index]["items"] if x_min <= item["x"] <= x_max and y_min <= item["y"] <= y_max]
 
 	def get_actors_in_field_of_sense(self, map_index: int, x_min: int, x_max: int, y_min: int, y_max: int) -> list:
 		"""
@@ -157,6 +174,7 @@ class TWorld:
 			"view": self.get_map_tile_slice(map_index, x_min, x_max, y_min, y_max),
 			"gateways": self.get_map_gateways(map_index),
 			"actors": self.get_actors_in_field_of_sense(map_index, x_min, x_max, y_min, y_max),
+			"items": self.get_items_in_field_of_sense(map_index, x_min, x_max, y_min, y_max),
 		}
 		return fos
 	

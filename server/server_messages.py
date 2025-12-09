@@ -8,7 +8,7 @@ import sys
 import socket
 import pickle
 
-from worlds.world import TWorld
+from server.world import TWorld
 
 import logging
 logger = logging.getLogger("EWlogger")
@@ -192,14 +192,14 @@ class TMessage:
 		self.request = {
 			"cmd": "nop"
 		}
-		data = self._recv_buffer[:content_len]
+#		data = self._recv_buffer[:content_len]
 		self._recv_buffer = self._recv_buffer[content_len:]
-		if self.jsonheader["content-type"] == "text/json":
-			encoding = self.jsonheader["content-encoding"]
-			request: dict = self._json_decode(data, encoding)
-		else:
+#		if self.jsonheader["content-type"] == "text/json":
+#			encoding = self.jsonheader["content-encoding"]
+#			request: dict = self._json_decode(data, encoding)
+#		else:
 			# Extract the request from the content
-			request = pickle.loads(data)
+#			request = pickle.loads(data)
 		return True
 
 	def create_response(self):

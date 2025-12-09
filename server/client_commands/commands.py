@@ -5,7 +5,7 @@ from collections.abc import Callable
 import server.client_commands.new as new
 import server.client_commands.fos as fos
 
-from worlds.world import TWorld
+from server.world import TWorld
 
 # Define the command handler interface
 type commandFn = Callable[[dict, TWorld], dict]

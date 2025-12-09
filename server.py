@@ -7,7 +7,7 @@ from pathlib import Path
 
 import server.game_server as server
 #from server.worlds import TWorld
-from worlds.world import TWorld
+from server.world import TWorld
 
 import logging
 logger = logging.getLogger("EWlogger")
