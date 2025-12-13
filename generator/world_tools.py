@@ -5,7 +5,7 @@ import pickle
 import random
 import math
 
-import tile_types
+import generator.tile_types as tile_types
 import tcod.tileset
 
 import generator.item_types as item_types
@@ -25,7 +25,7 @@ class TWorld:
 
 	def generate(self) -> bool:
 		logger.info("generate()")
-		with open("definitions/" + self.filename + ".json", "rt") as f:
+		with open("generator/definitions/" + self.filename + ".json", "rt") as f:
 			build = json.load(f)
 
 		# Check that a name is in there!		
@@ -66,7 +66,7 @@ class TWorld:
 
 	def save(self):
 		logger.info("TWorld->save()")
-		with open("worlds/" + self.filename + '.dat', "wb") as f:
+		with open("generator/worlds/" + self.filename + '.dat', "wb") as f:
 			save_data = {
 				"name": self.name,
 				"entry": self.entry,
