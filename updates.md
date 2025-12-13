@@ -1,3 +1,5 @@
+# 2025-12-13
+Recorded the game with 500 NPCs from the community client running around in the starship
 # 2025-12-08
 Every actor from the community looks the same.
 Added random face and skin colour on the client side.
