@@ -20,7 +20,7 @@ class TWorld:
 	items: list
 
 	def __init__(self, filename: Path):
-		logger.info(f"TWorld->__init__({filename})")
+		logger.info(f"TWorld->__init__( {filename} )")
 		with open(filename, "rb") as f:
 			data = pickle.load(f)
 			self.name = data["name"]
@@ -28,6 +28,7 @@ class TWorld:
 			self.entry_points = data["entry"]
 			self.actors = {}
 			self.items = []
+		print(f"World {self.name} loaded")
 		logger.debug(self.entry_points)
 
 	def get_world_definition(self) -> list:

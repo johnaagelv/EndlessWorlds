@@ -17,18 +17,14 @@ LOG_LEVEL = logging.INFO
 SERVER_PORT: int = 25261
 SERVER_HOST: str = "127.0.0.1"
 
-def main(port: int, log_level: int, world_name: Path):
+def main(port: int, log_level: int, filename: Path):
 	logging.basicConfig(filename=LOG_FILENAME, format="%(asctime)s %(levelname)-8s %(message)s", filemode="w", level=log_level)
-	logger.info('World server started')
-	print('World server started')
+	logger.info(f"World server {filename} started")
+	print("World server started")
 
 	host = utils.get_local_ip()
 
-	if world_name == "":
-		world_configuration = utils.get_config('world')
-		world_name = world_configuration['name']
-
-	world = TWorld(world_name)
+	world = TWorld(filename)
 	server.init(host, port)
 
 	try:
@@ -45,7 +41,7 @@ if __name__ == "__main__":
 	log_levels = {'info': logging.INFO, 'debug': logging.DEBUG}
 	port: int = SERVER_PORT
 	log_level: int = LOG_LEVEL
-	filename = Path('data/demo.dat')
+	filename: Path = Path("server/data/demo.dat")
 
 	parser = argparse.ArgumentParser(
 		description="Runs a multiplayer Roguelike World server.",
@@ -53,7 +49,7 @@ if __name__ == "__main__":
 	)
 	parser.add_argument("-p", "--port", help=f"the port number to use, default is {SERVER_PORT}")
 	parser.add_argument("-l", "--log_level", help="the logging level to use: 'info' (default) or 'debug'")
-	parser.add_argument("-w", "--world", help="filename of the world to serve")
+	parser.add_argument("-w", "--world", help="name of the world to serve. Default is 'demo'")
 
 	args = parser.parse_args()
 	if args.port is not None:
@@ -62,6 +58,6 @@ if __name__ == "__main__":
 		if args.log_level.lower() in log_levels.keys():
 			log_level = log_levels[args.log_level.lower()]
 	if args.world is not None:
-		filename = args.world.lower()
+		filename = Path(f"server/data/{args.world.lower()}.dat")
 
 	main(port, log_level, filename)
