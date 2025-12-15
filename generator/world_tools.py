@@ -395,16 +395,20 @@ class TWorld:
 	"""
 	def gen_item(self, map_idx: int, build: dict) -> None:
 		# Creates an item
-		# 1000=item, x, y, item name, count to genrate of this item
+		# 1000=x, y, w, h, n, item name, where n is the count per tile
 		logger.info(f"gen_item( {build!r} )")
-		count = 1
-		if len(build) > 4:
-			count = build[4]
-		for _ in range(0, count):
-			self.maps[map_idx]["items"].append(
-				{
-					"x": build[1],
-					"y": build[2],
-					"item": item_types.items[build[3]]
-				}
-			)
+		x = build[1]
+		y = build[2]
+		w = build[3]
+		h = build[4]
+		count = build[5]
+		for tile_x in range(x, x + w):
+			for tile_y in range(y, y + h):
+				for _ in range(0, count):
+					self.maps[map_idx]["items"].append(
+						{
+							"x": tile_x,
+							"y": tile_y,
+							"item": item_types.items[build[6]]
+						}
+					)

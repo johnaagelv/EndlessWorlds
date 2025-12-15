@@ -44,6 +44,37 @@ Using the "redjack17.png" tilesheet (16 x 16) with charmap CP437 - which define 
 224:  945,  223,  915,  960,  931,  963,  181,  964,  934,  920,  937,  948, 8734,  966,  949, 8745,
 240: 8801,  177, 8805, 8804, 8992, 8993,  247, 8776,  176, 8729,  183, 8730, 8319,  178, 9632,  160
 
+Ground		35, 37, 39, 44, 46, 96
+Floor		9617, 9618, 9619
+Rocks		8225, 8616
+Water		163, 124
+Stairs down	62
+Stairs up	60
+Map			223
+Minerals	42
+Chest		198
+House		238
+Door/gate	9532, 9579, 9578, 
+Food parcel	9576
+Wood pile	8801, 9644
+Bones		178
+Mountains	8776
+Axe			47
+Whip		167
+Helmet		9788
+Amulet		9792
+Boots		03
+Bag			9794
+Sculpture	197
+Mountains	126, 8776
+Rat			8729
+Actor		9786, 9786, 64, 937
+Palm tree	9573
+Tree		9827, 8593
+Well		251
+Computer	242, 243
+Coin		199
+
 # Items
 Played around with ECS on the client side to identify if and how this could be used on the server side.
 The client side can use the ECS, but the server side has no need to be burdened with this additional
@@ -90,3 +121,4 @@ feature.
 - name, food dispencer, computer, energy generator, ...
 - position, location on the map/world (x, y, z, m)
 - operations, 
+
