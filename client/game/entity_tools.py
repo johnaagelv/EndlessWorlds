@@ -1,10 +1,10 @@
 """ Tools assisting the entity capabilities """
 from __future__ import annotations
 
-import tcod.console
 import client.g as g
+from tcod.constants import FOV_DIAMOND #, FOV_BASIC
 from tcod.map import compute_fov
-from client.game.components import Graphic, Maps, Position, Vision
+from client.game.components import Maps, Position, Vision
 from client.game.tags import IsPlayer, IsWorld
 
 import client.configuration as config
@@ -21,6 +21,7 @@ def fov() -> None:
 	maps.maps[pos.m]['visible'][:] = compute_fov(
 		maps.maps[pos.m]['tiles']['transparent'],
 		(pos.x, pos.y),
-		radius = vision
+		radius = vision,
+		algorithm=FOV_DIAMOND
 	)
 	maps.maps[pos.m]['explored'] |= maps.maps[pos.m]['visible']
