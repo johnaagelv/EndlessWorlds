@@ -98,12 +98,12 @@ class InGame(State):
 			"y": pos.y,
 			"m": pos.m,
 			"r": player.components[Vision],
-#			"face": player.components[Graphic].face
 		}
 		result = client.game.connect_tools.query_server(fos_request)
 		temp = np.array(result['view'])
 		maps.maps[pos.m]["tiles"][result["x_min"]:result["x_max"],result["y_min"]:result["y_max"]] = temp
 		maps.maps[pos.m]["actors"] = result["actors"]
+		maps.maps[pos.m]["items"] = result["items"]
 		world.components[Maps] = Maps(maps.maps, maps.defs)
 		return None
 
