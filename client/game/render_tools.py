@@ -66,6 +66,9 @@ def world_map(map_idx, console: tcod.console.Console, view_port: tuple) -> None:
 		default=tile_types.SHROUD
 	)
 	console.print(x=config.WORLD_PORT_X, y=config.WORLD_PORT_Y, text=f"{maps.maps[map_idx]['name']}", fg=colours.bar_text)
+	items = [item for item in maps.maps[map_idx]["items"] if view_x1 <= item["x"] <= view_x2 and view_y1 <= item["y"] <= view_y2 and visible_tiles[item["x"], item["y"]]]
+	for item in items:
+		console.print(x=item["x"]-view_x1, y=item["y"]-view_y1, text=chr(9576), fg=(255,255,255))
 
 
 def entities(map_idx: int, console: tcod.console.Console, view_port: tuple) -> None:
