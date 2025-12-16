@@ -10,6 +10,22 @@ import client.tile_types as tile_types
 import client.ui.colours as colours
 import client.ui.configuration as config
 
+graphic_dt = np.dtype(
+	[
+		("ch", np.int32), # Unicode codepoint
+		("fg", "3B"), # 3 unsigned bytes, foreground RGB colours
+		("bg", "3B"), # Background RGB colours
+	]
+)
+
+item_dt = np.dtype(
+	[
+		("face", int), # Face of this item
+		("dark", graphic_dt), # Graphics outside of FOV
+		("light", graphic_dt), # Graphics inside of FOV
+	]
+)
+
 def player_states(player: Entity, console: tcod.console.Console) -> None:
 	""" Render all the player states such as health, energy, ... """
 	view_x = config.STATE_PORT_X
@@ -60,21 +76,20 @@ def world_map(map_idx, console: tcod.console.Console, view_port: tuple) -> None:
 
 	# Transfer the tiles within the view port to the console
 	view_x1, view_x2, view_y1, view_y2 = view_port
-	console.rgb[0:config.VIEW_PORT_WIDTH, 0:config.VIEW_PORT_HEIGHT] = np.select(
+	console.rgba[0:config.VIEW_PORT_WIDTH, 0:config.VIEW_PORT_HEIGHT] = np.select(
 		condlist=[visible_tiles[view_x1:view_x2, view_y1:view_y2], explored_tiles[view_x1:view_x2, view_y1:view_y2]],
 		choicelist=[light_tiles[view_x1:view_x2, view_y1:view_y2], dark_tiles[view_x1:view_x2, view_y1:view_y2]],
 		default=tile_types.SHROUD
 	)
 	console.print(x=config.WORLD_PORT_X, y=config.WORLD_PORT_Y, text=f"{maps.maps[map_idx]['name']}", fg=colours.bar_text)
-	items = [item for item in maps.maps[map_idx]["items"] if view_x1 <= item["x"] <= view_x2 and view_y1 <= item["y"] <= view_y2 and visible_tiles[item["x"], item["y"]]]
-	for item in items:
+
+	for item in [item for item in maps.maps[map_idx]["items"] if view_x1 <= item["x"] <= view_x2 and view_y1 <= item["y"] <= view_y2 and visible_tiles[item["x"], item["y"]]]:
 		x = item["x"] - view_x1
 		y = item["y"] - view_y1
-		face = item["item"]["light"][0]
-		fg = (item["item"]["light"][1][0], item["item"]["light"][1][1], item["item"]["light"][1][2], 255)
-		bg = (item["item"]["light"][2][0], item["item"]["light"][2][1], item["item"]["light"][2][2], 192)
-
-		console.rgba[x, y] = (face, fg, bg,)
+		face = item["item"]['face']
+		fg = item["item"]["fg"]
+		bg = item["item"]["bg"]
+		console.rgba[x, y] = (face, fg, bg)
 
 def entities(map_idx: int, console: tcod.console.Console, view_port: tuple) -> None:
 	view_x1, view_x2, view_y1, view_y2 = view_port

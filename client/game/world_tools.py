@@ -40,6 +40,7 @@ def new_game() -> Registry:
 		"explored": np.ndarray,
 		"gateways": list,
 		"actors": list,
+		"items": list,
 	}
 	map_template["loaded"] = False
 
@@ -84,6 +85,7 @@ def start_map(map_idx: int) -> None:
 			"tiles": np.full((map_width, map_height), fill_value=tile_types.blank, order="F"),
 			"visible": np.full((map_width, map_height), fill_value=map_visible, order="F"),
 			"explored": np.full((map_width, map_height), fill_value=map_visible, order="F"),
+			"items": definition["items"],
 		}
 
 		if map_visible:

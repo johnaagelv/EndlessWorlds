@@ -32,6 +32,7 @@ class TWorld:
 		if "name" not in build:
 			return False
 
+		map_idx: int = 0
 		self.name = build["name"]
 		self.entry = build["entry"]
 		for map in build["maps"]:
@@ -66,7 +67,7 @@ class TWorld:
 
 	def save(self):
 		logger.info("TWorld->save()")
-		with open("generator/worlds/" + self.filename + '.dat', "wb") as f:
+		with open("server/data/" + self.filename + '.dat', "wb") as f:
 			save_data = {
 				"name": self.name,
 				"entry": self.entry,
@@ -358,8 +359,8 @@ class TWorld:
 				map_tile = tile_types.new_tile(
 					walkable=True,
 					transparent=True,
-					dark=(sym_char, (255, 255, 255), (0, 0, 0)),
-					light=(sym_char, (255, 255, 255), (0, 0, 0)),
+					dark=(sym_char, (255, 255, 255, 255), (0, 0, 0, 255)),
+					light=(sym_char, (255, 255, 255, 255), (0, 0, 0, 255)),
 					gateway=False,
 				)
 				self.maps[map_idx]['tiles'][x, y] = map_tile

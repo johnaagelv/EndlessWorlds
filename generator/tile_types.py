@@ -8,8 +8,8 @@ import generator.colours as colour
 graphic_dt = np.dtype(
 	[
 		("ch", np.int32), # Unicode codepoint
-		("fg", "3B"), # 3 unsigned bytes, foreground RGB colours
-		("bg", "3B"), # Background RGB colours
+		("fg", "4B"), # 3 unsigned bytes, foreground RGB colours
+		("bg", "4B"), # Background RGB colours
 	]
 )
 
@@ -27,8 +27,8 @@ def new_tile(
 	*,
 	walkable: int,
 	transparent: int,
-	dark: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]],
-	light: Tuple[int, Tuple[int, int, int], Tuple[int, int, int]],
+	dark: Tuple[int, Tuple[int, int, int, int], Tuple[int, int, int, int]],
+	light: Tuple[int, Tuple[int, int, int, int], Tuple[int, int, int, int]],
 	gateway: bool,
 ) -> np.ndarray:
 	return np.array((walkable, transparent, dark, light, gateway), dtype=tile_dt)
@@ -52,50 +52,50 @@ tiles["floor"] = new_tile(
 tiles["wall"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(43, colour.silver, (32, 32, 32)),
-	light=(43, colour.white, (64, 64, 64)),
+	dark=(43, colour.silver, (32, 32, 32, 255)),
+	light=(43, colour.white, (64, 64, 64, 255)),
 	gateway=False,
 )
 tiles["gate"] = new_tile(
 	walkable=True,
 	transparent=False,
-	dark=(19, (160, 160, 160), (0, 0, 0)),
-	light=(19, (192, 192, 192), (0, 0, 0)),
+	dark=(19, (160, 160, 160, 255), (0, 0, 0, 255)),
+	light=(19, (192, 192, 192, 255), (0, 0, 0, 255)),
 	gateway=False,
 )
 tiles["plain"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(ord("."), (128, 192, 128), (0, 0, 0)),
-	light=(ord("."), (128, 255, 128), (0, 0, 0)),
+	dark=(ord("."), (128, 192, 128, 255), (0, 0, 0, 255)),
+	light=(ord("."), (128, 255, 128, 255), (0, 0, 0, 255)),
 	gateway=False,
 )
 tiles["gateway"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(76, (192, 192, 192), (0, 0, 0)),
-	light=(77, (255, 255, 255), (0, 0, 0)),
+	dark=(76, (192, 192, 192, 255), (0, 0, 0, 255)),
+	light=(77, (255, 255, 255, 255), (0, 0, 0, 255)),
 	gateway=True,
 )
 tiles["stairway_down"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(62, (192, 192, 192), (0, 0, 0)),
-	light=(62, (255, 255, 255), (0, 0, 0)),
+	dark=(62, (192, 192, 192, 255), (0, 0, 0, 255)),
+	light=(62, (255, 255, 255, 255), (0, 0, 0, 255)),
 	gateway=True,
 )
 tiles["stairway_up"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(60, (192, 192, 192), (0, 0, 0)),
-	light=(60, (255, 255, 255), (0, 0, 0)),
+	dark=(60, (192, 192, 192, 255), (0, 0, 0, 255)),
+	light=(60, (255, 255, 255, 255), (0, 0, 0, 255)),
 	gateway=True,
 )
 tiles["stairway"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(ord('X'), (192, 192, 192), (0, 0, 0)),
-	light=(ord('X'), (255, 255, 255), (0, 0, 0)),
+	dark=(ord('X'), (192, 192, 192, 255), (0, 0, 0, 255)),
+	light=(ord('X'), (255, 255, 255, 255), (0, 0, 0, 255)),
 	gateway=True,
 )
 tiles["grass1"] = new_tile(
@@ -122,36 +122,36 @@ tiles["grass3"] = new_tile(
 tiles["rock1"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(ord("#"), (80, 80, 80), (80, 80, 80)),
-	light=(ord("#"), (80, 80, 80), (80, 80, 80)),
+	dark=(ord("#"), (80, 80, 80, 255), (80, 80, 80, 255)),
+	light=(ord("#"), (80, 80, 80, 255), (80, 80, 80, 255)),
 	gateway=False,
 )
 tiles["rock2"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(ord("#"), (64, 64, 64), (64, 64, 64)),
-	light=(ord("#"), (64, 64, 64), (64, 64, 64)),
+	dark=(ord("#"), (64, 64, 64, 255), (64, 64, 64, 255)),
+	light=(ord("#"), (64, 64, 64, 255), (64, 64, 64, 255)),
 	gateway=False,
 )
 tiles["underground"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(32, (32, 32, 32), (32, 32, 32)),
-	light=(32, (48, 48, 48), (48, 48, 48)),
+	dark=(32, (32, 32, 32, 255), (32, 32, 32, 255)),
+	light=(32, (48, 48, 48, 255), (48, 48, 48, 255)),
 	gateway=False,
 )
 tiles["space"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(ord(" "), (0, 0, 0), (0, 0, 0)),
-	light=(ord(" "), (0, 0, 0), (0, 0, 0)),
+	dark=(ord(" "), (0, 0, 0, 255), (0, 0, 0, 255)),
+	light=(ord(" "), (0, 0, 0, 255), (0, 0, 0, 255)),
 	gateway=False,
 )
 tiles["space with small star"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(183, (128, 128, 128), (0, 0, 0)),
-	light=(183, (128, 128, 128), (0, 0, 0)),
+	dark=(183, (128, 128, 128, 255), (0, 0, 0, 255)),
+	light=(183, (128, 128, 128, 255), (0, 0, 0, 255)),
 	gateway=False,
 )
 tiles["space with star"] = new_tile(

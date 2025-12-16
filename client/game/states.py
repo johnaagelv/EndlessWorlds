@@ -100,10 +100,18 @@ class InGame(State):
 			"r": player.components[Vision],
 		}
 		result = client.game.connect_tools.query_server(fos_request)
+		x_min = result["x_min"]
+		x_max = result["x_max"]
+		y_min = result["y_min"]
+		y_max = result["y_max"]
+
 		temp = np.array(result['view'])
-		maps.maps[pos.m]["tiles"][result["x_min"]:result["x_max"],result["y_min"]:result["y_max"]] = temp
+		maps.maps[pos.m]["tiles"][x_min:x_max, y_min:y_max] = temp
 		maps.maps[pos.m]["actors"] = result["actors"]
-		maps.maps[pos.m]["items"] = result["items"]
+		
+		item_temp = np.array(result['items'])
+		maps.maps[pos.m]["items"] = item_temp
+		
 		world.components[Maps] = Maps(maps.maps, maps.defs)
 		return None
 
