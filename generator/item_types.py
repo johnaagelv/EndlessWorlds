@@ -16,6 +16,6 @@ items["food parcel"] = {
 	"energy": 1000,
 	"weight": 1,
 	"types": ["pickable", "consumable"],
-	"dark": (9576, colour.gray, colour.black),
-	"light": (9576, colour.brown, colour.black),
+	"dark": (9576, colour.spaceship_deck, colour.darkgray),
+	"light": (9576, colour.spaceship_deck, colour.lightgray),
 }

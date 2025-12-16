@@ -68,8 +68,13 @@ def world_map(map_idx, console: tcod.console.Console, view_port: tuple) -> None:
 	console.print(x=config.WORLD_PORT_X, y=config.WORLD_PORT_Y, text=f"{maps.maps[map_idx]['name']}", fg=colours.bar_text)
 	items = [item for item in maps.maps[map_idx]["items"] if view_x1 <= item["x"] <= view_x2 and view_y1 <= item["y"] <= view_y2 and visible_tiles[item["x"], item["y"]]]
 	for item in items:
-		console.print(x=item["x"]-view_x1, y=item["y"]-view_y1, text=chr(9576), fg=(255,255,255))
+		x = item["x"] - view_x1
+		y = item["y"] - view_y1
+		face = item["item"]["light"][0]
+		fg = (item["item"]["light"][1][0], item["item"]["light"][1][1], item["item"]["light"][1][2], 255)
+		bg = (item["item"]["light"][2][0], item["item"]["light"][2][1], item["item"]["light"][2][2], 192)
 
+		console.rgba[x, y] = (face, fg, bg,)
 
 def entities(map_idx: int, console: tcod.console.Console, view_port: tuple) -> None:
 	view_x1, view_x2, view_y1, view_y2 = view_port
