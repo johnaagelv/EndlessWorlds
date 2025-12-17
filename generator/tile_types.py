@@ -206,8 +206,8 @@ tiles["spaceship stairs"] = new_tile(
 tiles["popsicle"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9786, colour.cryo_fluid, colour.cryo_base),
-	light=(9786, colour.cryo_fluid, colour.cryo_base),
+	dark=(9608, colour.darkslategray, colour.cryo_base),
+	light=(9608, colour.darkslategray, colour.cryo_base),
 	gateway=False,
 )
 tiles["spaceship safety door"] = new_tile(
@@ -234,78 +234,78 @@ tiles["spaceship container"] = new_tile(
 tiles["cryopipe upper left"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9554, colour.cryo_fluid, colour.spaceship_wall),
-	light=(9554, colour.cryo_fluid, colour.spaceship_wall),
+	dark=(9554, colour.cryo_fluid, colour.cryo_base),
+	light=(9554, colour.cryo_fluid, colour.cryo_base),
 	gateway=False,
 )
 tiles["cryopipe horizontal"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9472, colour.cryo_fluid, colour.spaceship_wall),
-	light=(9472, colour.cryo_fluid, colour.spaceship_wall),
+	dark=(9472, colour.cryo_fluid, colour.cryo_base),
+	light=(9472, colour.cryo_fluid, colour.cryo_base),
 	gateway=False,
 )
 tiles["cryopipe cross"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9568, colour.cryo_fluid, colour.spaceship_wall),
-	light=(9568, colour.cryo_fluid, colour.spaceship_wall),
+	dark=(9568, colour.cryo_fluid, colour.cryo_base),
+	light=(9568, colour.cryo_fluid, colour.cryo_base),
 	gateway=False,
 )
 tiles["cryopipe upper t"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9516, colour.cryo_fluid, colour.spaceship_wall),
-	light=(9516, colour.cryo_fluid, colour.spaceship_wall),
+	dark=(9516, colour.cryo_fluid, colour.cryo_base),
+	light=(9516, colour.cryo_fluid, colour.cryo_base),
 	gateway=False,
 )
 tiles["cryopipe left t"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9500, colour.cryo_fluid, colour.spaceship_wall),
-	light=(9500, colour.cryo_fluid, colour.spaceship_wall),
+	dark=(9500, colour.cryo_fluid, colour.cryo_base),
+	light=(9500, colour.cryo_fluid, colour.cryo_base),
 	gateway=False,
 )
 tiles["cryopipe right t"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9508, colour.cryo_fluid, colour.spaceship_wall),
-	light=(9508, colour.cryo_fluid, colour.spaceship_wall),
+	dark=(9508, colour.cryo_fluid, colour.cryo_base),
+	light=(9508, colour.cryo_fluid, colour.cryo_base),
 	gateway=False,
 )
 tiles["cryopipe upper right"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9558, colour.cryo_fluid, colour.spaceship_wall),
-	light=(9558, colour.cryo_fluid, colour.spaceship_wall),
+	dark=(9558, colour.cryo_fluid, colour.cryo_base),
+	light=(9558, colour.cryo_fluid, colour.cryo_base),
 	gateway=False,
 )
 tiles["cryopipe vertical"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9474, colour.cryo_fluid, colour.spaceship_wall),
-	light=(9474, colour.cryo_fluid, colour.spaceship_wall),
+	dark=(9474, colour.cryo_fluid, colour.cryo_base),
+	light=(9474, colour.cryo_fluid, colour.cryo_base),
 	gateway=False,
 )
 tiles["cryopipe lower right"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9496, colour.cryo_fluid, colour.spaceship_wall),
-	light=(9496, colour.cryo_fluid, colour.spaceship_wall),
+	dark=(9496, colour.cryo_fluid, colour.cryo_base),
+	light=(9496, colour.cryo_fluid, colour.cryo_base),
 	gateway=False,
 )
 tiles["cryopipe lower left"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9492, colour.cryo_fluid, colour.spaceship_wall),
-	light=(9492, colour.cryo_fluid, colour.spaceship_wall),
+	dark=(9492, colour.cryo_fluid, colour.cryo_base),
+	light=(9492, colour.cryo_fluid, colour.cryo_base),
 	gateway=False,
 )
 tiles["cryotank"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9608, colour.cryo_base, colour.cryo_fluid),
-	light=(9608, colour.cryo_base, colour.cryo_fluid),
+	dark=(9608, colour.cryo_fluid, colour.cryo_base),
+	light=(9608, colour.cryo_fluid, colour.cryo_base),
 	gateway=False,
 )
 tiles["cryocontainer"] = new_tile(
@@ -318,8 +318,8 @@ tiles["cryocontainer"] = new_tile(
 tiles["spaceship propulsion"] = new_tile(
 	walkable=False,
 	transparent=False,
-	dark=(9688, colour.silver, colour.black),
-	light=(9688, colour.silver, colour.yellow),
+	dark=(9688, colour.darkslateblue, colour.goldenrod),
+	light=(9688, colour.darkslateblue, colour.goldenrod),
 	gateway=False,
 )
 tiles["propulsion fluid"] = new_tile(

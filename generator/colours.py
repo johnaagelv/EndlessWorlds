@@ -155,12 +155,12 @@ yellow_safety = (238, 210, 2, 255)
 yellow_chartreuse = (223, 255, 0, 255)
 
 spaceship_deck = rocket_metallic
-spaceship_wall = (32,32,32, 255)
+spaceship_wall = (32, 32, 32, 255)
 spaceship_shell = darkslategray
 spaceship_container = saddlebrown
 glass_wall = (0xE0, 0xF2, 0xF1, 255)
 cryo_fluid = (44, 188, 201, 255)
-cryo_base = (92, 135, 140, 255)
+cryo_base = (32, 64, 96, 255)
 
 ocean_seaside = (224, 242, 241, 255)
 

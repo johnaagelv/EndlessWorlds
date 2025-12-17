@@ -69,6 +69,7 @@ Sculpture	197
 Mountains	126, 8776
 Rat			8729
 Actor		9786, 9786, 64, 937
+Cryopod		9608
 Palm tree	9573
 Tree		9827, 8593
 Well		251
