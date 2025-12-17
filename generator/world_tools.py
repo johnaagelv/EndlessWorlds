@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 import json
 import pickle
 import random
@@ -410,6 +411,7 @@ class TWorld:
 						{
 							"x": tile_x,
 							"y": tile_y,
+							"iid": uuid.uuid4(),
 							"item": item_types.items[build[6]]
 						}
 					)
