@@ -4,6 +4,7 @@ from collections.abc import Callable
 
 import server.client_commands.new as new
 import server.client_commands.fos as fos
+import server.client_commands.get as get
 
 from server.world import TWorld
 
@@ -14,4 +15,5 @@ type commandFn = Callable[[dict, TWorld], dict]
 client_commands: dict[str, commandFn] = {
 	"new": new.cmd_new,
 	"fos": fos.cmd_fos,
+	"get": get.cmd_get,
 }

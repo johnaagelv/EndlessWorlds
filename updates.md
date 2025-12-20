@@ -1,3 +1,9 @@
+# 2025-12-20
+Implementing client/server command for picking up an item
+# 2025-12-17
+Server side has items, food parcels and backpack, and the client side can present them when
+the player uses the pickup action. The presentation is using the menus - just have to find out
+how to tell the server that one item has been picked up.
 # 2025-12-13
 Recorded the game with 500 NPCs from the community client running around in the starship
 # 2025-12-08

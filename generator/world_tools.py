@@ -106,11 +106,11 @@ class TWorld:
 			"width": map_width,
 			"height": map_height,
 			"tiles": np.full((map_width, map_height), fill_value=map_tile, order="F"),
-			"gateways": [],
-			"actions": [],
+			"gateways": list,
+			"actions": list,
 			"visible": map_visibility,
-			"items": [],
-			"actors": []
+			"items": list,
+			"actors": list
 		}
 		return map
 

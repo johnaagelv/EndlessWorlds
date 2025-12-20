@@ -194,10 +194,16 @@ class PickupMenu(client.game.menus.ListMenu):
 	
 	def pickup(self, item: dict) -> StateResult:
 		""" Return to the game """
-		print(self.selected)
-		print(item)
+		(player,) = g.game.Q.all_of(tags=[IsPlayer])
+		pos = player.components[Position]
+		request = {
+			"cmd": "get",
+			"m": pos.m,
+			"iid": item["iid"]
+		}
+		result = client.game.connect_tools.query_server(request)
+		print(result)
 		return Reset(InGame())
-
 
 @attrs.define()
 class Pickup(State):
