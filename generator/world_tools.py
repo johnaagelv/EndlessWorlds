@@ -412,6 +412,9 @@ class TWorld:
 							"x": tile_x,
 							"y": tile_y,
 							"iid": uuid.uuid4(),
-							"item": item_types.items[build[6]]
+							"face": item_types.items[build[6]]["face"],
+							"name": item_types.items[build[6]]["name"],
+							"fg": item_types.items[build[6]]["fg"],
+							"bg": item_types.items[build[6]]["bg"],
 						}
 					)
