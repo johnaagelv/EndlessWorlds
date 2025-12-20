@@ -37,8 +37,8 @@ class SelectItem(MenuItem):
 	A click-/selectable menu item
 	"""
 	label: str # the menu item label
-	callback: Callable[[int], StateResult] # Callable function returning a state result
-	id: int # ID of the menu item
+	callback: Callable[[dict], StateResult] # Callable function returning a state result
+	id: dict # ID of the menu item
 
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		""" Handle events selecting this menu item """
