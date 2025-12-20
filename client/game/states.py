@@ -27,6 +27,7 @@ class InGame(State):
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		""" Handle events for the in-game state """
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
+		pos = player.components[Position]
 		match event:
 		
 			case tcod.event.KeyDown(sym=sym, mod=mod) if (sym, mod) in STAIR_KEYS:
@@ -42,7 +43,8 @@ class InGame(State):
 					case (KeySym.D, Modifier.NONE):
 						return Push(Drop())
 					case (KeySym.COMMA, Modifier.NONE):
-						return Push(Pickup())
+						if world_tools.pickable_items_near(pos):
+							return Push(PickupMenu())
 				return None
 
 			case tcod.event.KeyDown(sym=sym) if sym in DIRECTION_KEYS:
@@ -122,14 +124,14 @@ class MainMenu(client.game.menus.ListMenu):
 	def __init__(self) -> None:
 		""" Initialize the main menu """
 		items = [
-			client.game.menus.SelectItem("New game", self.new_game, 100),
+			client.game.menus.SelectItem("New game", self.new_game, {id:100}),
 		]
 		if hasattr(g, "world"):
 			# We got a world, so add the continue menu item
-			items.append(client.game.menus.SelectItem("Continue", self.continue_, 800))
+			items.append(client.game.menus.SelectItem("Continue", self.continue_, {id:800}))
 
 		# Add the quit menu item
-		items.append(client.game.menus.SelectItem("Quit", self.quit, 900))
+		items.append(client.game.menus.SelectItem("Quit", self.quit, {id:900}))
 
 		super().__init__(
 			items=tuple(items),
@@ -139,12 +141,12 @@ class MainMenu(client.game.menus.ListMenu):
 		)
 
 	@staticmethod
-	def continue_(id: int) -> StateResult:
+	def continue_(item: dict) -> StateResult:
 		""" Return to the game """
 		return Reset(InGame())
 	
 	@staticmethod
-	def new_game(id: int) -> StateResult:
+	def new_game(item: dict) -> StateResult:
 		""" Begin a new game """
 		g.game = world_tools.new_game()
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
@@ -152,18 +154,80 @@ class MainMenu(client.game.menus.ListMenu):
 		return Reset(InGame())
 
 	@staticmethod
-	def quit(id: int) -> StateResult:
+	def quit(item: dict) -> StateResult:
 		""" Close the program """
 		raise SystemExit
+
+class PickupMenu(client.game.menus.ListMenu):
+	""" Pickup menu """
+	__slots__ = ()
+
+	def __init__(self) -> None:
+		""" Initialize the pickup menu """
+		items = [
+		]
+		(player,) = g.game.Q.all_of(tags=[IsPlayer])
+		pos = player.components[Position]
+		map_items = world_tools.get_items_by_location(pos=pos)
+		unique_items: dict = {}
+		for item in map_items:
+			if item["name"] in unique_items.keys():
+				unique_items[item["name"]]["count"] += 1
+			else:
+				unique_items[item["name"]] = {
+					"count": 1,
+					"name": item["name"],
+					"iid": item["iid"]
+				}
+
+		item_idx = 0		
+		for item in unique_items.keys():
+			items.append(client.game.menus.SelectItem(f"{unique_items[item]["count"]:4d} {item}", self.pickup, unique_items[item]))
+			item_idx += 1
+
+		super().__init__(
+			items=tuple(items),
+			selected=0,
+			x=5,
+			y=5,
+		)
+	
+	def pickup(self, item: dict) -> StateResult:
+		""" Return to the game """
+		print(self.selected)
+		print(item)
+		return Reset(InGame())
+
 
 @attrs.define()
 class Pickup(State):
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		""" Handle events for picking up items from player location """
-		return Pop()
+		match event:
+			case tcod.event.KeyDown(sym=KeySym.ESCAPE):
+				return Pop()
+		return None
 	
 	def on_draw(self, console: tcod.console.Console) -> None:
 		""" Present the items on player location available for pickup """
+		(player,) = g.game.Q.all_of(tags=[IsPlayer])
+		pos = player.components[Position]
+		(world,) = g.game.Q.all_of(tags=[IsWorld])
+		visible_tiles = world.components[Maps].maps[pos.m]["visible"]
+		map_items = world.components[Maps].maps[pos.m]["items"]
+		unique_items: dict = {}
+		for item in [item for item in map_items if pos.x - 1 <= item["x"] <= pos.x + 1 and pos.y - 1 <= item["y"] <= pos.y + 1 and visible_tiles[item["x"], item["y"]]]:
+			
+			if item["name"] in unique_items.keys():
+				unique_items[item["name"]] += 1
+			else:
+				unique_items[item["name"]] = 1
+		
+		y: int = 10
+		for item in unique_items.keys():
+			console.print(40, y, text=f"{unique_items[item]} {item}")
+			y+=1
+
 		return None
 
 @attrs.define()
