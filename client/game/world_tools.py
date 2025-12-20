@@ -137,5 +137,16 @@ def get_view_port(pos: Position) -> tuple:
 	view_y2 = view_y1 + view_height
 	return (view_x1, view_x2, view_y1, view_y2)
 
-#def get_entities_at_location(self, location_x: int, location_y: int) -> Optional[List]:
-#	return [entity for entity in self.entities if entity.data['x'] == location_x and entity.data['y'] == location_y]
+def pickable_items_near(pos: Position) -> bool:
+	return len(get_items_by_location(pos)) > 0
+
+def get_items_by_location(pos: Position) -> list:
+	""" Get items within a location +/- 1 """
+	x_min = pos.x - 1
+	x_max = pos.x + 1
+	y_min = pos.y - 1
+	y_max = pos.y + 1
+	(world,) = g.game.Q.all_of(tags=[IsWorld])
+	visible_tiles = world.components[Maps].maps[pos.m]["visible"]
+	map_items = world.components[Maps].maps[pos.m]["items"]
+	return [item for item in map_items if x_min <= item["x"] <= x_max and y_min <= item["y"] <= y_max and visible_tiles[item["x"], item["y"]]]
