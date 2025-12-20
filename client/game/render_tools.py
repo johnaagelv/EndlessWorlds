@@ -10,22 +10,6 @@ import client.tile_types as tile_types
 import client.ui.colours as colours
 import client.ui.configuration as config
 
-graphic_dt = np.dtype(
-	[
-		("ch", np.int32), # Unicode codepoint
-		("fg", "3B"), # 3 unsigned bytes, foreground RGB colours
-		("bg", "3B"), # Background RGB colours
-	]
-)
-
-item_dt = np.dtype(
-	[
-		("face", int), # Face of this item
-		("dark", graphic_dt), # Graphics outside of FOV
-		("light", graphic_dt), # Graphics inside of FOV
-	]
-)
-
 def player_states(player: Entity, console: tcod.console.Console) -> None:
 	""" Render all the player states such as health, energy, ... """
 	view_x = config.STATE_PORT_X
@@ -86,9 +70,9 @@ def world_map(map_idx, console: tcod.console.Console, view_port: tuple) -> None:
 	for item in [item for item in maps.maps[map_idx]["items"] if view_x1 <= item["x"] <= view_x2 and view_y1 <= item["y"] <= view_y2 and visible_tiles[item["x"], item["y"]]]:
 		x = item["x"] - view_x1
 		y = item["y"] - view_y1
-		face = item["item"]['face']
-		fg = item["item"]["fg"]
-		bg = item["item"]["bg"]
+		face = item["face"]
+		fg = item["fg"]
+		bg = item["bg"]
 		console.rgba[x, y] = (face, fg, bg)
 
 def entities(map_idx: int, console: tcod.console.Console, view_port: tuple) -> None:
