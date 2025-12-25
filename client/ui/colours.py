@@ -148,3 +148,8 @@ bar_high = darkgreen
 bar_medium = orange
 bar_low = venetian_red
 bar_empty = dark_charcoal
+
+food_parcel = (182, 122, 79, 255)
+backpack = (72, 44, 25, 255)
+
+background = (0, 0, 0, 0)
