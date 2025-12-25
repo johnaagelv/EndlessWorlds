@@ -176,6 +176,7 @@ class PickupMenu(client.game.menus.ListMenu):
 			else:
 				unique_items[item["name"]] = {
 					"count": 1,
+					"face": item["face"], 
 					"name": item["name"],
 					"iid": item["iid"]
 				}
@@ -202,7 +203,8 @@ class PickupMenu(client.game.menus.ListMenu):
 			"iid": item["iid"]
 		}
 		result = client.game.connect_tools.query_server(request)
-		print(result)
+		if result["iid"] == request["iid"]:
+			print(f"Got {item}")
 		return Reset(InGame())
 
 @attrs.define()
