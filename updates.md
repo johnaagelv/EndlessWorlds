@@ -1,3 +1,5 @@
+# 2025-12-23
+Considering how to identify items across worlds! Using "face", "iid", or ...?
 # 2025-12-20
 Implementing client/server command for picking up an item
 # 2025-12-17
