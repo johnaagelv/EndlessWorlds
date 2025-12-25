@@ -53,6 +53,7 @@ def query_server(request: dict) -> dict:
 #	logger.debug(f"query_server( request {request['cmd']})")
 	start_connection(request)
 	query_on = True
+	result: dict = {}
 	while query_on:
 		events = g.sel.select()
 		for key, mask in events:
