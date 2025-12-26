@@ -15,6 +15,8 @@ import numpy as np
 import logging
 logger = logging.getLogger("EWGenerate")
 
+gateway_list: list[dict]
+
 class TWorld:
 	maps: list = []
 	name: str
@@ -101,7 +103,7 @@ class TWorld:
 		except Exception:
 			pass
 
-		map = {
+		map: dict = {
 			"name": map_name,
 			"width": map_width,
 			"height": map_height,
@@ -112,6 +114,11 @@ class TWorld:
 			"items": list,
 			"actors": list
 		}
+		# Initialize the lists to ensure append will work
+		map['items'] = []
+		map['actors'] = []
+		map['gateways'] = []
+		map['actions'] = []
 		return map
 
 	"""
@@ -204,6 +211,7 @@ class TWorld:
 			user_action = build[8]
 		if len(build) > 9:
 			target_host = build[9]
+
 		self.maps[map_idx]['gateways'].append(
 			{
 				"x": tile_x,
@@ -216,7 +224,7 @@ class TWorld:
 					"h": target_host
 				}
 			}
-		)	
+		)
 
 	"""
 	5. Generate an area of up to 3 tiles based on chances
@@ -384,6 +392,7 @@ class TWorld:
 		tile_x: int = build[1]
 		tile_y: int = build[2]
 		user_actions: dict = build[4]
+
 		self.maps[map_idx]['actions'].append(
 			{
 				"x": tile_x,
