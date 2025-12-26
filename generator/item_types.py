@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 #from typing import Tuple
-from client.ui.item_tiles import item_faces, item_types
+from client.ui.item_tiles import item_faces
 
 items: dict = {}
 
@@ -13,5 +13,5 @@ def new_item(
 ) -> dict:
 	return {"name": name, "face": face, "fg": fg, "bg": bg}
 
-for item_face in item_faces:
-	items[item_types[item_face]["name"]] = item_types[item_face]
+for item_face in item_faces.keys():
+	items[item_faces[item_face]["name"]] = item_faces[item_face]
