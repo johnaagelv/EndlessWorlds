@@ -1,47 +1,48 @@
 {
 	"id":"",
 	"name": "Ankt",
-	"entry": [[6, 6, 0, 0], [6, 8, 0, 0], [8, 6, 0, 0], [8, 8, 0, 0]],
+	"entry": [[6, 6, 0, 0], [6, 8, 0, 0], [8, 6, 0, 0], [8, 8, 0, 0],[23, 8, 0, 0]],
 	"maps": [
 		[
-			[0, "Tower Ankt", 80, 80, "plain", true, 234567890],
-			[5, 0, 0, 80, 80, "grass1", "grass2"],
-			[2, 7, 7, 7, "wall", true, 2],
-			[4, 7, 7, "spaceship stairs", 7, 7, 0, 1, "down"]
+			[0, "Tower Ankt", 80, 80, ["grass1","grass2","grass3"], true, 234567890],
+			[2, 7, 7, 8, ["wall"], false, 2],
+			[4, 2, 6, "stairway down", 2, 6, 0, 1, "down"],
+			[1, 13, 6, 3, 3, ["grass1", "grass2", "grass3"], true]
 		],
 		[
-			[0, "Tower Ankt, level 1", 80, 80, "plain", true],
-			[5, 0, 0, 80, 80, "grass1", "grass2"],
-			[2, 7, 7, 7, "wall", true, 2],
-			[4, 7, 7, "spaceship stairs", 7, 7, 0, 0, "up"], 
-			[4, 7, 7, "spaceship stairs", 7, 7, 0, 2, "down"]
+			[0, "Underground 1", 80, 80, ["rock1","rock2"], false],
+			[2, 7, 7, 6, ["underground", "underground2"], true, 5],
+			[4, 2, 6, "stairway up", 2, 6, 0, 0, "up"], 
+			[4, 2, 8, "stairway down", 2, 8, 0, 2, "down"],
+			[1, 11, 7, 45, 1, ["underground", "underground2"], false]
 		],
 		[
-			[0, "Tower Ankt, level 2", 80, 80, "plain", true],
-			[5, 0, 0, 80, 80, "grass1", "grass2"],
-			[2, 7, 7, 7, "wall", true, 2],
-			[4, 7, 7, "spaceship stairs", 7, 7, 0, 1, "up"], 
-			[4, 7, 7, "spaceship stairs", 7, 7, 0, 3, "down"]
+			[0, "Underground 2", 80, 80, ["rock1","rock2"], false],
+			[2, 7, 7, 6, ["underground", "underground2"], true, 5],
+			[4, 2, 8, "stairway up", 2, 8, 0, 1, "up"], 
+			[4, 2, 6, "stairway down", 2, 6, 0, 3, "down"]
 		],
 		[
-			[0, "Tower Ankt, level 3", 80, 80, "plain", true],
-			[5, 0, 0, 80, 80, "grass1", "grass2"],
-			[2, 7, 7, 7, "wall", true, 2],
-			[4, 7, 7, "spaceship stairs", 7, 7, 0, 2, "up"], 
-			[4, 7, 7, "spaceship stairs", 7, 7, 0, 4, "down"]
+			[0, "Underground 3", 80, 80, ["rock1","rock2"], false],
+			[2, 7, 7, 6, ["underground", "underground2"], true, 5],
+			[4, 2, 6, "stairway up", 2, 6, 0, 2, "up"], 
+			[4, 2, 8, "stairway down", 2, 8, 0, 4, "down"]
 		],
 		[
-			[0, "Tower Ankt, level 4", 80, 80, "plain", true],
-			[5, 0, 0, 80, 80, "grass1", "grass2"],
-			[2, 7, 7, 7, "wall", true, 2],
-			[4, 7, 7, "spaceship stairs", 7, 7, 0, 3, "up"], 
-			[4, 7, 7, "spaceship stairs", 7, 7, 0, 5, "down"]
+			[0, "Underground 4", 80, 80, ["rock1","rock2"], false],
+			[2, 7, 7, 6, ["underground", "underground2"], true, 5],
+			[4, 2, 8, "stairway up", 2, 8, 0, 3, "up"], 
+			[2, 37, 7, 6, ["underground", "underground2"], true, 5],
+			[4, 2, 6, "stairway down", 2, 6, 0, 5, "down"],
+			[4, 41, 6, "stairway down", 41, 6, 0, 5, "down"]
 		],
 		[
-			[0, "Tower Ankt, level 5", 80, 80, "plain", true],
-			[5, 0, 0, 80, 80, "grass1", "grass2"],
-			[2, 7, 7, 7, "wall", true, 2],
-			[4, 7, 7, "spaceship stairs", 7, 7, 0, 4, "up"]
+			[0, "End of the road", 80, 80, ["rock1","rock2"], false],
+			[2, 7, 7, 6, ["underground", "underground2"], true, 5],
+			[2, 37, 7, 6, ["underground", "underground2"], true, 5],
+			[1, 11, 7, 27, 1, ["underground", "underground2"], false],
+			[4, 2, 6, "stairway up", 2, 6, 0, 4, "up"],
+			[4, 41, 6, "stairway up", 41, 6, 0, 4, "up"]
 		]
 	]
 }

@@ -77,14 +77,14 @@ tiles["gateway"] = new_tile(
 	light=(77, (255, 255, 255, 255), (0, 0, 0, 255)),
 	gateway=True,
 )
-tiles["stairway_down"] = new_tile(
+tiles["stairway down"] = new_tile(
 	walkable=True,
 	transparent=True,
 	dark=(62, (192, 192, 192, 255), (0, 0, 0, 255)),
 	light=(62, (255, 255, 255, 255), (0, 0, 0, 255)),
 	gateway=True,
 )
-tiles["stairway_up"] = new_tile(
+tiles["stairway up"] = new_tile(
 	walkable=True,
 	transparent=True,
 	dark=(60, (192, 192, 192, 255), (0, 0, 0, 255)),
@@ -136,8 +136,15 @@ tiles["rock2"] = new_tile(
 tiles["underground"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(32, (32, 32, 32, 255), (32, 32, 32, 255)),
-	light=(32, (48, 48, 48, 255), (48, 48, 48, 255)),
+	dark=(35, (32, 32, 32, 255), (0, 0, 0, 255)),
+	light=(35, (48, 48, 48, 255), (0, 0, 0, 255)),
+	gateway=False,
+)
+tiles["underground2"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(37, (16, 16, 16, 255), (0, 0, 0, 255)),
+	light=(37, (32, 32, 32, 255), (0, 0, 0, 255)),
 	gateway=False,
 )
 tiles["space"] = new_tile(

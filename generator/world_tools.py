@@ -93,7 +93,9 @@ class TWorld:
 	def gen_map(self, build: dict) -> dict:
 		logger.info("")
 		logger.info(f"gen_map( {build!r} )")
-		map_tile = self.get_tile_by_name(build[4])
+		# Always start with the first tile
+		map_tile = self.get_tile_by_name(build[4][0])
+		tile_count = len(build[4])
 		map_name = build[1]
 		map_width = build[2]
 		map_height = build[3]
@@ -114,6 +116,12 @@ class TWorld:
 			"items": list,
 			"actors": list
 		}
+		# randomize tiles
+		if tile_count > 1:
+			for x in range(0, map_width):
+				for y in range(0, map_height):
+					map["tiles"][x, y] = self.get_tile_by_name(build[4][random.randint(0,tile_count - 1)])
+
 		# Initialize the lists to ensure append will work
 		map['items'] = []
 		map['actors'] = []
@@ -140,19 +148,28 @@ class TWorld:
 		if len(build) < 7:
 			logger.error(f"- too few build parameters! {len(build)} given")
 			raise SystemError()
-		map_tile = self.get_tile_by_name(build[5])
+		# Use first tile as default
+		map_tile = self.get_tile_by_name(build[5][0])
+		tile_count = len(build[5])
 		x1 = build[1]
 		y1 = build[2]
 		x2 = x1 + build[3]
 		y2 = y1 + build[4]
 		fill = build[6]
 		if fill:
-			self.maps[map_idx]['tiles'][x1:x2, y1:y2] = map_tile
+			if tile_count > 1:
+				for x in range(x1, x2):
+					for y in range(y1, y2):
+						self.maps[map_idx]["tiles"][x, y] = self.get_tile_by_name(build[5][random.randint(0,tile_count - 1)])
+			else:
+				self.maps[map_idx]['tiles'][x1:x2, y1:y2] = map_tile
 		else:
-			self.maps[map_idx]['tiles'][x1, y1:y2] = map_tile
-			self.maps[map_idx]['tiles'][x2-1, y1:y2] = map_tile
-			self.maps[map_idx]['tiles'][x1:x2, y1] = map_tile
-			self.maps[map_idx]['tiles'][x1:x2, y2-1] = map_tile
+			for y in range(y1, y2):
+				self.maps[map_idx]['tiles'][x1, y] = self.get_tile_by_name(build[5][random.randint(0,tile_count - 1)])
+				self.maps[map_idx]['tiles'][x2-1, y] = self.get_tile_by_name(build[5][random.randint(0,tile_count - 1)])
+			for x in range(x1, x2):
+				self.maps[map_idx]['tiles'][x, y1] = self.get_tile_by_name(build[5][random.randint(0,tile_count - 1)])
+				self.maps[map_idx]['tiles'][x, y2-1] = self.get_tile_by_name(build[5][random.randint(0,tile_count - 1)])
 
 	"""
 	2. Generate a circular area with a border of a tile or filled with a tile
@@ -174,6 +191,8 @@ class TWorld:
 				x = center_x + int(math.sin(r_angle) * radius)
 				y = center_y + int(math.cos(r_angle) * radius)
 				if min(center_x, x) >= 0 and max(center_x, x) <= self.maps[map_idx]['width'] and min(center_y, y) >= 0 and max(center_y, y) <= self.maps[map_idx]['height']:
+					tile_name = build[4][random.randint(0,len(build[4]) - 1)]
+					map_tile = self.get_tile_by_name(tile_name)
 					self.maps[map_idx]['tiles'][min(center_x, x):max(center_x, x), min(center_y, y):max(center_y, y)] = map_tile
 		else:
 			thickness = 1
@@ -185,6 +204,8 @@ class TWorld:
 					x = center_x + int(math.sin(r_angle) * (radius - t))
 					y = center_y + int(math.cos(r_angle) * (radius - t))
 					if min(center_x, x) >= 0 and max(center_x, x) < self.maps[map_idx]['width'] and min(center_y, y) >= 0 and max(center_y, y) < self.maps[map_idx]['height']:
+						tile_name = build[4][random.randint(0,len(build[4]) - 1)]
+						map_tile = self.get_tile_by_name(tile_name)
 						self.maps[map_idx]['tiles'][x, y] = map_tile
 
 	"""
