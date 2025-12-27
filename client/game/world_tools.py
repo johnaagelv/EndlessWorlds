@@ -20,7 +20,7 @@ def new_game() -> Registry:
 
 	faces = [64, 9786, 9787]
 	face = faces[rng.randint(0,2)]
-	skin: tuple = (randint(64, 255), randint(64, 255), randint(64, 255))
+	skin: tuple = (255, 255, 255) #(randint(64, 255), randint(64, 255), randint(64, 255))
 
 	result = client.game.connect_tools.query_server(
 		{
