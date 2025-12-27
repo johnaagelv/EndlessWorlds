@@ -7,7 +7,9 @@
 			[0, "Tower Ankt", 80, 80, ["grass1","grass2","grass3"], true, 234567890],
 			[2, 7, 7, 8, ["wall"], false, 2],
 			[4, 2, 6, "stairway down", 2, 6, 0, 1, "down"],
-			[1, 13, 6, 3, 3, ["grass1", "grass2", "grass3"], true]
+			[1, 13, 6, 3, 3, ["grass1", "grass2", "grass3"], true],
+			[9, 20, 6, "y"],
+			[9, 60, 6, "y"]
 		],
 		[
 			[0, "Underground 1", 80, 80, ["rock1","rock2"], false],
@@ -43,6 +45,11 @@
 			[1, 11, 7, 27, 1, ["underground", "underground2"], false],
 			[4, 2, 6, "stairway up", 2, 6, 0, 4, "up"],
 			[4, 41, 6, "stairway up", 41, 6, 0, 4, "up"]
+		],
+		[
+			[0, "Tower Ankt", 80, 80, ["grass1","grass2","grass3"], true],
+			[9, 20, 0, "y"],
+			[9, 60, 0, "y"]
 		]
 	]
 }

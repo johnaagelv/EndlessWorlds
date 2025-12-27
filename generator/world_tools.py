@@ -60,6 +60,8 @@ class TWorld:
 					self.gen_sym(map_idx, build)
 				elif build[0] == 8:
 					self.gen_item_tile(map_idx, build)
+				elif build[0] == 9:
+					self.gen_gateway_border(map_idx, build)
 				elif build[0] == 1000: # Items
 					self.gen_item(map_idx, build)
 				else:
@@ -79,7 +81,7 @@ class TWorld:
 			pickle.dump(save_data, f)
 	
 	def get_tile_by_name(self, name: str) -> np.ndarray:
-		logger.info(f"get_tile_by_name( {name} )")
+#		logger.info(f"get_tile_by_name( {name} )")
 		try:
 			tile = tile_types.tiles[name]
 		except Exception:
@@ -421,6 +423,45 @@ class TWorld:
 				"actions": user_actions,
 			}
 		)
+	"""
+	9. Generate a border gateway
+	"""
+	def gen_gateway_border(self, map_idx: int, build: dict) -> None:
+		# Create a X or Y border gateway
+		# 9=border, target map, X or Y
+		logger.info(f"gen_gateway_border( {build!r} )")
+		if build[3] == "x":
+			for y in range(0, self.maps[map_idx]["height"]):
+				self.maps[map_idx]["gateways"].append(
+					{
+						"x": build[1],
+						"y": y,
+						"action": None,
+						"gateway": {
+							"x": build[1],
+							"y": y,
+							"m": build[2],
+						}
+					}
+				)
+				self.maps[map_idx]["tiles"][build[1],y]["gateway"] = True
+
+		if build[3] == "y":
+			for x in range(0, self.maps[map_idx]["width"]):
+				self.maps[map_idx]["gateways"].append(
+					{
+						"x": x,
+						"y": build[1],
+						"action": None,
+						"gateway": {
+							"x": x,
+							"y": build[1],
+							"m": build[2],
+						}
+					}
+				)
+				self.maps[map_idx]["tiles"][x, build[1]]["gateway"] = True
+
 
 	"""
 	1000. Generate an item
