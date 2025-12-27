@@ -11,6 +11,7 @@ lawngreen = (124, 252, 0, 255)
 lightgray = (211, 211, 211, 255) # Real name is lightgrey
 mediumblue = (0, 0, 205, 255)
 saddlebrown = (139, 69, 19, 255)
+saddlebrown2 = (139, 69, 19, 192)
 silver = (192, 192, 192, 255)
 white = (255, 255, 255, 255)
 rocket_metallic = (138, 127, 128, 255)

@@ -136,15 +136,15 @@ tiles["rock2"] = new_tile(
 tiles["underground"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(35, (32, 32, 32, 255), (0, 0, 0, 255)),
-	light=(35, (48, 48, 48, 255), (0, 0, 0, 255)),
+	dark=(37, colour.saddlebrown2, colour.black),
+	light=(39, colour.saddlebrown2, colour.black),
 	gateway=False,
 )
 tiles["underground2"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(37, (16, 16, 16, 255), (0, 0, 0, 255)),
-	light=(37, (32, 32, 32, 255), (0, 0, 0, 255)),
+	dark=(39, colour.saddlebrown, colour.black),
+	light=(37, colour.saddlebrown, colour.black),
 	gateway=False,
 )
 tiles["space"] = new_tile(
