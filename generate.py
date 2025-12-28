@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
 import generator.world_tools as world_tools
 
@@ -14,10 +15,11 @@ def main(world_name: str, log_level: int):
 	logging.basicConfig(filename=LOG_FILENAME, format=LOG_FORMAT, filemode="w", level=log_level)
 	logging.info('Generator started')
 	print('Generator started')
-	world = world_tools.TWorld(world_name)
-	if not world.generate():
-		logging.info(f"- {world_name} is not a world file")
-		print(f"- '{world_name}' is not a world file")
+	world_tools.generate(Path('generator/definitions/ankt.json'))
+#	world = world_tools.TWorld(world_name)
+#	if not world.generate():
+#		logging.info(f"- {world_name} is not a world file")
+#		print(f"- '{world_name}' is not a world file")
 	print('Generator stopped')
 	logging.info('Generator stopped')
 

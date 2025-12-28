@@ -18,7 +18,7 @@ logger = logging.getLogger(config.LOG_NAME)
 Generate a binary header dictionary
 """
 def generate_binary_message(data: dict) -> bytes:
-#	logger.debug("generate_binary_message")
+	logger.debug("generate_binary_message")
 	content_bytes = pickle.dumps(data)
 	jsonheader = {
 		"byteorder": sys.byteorder,
@@ -31,7 +31,7 @@ def generate_binary_message(data: dict) -> bytes:
 	return message_hdr + jsonheader_bytes + content_bytes
 
 def start_connection(request: dict):
-#	logger.debug("start_connection( request )")
+	logger.debug("start_connection( request )")
 	# Accept a connection from a client
 	host = "192.168.1.104"
 	port = 25261
@@ -49,8 +49,8 @@ def start_connection(request: dict):
 	g.sel.register(client_connection, selectors.EVENT_WRITE, data=client_communicator)
 
 def query_server(request: dict) -> dict:
-#	logger.debug(" ")
-#	logger.debug(f"query_server( request {request['cmd']})")
+	logger.debug(" ")
+	logger.debug(f"query_server( request {request['cmd']})")
 	start_connection(request)
 	query_on = True
 	while query_on:
@@ -63,13 +63,13 @@ def query_server(request: dict) -> dict:
 						# Has a request been received?
 						if client_communicator.dispatch(mask):
 							result = client_communicator.message
-#							logger.debug("- response received ...")
+							logger.debug("- response received ...")
 							# Message has been received, set False to stop
 							query_on = False
 					else:
 						# Has the response been sent?
 						if client_communicator.dispatch(mask):
-#							logger.debug("- message sent ...")
+							logger.debug("- message sent ...")
 							client_communicator.message = {}
 							client_communicator._jsonheader_len = -1
 							client_communicator.jsonheader = {}

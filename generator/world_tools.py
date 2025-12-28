@@ -6,6 +6,9 @@ import pickle
 import random
 import math
 
+from pathlib import Path
+from typing import Callable
+
 import generator.tile_types as tile_types
 import tcod.tileset
 
@@ -14,6 +17,109 @@ import generator.item_types as item_types
 import numpy as np
 import logging
 logger = logging.getLogger("EWGenerate")
+
+name: str = ""
+maps: list = []
+entries: list = []
+gateways: list = []
+
+type commandFn = Callable[[list], None]
+
+def generate(filename: Path) -> None:
+	logger.info(f"generate( {filename} )")
+	with open(filename, "rt") as f:
+		build_instructions = json.load(f)
+	
+	name = build_instructions["name"]
+	entries = build_instructions["entries"]
+
+	for build in build_instructions["builds"][0]:
+		generator_name = build[0]
+		generator = generators.get(generator_name)
+		if generator:
+			generator(build)
+
+	logger.info("- saving")
+	with open("server/data/ankt.dat", "wb") as f:
+		save_data = {
+			"name": name,
+			"entry": entries,
+			"maps": maps
+		}
+		pickle.dump(save_data, f)
+
+
+def get_tile_by_name(name: str) -> np.ndarray:
+#	logger.info(f"get_tile_by_name( {name} )")
+	try:
+		tile = tile_types.tiles[name]
+	except Exception:
+		logger.warning(
+			f"- tile {name} not found among tile types! Using tile 'blank' instead!"
+		)
+		tile = tile_types.tiles['blank']
+	return tile
+
+def generate_world(build: list) -> None:
+	""" Generate a world as a collection of maps """
+	logger.info(f"generate_world( {build} )")
+	generator_name: str = build[0]
+	map_width: int = build[1]
+	map_height: int = build[2]
+	world_width: int = build[3]
+	world_height: int = build[4]
+	map_tiles: list = build[5]
+	# seed = build[6]
+	for ww in range(0, world_width):
+		for wh in range(0, world_height):
+			generate_map([generator_name, map_width, map_height, map_tiles, False, ww, wh])
+
+def generate_map(build: list) -> None:
+	""" Generate a single map """
+	logger.info(f"generate_map( {build} )")
+	# 0=name, 1=width, 2=height, 3=tiles, 4=visible, 5=ww, 6=wh, 7=name (optional)
+	map_tile = get_tile_by_name(build[3][0])
+	ww = build[5]
+	wh = build[6]
+	map_name = f"Quadrant {ww},{wh}"
+	if len(build) > 7:
+		map_name = build[7]
+	map_width = build[1]
+	map_height = build[2]
+	map_visibility = build[4]
+	tile_count = len(build[3])
+
+	map: dict = {
+		"name": map_name,
+		"ww": ww,
+		"wh": wh,
+		"width": map_width,
+		"height": map_height,
+		"tiles": np.full((map_width, map_height), fill_value=map_tile, order="F"),
+		"gateways": list,
+		"actions": list,
+		"visible": map_visibility,
+		"items": list,
+		"actors": list
+	}
+	# randomize tiles
+	if tile_count > 1:
+		for x in range(0, map_width):
+			for y in range(0, map_height):
+				map["tiles"][x, y] = get_tile_by_name(build[3][random.randint(0,tile_count - 1)])
+
+	# Initialize the lists to ensure append will work
+	map['items'] = []
+	map['actors'] = []
+	map['gateways'] = []
+	map['actions'] = []
+	maps.append(map)
+
+""" Generators to be used for building a world """
+generators: dict[str, commandFn] = {
+	"world": generate_world,
+	"map": generate_map
+}
 
 gateway_list: list[dict]
 
@@ -438,7 +544,7 @@ class TWorld:
 						"y": y,
 						"action": None,
 						"gateway": {
-							"x": build[1],
+							"x": build[4],
 							"y": y,
 							"m": build[2],
 						}
@@ -455,7 +561,7 @@ class TWorld:
 						"action": None,
 						"gateway": {
 							"x": x,
-							"y": build[1],
+							"y": build[4],
 							"m": build[2],
 						}
 					}

@@ -2,8 +2,11 @@ from __future__ import annotations
 import uuid
 import random
 from server.world import TWorld
+import logging
+logger = logging.getLogger("EWlogger")
 
 def cmd_new(request: dict, world: TWorld) -> dict:
+	logger.debug(f"cmd_new( {request}, world )")
 	cmd_keys = request.keys()
 	response: dict = {"cmd": "new"}
 	if "cid" in cmd_keys:

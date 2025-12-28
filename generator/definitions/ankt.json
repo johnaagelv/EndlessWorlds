@@ -1,15 +1,16 @@
 {
-	"id":"",
-	"name": "Ankt",
-	"entry": [[6, 6, 0, 0], [6, 8, 0, 0], [8, 6, 0, 0], [8, 8, 0, 0],[23, 8, 0, 0]],
-	"maps": [
+	"id":"EW2025Ankt",
+	"name": "Planet Ankt",
+	"entries": [[10, 10, 0, 0],[20, 10, 0, 1],[30, 10, 0, 2]],
+	"builds": [
 		[
-			[0, "Tower Ankt", 80, 80, ["grass1","grass2","grass3"], true, 234567890],
-			[2, 7, 7, 8, ["wall"], false, 2],
-			[4, 2, 6, "stairway down", 2, 6, 0, 1, "down"],
-			[1, 13, 6, 3, 3, ["grass1", "grass2", "grass3"], true],
-			[9, 20, 6, "y"],
-			[9, 60, 6, "y"]
+			["world", 400, 400, 10, 10, ["grass1","grass2","grass3"], 234567890]
+		],
+		[
+			[0, "Planet Ankt", 400, 400, ["grass1","grass2","grass3"], true, 234567890, 100, 100],
+			[2, 27, 27, 8, ["wall"], false, 2],
+			[4, 22, 26, "stairway down", 2, 6, 0, 1, "down"],
+			[1, 33, 26, 3, 3, ["grass1", "grass2", "grass3"], true]
 		],
 		[
 			[0, "Underground 1", 80, 80, ["rock1","rock2"], false],
@@ -45,11 +46,6 @@
 			[1, 11, 7, 27, 1, ["underground", "underground2"], false],
 			[4, 2, 6, "stairway up", 2, 6, 0, 4, "up"],
 			[4, 41, 6, "stairway up", 41, 6, 0, 4, "up"]
-		],
-		[
-			[0, "Tower Ankt", 80, 80, ["grass1","grass2","grass3"], true],
-			[9, 20, 0, "y"],
-			[9, 60, 0, "y"]
 		]
 	]
 }

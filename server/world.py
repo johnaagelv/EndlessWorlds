@@ -36,7 +36,7 @@ class TWorld:
 		Get world definition
 		- collects and returns the name, size, visibility, and may include the FOS, of all the maps
 		"""
-		logger.info("TWorld->get_world_definition()")
+		logger.debug("TWorld->get_world_definition()")
 		map_sizes: list = []
 		for map_index, map in enumerate(self.maps):
 			fos: dict = {}
@@ -44,6 +44,8 @@ class TWorld:
 				fos = self.get_map_field_of_sense(map_index, 0, 0, 0, True)
 			map_sizes.append({
 				"name": map["name"],
+				"ww": map["ww"],
+				"wh": map["wh"],
 				"width": self.get_map_width(map_index),
 				"height": self.get_map_height(map_index),
 				"visible": map["visible"],
@@ -58,7 +60,7 @@ class TWorld:
 		Get world entry points
 		- retrieves and returns the world entry points, where a new player can be located
 		"""
-		logger.info("TWorld->get_world_entry_points()")
+		logger.debug("TWorld->get_world_entry_points()")
 		return self.entry_points
 
 	# NOTE: get_map_by_index is not used!
@@ -120,6 +122,7 @@ class TWorld:
 		- calculates a map slice dimensions as the x and y axes minimum and maximum values based on the specified point (x, y), radius and visibility indication
 		returns the calculated map slice dimensions
 		"""
+		logger.debug(f"_calculate_field_of_sense( {map_index}, {x}, {y}, {r}, {visible})")
 		map_width, map_height = self.get_map_size(map_index)
 		if visible or r == 0: # Get the full map
 			x_min = 0

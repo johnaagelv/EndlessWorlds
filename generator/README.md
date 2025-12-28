@@ -21,7 +21,10 @@ The map build instructions each starts with a build instruction number, where:
 - 5 is the instruction to build an area at coordinates x, y with a width and height, using two or three tiles randomly
 - 6 is the instruction to build a trail at coordinates x1, y1 with a target of coordinates x2, y2 and the trail width between two values
 - 7 is the instruction to build an area at coordinates x, y with a width and height filled with a specified symbol (ie. a new tile will be created)
-
+- 8 is the instruction to build a tile at coordinates x, y that may accept a specific action
+- 9 is the instruction to build a gateway border at the x or y
+- 100 is the instruction to build a world of linked maps from world width and height and map width and height
+- 1000 is the instruction to build an item at coordinates x, y with a width and height, using an item type
 Whenever a 0 build instruction number is read, a new map is started and every higher build instruction number is applied to that map.
 
 # Preconditions

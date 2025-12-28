@@ -21,4 +21,5 @@ def generate_binary_message(data: dict) -> bytes:
 	}
 	jsonheader_bytes = json.dumps(jsonheader, ensure_ascii=False).encode("utf-8")
 	message_hdr = struct.pack(">H", len(jsonheader_bytes))
+	logger.debug("- generated")
 	return message_hdr + jsonheader_bytes + content_bytes

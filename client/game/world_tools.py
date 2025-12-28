@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from random import Random, randint
+from random import Random #, randint
 from tcod.ecs import Registry
 import client.tile_types as tile_types
 import client.g as g
@@ -79,6 +79,8 @@ def start_map(map_idx: int) -> None:
 		maps.maps[map_idx] = {
 			"loaded": True,
 			"name": definition["name"],
+			"ww": definition["ww"],
+			"wh": definition["wh"],
 			"width": map_width,
 			"height": map_height,
 			"gateways": definition["gateways"],
@@ -103,6 +105,7 @@ def in_gateway(x: int, y: int, map_idx: int) -> bool:
 
 def go_gateway(x: int, y: int, map_idx: int, direction = None) -> dict:
 	""" Return the gateway at the current location """
+	print(f"go_gateway: {x},{y},{map_idx}, {direction}")
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
 	gateway_fallback = {

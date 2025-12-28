@@ -7,6 +7,7 @@ import tcod.ecs.callbacks
 from tcod.ecs import Entity
 
 from client.game.tags import IsWorld
+#from client.game.world_tools import start_map
 
 import client.configuration as config
 import logging
@@ -27,13 +28,14 @@ class Position:
 		x, y = direction
 		new_x = self.x + x
 		new_y = self.y + y
-		if map["tiles"][new_x, new_y]["walkable"] and 0 <= new_x < map["width"] and 0 <= new_y < map["height"]:
+		new_m = self.m
+
+		if 0 <= new_x < map["width"] and 0 <= new_y < map["height"] and map["tiles"][new_x, new_y]["walkable"]:
 			pass
 		else:
 			new_x = self.x
 			new_y = self.y
-
-		return self.__class__(new_x, new_y, self.m)
+		return self.__class__(new_x, new_y, new_m)
 	
 @tcod.ecs.callbacks.register_component_changed(component=Position)
 def on_position_changed(entity: Entity, old: Position | None, new: Position | None) -> None:

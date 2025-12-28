@@ -27,6 +27,7 @@ class InGame(State):
 	def on_event(self, event: tcod.event.Event) -> StateResult:
 		""" Handle events for the in-game state """
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
+		(world,) = g.game.Q.all_of(tags=[IsWorld])
 		pos = player.components[Position]
 		match event:
 		
@@ -49,6 +50,36 @@ class InGame(State):
 
 			case tcod.event.KeyDown(sym=sym) if sym in DIRECTION_KEYS:
 				player.components[Position] += DIRECTION_KEYS[sym]
+				new_pos = player.components[Position]
+				map = world.components[Maps].maps[new_pos.m]
+				vision_radius = player.components[Vision]
+				if not (vision_radius - 1 < new_pos.x < map["width"] - vision_radius and vision_radius - 1 < new_pos.y < map["height"] - vision_radius):
+					ww = map["ww"]
+					wh = map["wh"]
+					new_x = new_pos.x
+					new_y = new_pos.y
+					if new_x < vision_radius:
+						new_x = map["width"] - vision_radius
+						ww = (ww - 1) % 10
+					if new_x > map["width"] - vision_radius:
+						new_x = vision_radius
+						ww = (ww + 1) % 10
+					if new_y < vision_radius:
+						new_y = map["height"] - vision_radius
+						wh = (wh - 1) % 10
+					if new_y > map["height"] - vision_radius:
+						new_y = vision_radius
+						wh = (wh + 1) % 10
+					m = ww * 10 + wh
+					print(f"Switch to map {m} based on {ww} and {wh}")
+					world_tools.start_map(m)
+					player.components[Position] = Position(new_x, new_y, m)
+					return None
+				if world_tools.in_gateway(new_pos.x, new_pos.y, new_pos.m):
+					gateway = world_tools.go_gateway(new_pos.x, new_pos.y, new_pos.m)
+					world_tools.start_map(gateway["gateway"]["m"])
+					# Move to x, y coordinate in map number m
+					player.components[Position] = Position(gateway["gateway"]["x"], gateway["gateway"]["y"], gateway["gateway"]["m"])
 				return None
 
 			case tcod.event.KeyDown(sym=KeySym.ESCAPE):
