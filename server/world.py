@@ -25,6 +25,9 @@ class TWorld:
 			data = pickle.load(f)
 			self.name = data["name"]
 			self.maps = data["maps"]
+			print(f"World size {data['width']},{data['height']}")
+			self.width = data["width"]
+			self.height = data["height"]
 			self.entry_points = data["entry"]
 			self.actors = {}
 			self.items = []
@@ -46,6 +49,7 @@ class TWorld:
 				"name": map["name"],
 				"ww": map["ww"],
 				"wh": map["wh"],
+				"overworld": map["overworld"],
 				"width": self.get_map_width(map_index),
 				"height": self.get_map_height(map_index),
 				"visible": map["visible"],

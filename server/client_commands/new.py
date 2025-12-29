@@ -33,5 +33,7 @@ def cmd_new(request: dict, world: TWorld) -> dict:
 	}
 
 	response["name"] = world.name
+	response["width"] = world.width
+	response["height"] = world.height
 	response["map_sizes"] = world.get_world_definition()
 	return response

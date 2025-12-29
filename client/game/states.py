@@ -9,7 +9,7 @@ from tcod.event import KeySym, Modifier
 import client.g as g
 from client.constants import DIRECTION_KEYS, ACTION_KEYS, STAIR_KEYS
 from client.game.state import Pop, Push, Reset, State, StateResult
-from client.game.components import CID, Maps, Position, Vision
+from client.game.components import CID, Maps, Position, Vision, World
 from client.game.tags import IsPlayer, IsWorld
 import client.game.world_tools as world_tools
 import client.game.entity_tools as entity_tools
@@ -53,24 +53,24 @@ class InGame(State):
 				new_pos = player.components[Position]
 				map = world.components[Maps].maps[new_pos.m]
 				vision_radius = player.components[Vision]
-				if not (vision_radius - 1 < new_pos.x < map["width"] - vision_radius and vision_radius - 1 < new_pos.y < map["height"] - vision_radius):
+				if map["overworld"] and not (vision_radius - 1 < new_pos.x < map["width"] - vision_radius and vision_radius - 1 < new_pos.y < map["height"] - vision_radius):
 					ww = map["ww"]
 					wh = map["wh"]
 					new_x = new_pos.x
 					new_y = new_pos.y
 					if new_x < vision_radius:
 						new_x = map["width"] - vision_radius
-						ww = (ww - 1) % 10
+						ww = (ww - 1) % world.components[World].width
 					if new_x > map["width"] - vision_radius:
 						new_x = vision_radius
-						ww = (ww + 1) % 10
+						ww = (ww + 1) % world.components[World].width
 					if new_y < vision_radius:
 						new_y = map["height"] - vision_radius
-						wh = (wh - 1) % 10
+						wh = (wh - 1) % world.components[World].height
 					if new_y > map["height"] - vision_radius:
 						new_y = vision_radius
-						wh = (wh + 1) % 10
-					m = ww * 10 + wh
+						wh = (wh + 1) % world.components[World].height
+					m = ww * world.components[World].width + wh
 					print(f"Switch to map {m} based on {ww} and {wh}")
 					world_tools.start_map(m)
 					player.components[Position] = Position(new_x, new_y, m)

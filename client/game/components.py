@@ -80,8 +80,11 @@ Vision: Final = ("Vision", int)
 @attrs.define()
 class World:
 	""" World """
-	definitions: list[dict] = []
-	maps: list[dict] = []
+	name: str
+	width: int
+	height: int
+#	definitions: list[dict] = []
+#	maps: list[dict] = []
 
 @attrs.define()
 class Maps:

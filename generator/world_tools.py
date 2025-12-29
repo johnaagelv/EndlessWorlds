@@ -17,11 +17,14 @@ import generator.item_types as item_types
 import numpy as np
 import logging
 logger = logging.getLogger("EWGenerate")
-
-name: str = ""
-maps: list = []
-entries: list = []
-gateways: list = []
+world_data: dict = {
+	"name": str,
+	"world_width": int,
+	"world_height": int,
+	"maps": list,
+	"entries": list,
+	"gateways": list
+}
 
 type commandFn = Callable[[list], None]
 
@@ -30,8 +33,9 @@ def generate(filename: Path) -> None:
 	with open(filename, "rt") as f:
 		build_instructions = json.load(f)
 	
-	name = build_instructions["name"]
-	entries = build_instructions["entries"]
+	world_data["name"] = build_instructions["name"]
+	world_data["entries"] = build_instructions["entries"]
+	world_data["maps"] = []
 
 	for build in build_instructions["builds"][0]:
 		generator_name = build[0]
@@ -41,13 +45,15 @@ def generate(filename: Path) -> None:
 
 	logger.info("- saving")
 	with open("server/data/ankt.dat", "wb") as f:
+		print(f"World size {world_data["world_width"]},{world_data["world_height"]}")
 		save_data = {
-			"name": name,
-			"entry": entries,
-			"maps": maps
+			"name": world_data["name"],
+			"width": world_data["world_width"],
+			"height": world_data["world_height"],
+			"entry": world_data["entries"],
+			"maps": world_data["maps"]
 		}
 		pickle.dump(save_data, f)
-
 
 def get_tile_by_name(name: str) -> np.ndarray:
 #	logger.info(f"get_tile_by_name( {name} )")
@@ -66,24 +72,24 @@ def generate_world(build: list) -> None:
 	generator_name: str = build[0]
 	map_width: int = build[1]
 	map_height: int = build[2]
-	world_width: int = build[3]
-	world_height: int = build[4]
+	world_data["world_width"] = build[3]
+	world_data["world_height"] = build[4]
 	map_tiles: list = build[5]
 	# seed = build[6]
-	for ww in range(0, world_width):
-		for wh in range(0, world_height):
-			generate_map([generator_name, map_width, map_height, map_tiles, False, ww, wh])
+	for ww in range(0, world_data["world_width"]):
+		for wh in range(0, world_data["world_height"]):
+			generate_map([generator_name, map_width, map_height, map_tiles, False, ww, wh, True])
 
 def generate_map(build: list) -> None:
 	""" Generate a single map """
 	logger.info(f"generate_map( {build} )")
-	# 0=name, 1=width, 2=height, 3=tiles, 4=visible, 5=ww, 6=wh, 7=name (optional)
+	# 0=name, 1=width, 2=height, 3=tiles, 4=visible, 5=ww, 6=wh, 7=Overworld, 8=name (optional)
 	map_tile = get_tile_by_name(build[3][0])
 	ww = build[5]
 	wh = build[6]
-	map_name = f"Quadrant {ww},{wh}"
-	if len(build) > 7:
-		map_name = build[7]
+	map_name = f"Quadrant {ww} {wh}"
+	if len(build) > 8:
+		map_name = build[8]
 	map_width = build[1]
 	map_height = build[2]
 	map_visibility = build[4]
@@ -93,6 +99,7 @@ def generate_map(build: list) -> None:
 		"name": map_name,
 		"ww": ww,
 		"wh": wh,
+		"overworld": build[7],
 		"width": map_width,
 		"height": map_height,
 		"tiles": np.full((map_width, map_height), fill_value=map_tile, order="F"),
@@ -113,7 +120,8 @@ def generate_map(build: list) -> None:
 	map['actors'] = []
 	map['gateways'] = []
 	map['actions'] = []
-	maps.append(map)
+	world_data["maps"].append(map)
+
 
 """ Generators to be used for building a world """
 generators: dict[str, commandFn] = {

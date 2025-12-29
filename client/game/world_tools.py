@@ -29,12 +29,14 @@ def new_game() -> Registry:
 			"skin": skin, # Colour, tuple, for the skin colour
 		}
 	)
+	print(result.keys())
 
 	map_sizes = result['map_sizes']
 	map_template = {
 		"loaded": bool,
 		"width": int,
 		"height": int,
+		"overworld": bool,
 		"tiles": np.ndarray,
 		"visible": np.ndarray,
 		"explored": np.ndarray,
@@ -45,7 +47,11 @@ def new_game() -> Registry:
 	map_template["loaded"] = False
 
 	world = game[object()]
-	world.components[World] = World()
+	world.components[World] = World(
+		name=result["name"],
+		width=result["width"],
+		height=result["height"]
+	)
 	world.components[Maps] = Maps([map_template] * len(map_sizes), map_sizes)
 	world.tags |= {IsWorld}
 
@@ -81,6 +87,7 @@ def start_map(map_idx: int) -> None:
 			"name": definition["name"],
 			"ww": definition["ww"],
 			"wh": definition["wh"],
+			"overworld": definition["overworld"],
 			"width": map_width,
 			"height": map_height,
 			"gateways": definition["gateways"],
