@@ -11,6 +11,7 @@ from client.constants import DIRECTION_KEYS, ACTION_KEYS, STAIR_KEYS
 from client.game.state import Pop, Push, Reset, State, StateResult
 from client.game.components import CID, Maps, Position, Vision, World
 from client.game.tags import IsPlayer, IsWorld
+import client.tile_types as tile_types
 import client.game.world_tools as world_tools
 import client.game.entity_tools as entity_tools
 import client.game.menus
@@ -58,23 +59,24 @@ class InGame(State):
 					wh = map["wh"]
 					new_x = new_pos.x
 					new_y = new_pos.y
-					if new_x < vision_radius:
-						new_x = map["width"] - vision_radius
+					if new_x < 0:
+						new_x = map["width"] - 1
 						ww = (ww - 1) % world.components[World].width
-					if new_x > map["width"] - vision_radius:
-						new_x = vision_radius
+					if new_x >= map["width"]:
+						new_x = 0
 						ww = (ww + 1) % world.components[World].width
-					if new_y < vision_radius:
-						new_y = map["height"] - vision_radius
+					if new_y < 0:
+						new_y = map["height"] - 1
 						wh = (wh - 1) % world.components[World].height
-					if new_y > map["height"] - vision_radius:
-						new_y = vision_radius
+					if new_y >= map["height"]:
+						new_y = 0
 						wh = (wh + 1) % world.components[World].height
 					m = ww * world.components[World].width + wh
 					print(f"Switch to map {m} based on {ww} and {wh}")
 					world_tools.start_map(m)
 					player.components[Position] = Position(new_x, new_y, m)
 					return None
+				
 				if world_tools.in_gateway(new_pos.x, new_pos.y, new_pos.m):
 					gateway = world_tools.go_gateway(new_pos.x, new_pos.y, new_pos.m)
 					world_tools.start_map(gateway["gateway"]["m"])
@@ -95,19 +97,87 @@ class InGame(State):
 		""" Draw the stancard screen """
 		(player,) = g.game.Q.all_of(tags=[IsPlayer])
 		pos = player.components[Position]
+		vision = player.components[Vision]
+		(world,) = g.game.Q.all_of(tags=[IsWorld])
+		maps = world.components[Maps].maps
+		world_width = world.components[World].width
+		world_height = world.components[World].height
+		render_map = maps[pos.m]
+	
+		if maps[pos.m]["overworld"]:
+			render_map: dict = {}
+			ww = maps[pos.m]["ww"]
+			wh = maps[pos.m]["wh"]
+			map_width = maps[pos.m]["width"]
+			map_height = maps[pos.m]["height"]
 
-		# Ensure that the FOV is updated
-		entity_tools.fov()
+			qul = ((ww - 1) % world_width) * world_width + (wh - 1) % world_height # Quadrant upper left
+			qml = ((ww - 1) % world_width) * world_width + (wh - 0) % world_height # Quadrant left
+			qll = ((ww - 1) % world_width) * world_width + (wh + 1) % world_height # Quadrant lower left
+			qum = ((ww - 0) % world_width) * world_width + (wh - 1) % world_height
+			qmm = ((ww - 0) % world_width) * world_width + (wh - 0) % world_height
+			qlm = ((ww - 0) % world_width) * world_width + (wh + 1) % world_height
+			qur = ((ww + 1) % world_width) * world_width + (wh - 1) % world_height
+			qmr = ((ww + 1) % world_width) * world_width + (wh - 0) % world_height
+			qlr = ((ww + 1) % world_width) * world_width + (wh + 1) % world_height
+
+			world_tools.start_map(qul)
+			world_tools.start_map(qml)
+			world_tools.start_map(qll)
+			world_tools.start_map(qum)
+			world_tools.start_map(qmm)
+			world_tools.start_map(qlm)
+			world_tools.start_map(qur)
+			world_tools.start_map(qmr)
+			world_tools.start_map(qlr)
+
+			entity_tools.fov(Position(pos.x - map_width, pos.y - map_height, qul), vision, maps[qul], False)
+			entity_tools.fov(Position(pos.x - map_width, pos.y, qml), vision, maps[qml], False)
+			entity_tools.fov(Position(pos.x - map_width, pos.y + map_height, qll), vision, maps[qll], False)
+			entity_tools.fov(Position(pos.x, pos.y - map_height, qum), vision, maps[qum], False)
+			entity_tools.fov(Position(pos.x, pos.y, qmm), vision, maps[qmm])
+			entity_tools.fov(Position(pos.x, pos.y + map_height, qlm), vision, maps[qlm], False)
+			entity_tools.fov(Position(pos.x + map_width, pos.y - map_height, qur), vision, maps[qur], False)
+			entity_tools.fov(Position(pos.x + map_width, pos.y, qmr), vision, maps[qmr], False)
+			entity_tools.fov(Position(pos.x + map_width, pos.y + map_height, qlr), vision, maps[qlr], False)
+
+			maps_left: dict = {}
+			maps_left["visible"] = np.concatenate((maps[qul]["visible"], maps[qml]["visible"], maps[qll]["visible"]), axis=1)
+			maps_left["explored"] = np.concatenate((maps[qul]["explored"], maps[qml]["explored"], maps[qll]["explored"]), axis=1)
+			maps_left["tiles"] = np.concatenate((maps[qul]["tiles"], maps[qml]["tiles"], maps[qll]["tiles"]), axis=1)
+
+			maps_middle: dict = {}
+			maps_middle["visible"] = np.concatenate((maps[qum]["visible"], maps[qmm]["visible"], maps[qlm]["visible"]), axis=1)
+			maps_middle["explored"] = np.concatenate((maps[qum]["explored"], maps[qmm]["explored"], maps[qlm]["explored"]), axis=1)
+			maps_middle["tiles"] = np.concatenate((maps[qum]["tiles"], maps[qmm]["tiles"], maps[qlm]["tiles"]), axis=1)
+
+			maps_right: dict = {}
+			maps_right["visible"] = np.concatenate((maps[qur]["visible"], maps[qmr]["visible"], maps[qlr]["visible"]), axis=1)
+			maps_right["explored"] = np.concatenate((maps[qur]["explored"], maps[qmr]["explored"], maps[qlr]["explored"]), axis=1)
+			maps_right["tiles"] = np.concatenate((maps[qur]["tiles"], maps[qmr]["tiles"], maps[qlr]["tiles"]), axis=1)
+
+			render_map["visible"] = np.concatenate((maps_left["visible"], maps_middle["visible"], maps_right["visible"]), axis=0)
+			render_map["explored"] = np.concatenate((maps_left["explored"], maps_middle["explored"], maps_right["explored"]), axis=0)
+			render_map["tiles"] = np.concatenate((maps_left["tiles"], maps_middle["tiles"], maps_right["tiles"]), axis=0)
+			
+			render_map["width"] = map_width * 3
+			render_map["height"] = map_height * 3
+			render_map["name"] = maps[pos.m]["name"]
+			render_map["items"] = maps[pos.m]["items"]
+
+			pos = Position(pos.x + map_width, pos.y + map_height, pos.m)
+
+		entity_tools.fov(pos, vision, render_map)
 
 		# Get the view port for the rendering methods
-		view_port = world_tools.get_view_port(pos)
+		view_port = world_tools.get_view_port(pos, render_map)
 
 		# Render the current map
-		renders.world_map(pos.m, console, view_port)
+		renders.world_map(render_map, console, view_port)
 
 		# Draw the entities including the player
-		renders.entities(pos.m, console, view_port)
-		renders.player(player, console, view_port)
+#		renders.entities(pos.m, console, view_port)
+		renders.player(player, console, view_port, pos)
 
 		# Draw the player information
 		renders.player_states(player, console)

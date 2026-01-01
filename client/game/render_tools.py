@@ -9,6 +9,9 @@ from client.game.tags import IsPlayer, IsState, IsWorld
 import client.tile_types as tile_types
 import client.ui.colours as colours
 import client.ui.configuration as config
+import client.configuration as logconfig
+import logging
+logger = logging.getLogger(logconfig.LOG_NAME_CLIENT)
 
 def player_states(player: Entity, console: tcod.console.Console) -> None:
 	""" Render all the player states such as health, energy, ... """
@@ -48,15 +51,12 @@ def player_states(player: Entity, console: tcod.console.Console) -> None:
 		console.print(view_x + state_x, view_y, text=f"{current_value}", fg=colours.bar_text)
 		view_y += 1
 
-def world_map(map_idx, console: tcod.console.Console, view_port: tuple) -> None:
+def world_map(current_map: dict, console: tcod.console.Console, view_port: tuple) -> None:
 	""" Render the world map in the view port and render the name of the map """
-	(world,) = g.game.Q.all_of(tags=[IsWorld])
-	maps = world.components[Maps]
-
-	visible_tiles = maps.maps[map_idx]['visible']
-	explored_tiles = maps.maps[map_idx]['explored']
-	light_tiles = maps.maps[map_idx]['tiles']['light']
-	dark_tiles = maps.maps[map_idx]['tiles']['dark']
+	visible_tiles = current_map['visible']
+	explored_tiles = current_map['explored']
+	light_tiles = current_map['tiles']['light']
+	dark_tiles = current_map['tiles']['dark']
 
 	# Transfer the tiles within the view port to the console
 	view_x1, view_x2, view_y1, view_y2 = view_port
@@ -65,9 +65,9 @@ def world_map(map_idx, console: tcod.console.Console, view_port: tuple) -> None:
 		choicelist=[light_tiles[view_x1:view_x2, view_y1:view_y2], dark_tiles[view_x1:view_x2, view_y1:view_y2]],
 		default=tile_types.SHROUD
 	)
-	console.print(x=config.WORLD_PORT_X, y=config.WORLD_PORT_Y, text=f"{maps.maps[map_idx]['name']}", fg=colours.bar_text)
+	console.print(x=config.WORLD_PORT_X, y=config.WORLD_PORT_Y, text=f"{current_map['name']}", fg=colours.bar_text)
 
-	for item in [item for item in maps.maps[map_idx]["items"] if view_x1 <= item["x"] <= view_x2 and view_y1 <= item["y"] <= view_y2 and visible_tiles[item["x"], item["y"]]]:
+	for item in [item for item in current_map["items"] if view_x1 <= item["x"] <= view_x2 and view_y1 <= item["y"] <= view_y2 and visible_tiles[item["x"], item["y"]]]:
 		x = item["x"] - view_x1
 		y = item["y"] - view_y1
 		face = item["face"]
@@ -90,10 +90,10 @@ def entities(map_idx: int, console: tcod.console.Console, view_port: tuple) -> N
 				console.rgb[["ch", "fg"]][x, y] = actor['face'], actor['skin']
 
 
-def player(player: Entity, console: tcod.console.Console, view_port: tuple) -> None:
+def player(player: Entity, console: tcod.console.Console, view_port: tuple, pos: Position) -> None:
 	# Render player entity as the last to ensure it is in front
 	view_x1, view_x2, view_y1, view_y2 = view_port
-	pos = player.components[Position]
+#	pos = player.components[Position]
 	graphic = player.components[Graphic]
 	x = pos.x - view_x1, 
 	y = pos.y - view_y1,

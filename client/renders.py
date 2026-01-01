@@ -30,7 +30,7 @@ class TRender:
 		self.context = 	tcod.context.new(
 			console = self.root_console,
 			tileset = self.tileset,
-			title = "Endless Worlds, Ankt, (c) 2025",
+			title = "Endless Worlds, (c) 2025",
 			vsync = True,
 		)
 

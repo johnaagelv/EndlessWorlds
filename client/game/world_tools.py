@@ -34,14 +34,16 @@ def new_game() -> Registry:
 	map_sizes = result['map_sizes']
 	map_template = {
 		"loaded": bool,
+		"name": str,
+		"ww": int,
+		"wh": int,
+		"overworld": bool,
 		"width": int,
 		"height": int,
-		"overworld": bool,
+		"gateways": list,
 		"tiles": np.ndarray,
 		"visible": np.ndarray,
 		"explored": np.ndarray,
-		"gateways": list,
-		"actors": list,
 		"items": list,
 	}
 	map_template["loaded"] = False
@@ -78,10 +80,11 @@ def start_map(map_idx: int) -> None:
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
 	if not maps.maps[map_idx]['loaded']:
+		print(f"*** Starting map {map_idx}")
 		definition = maps.defs[map_idx]
 		map_width = int(definition["width"])
 		map_height = int(definition["height"])
-		map_visible = definition["visible"]
+		map_visible = False #definition["visible"]
 		maps.maps[map_idx] = {
 			"loaded": True,
 			"name": definition["name"],
@@ -129,16 +132,13 @@ def go_gateway(x: int, y: int, map_idx: int, direction = None) -> dict:
 		gateway = next((item for item in maps.maps[map_idx]["gateways"] if item["x"] == x and item["y"] == y and item['action'] == direction), gateway_fallback)
 	return gateway
 
-def get_view_port(pos: Position) -> tuple:
+def get_view_port(pos: Position, map: dict) -> tuple:
 	""" Calculate the view port """
-	(world,) = g.game.Q.all_of(tags=[IsWorld])
-	maps = world.components[Maps]
-
 	view_width = ui.VIEW_PORT_WIDTH
 	view_height = ui.VIEW_PORT_HEIGHT
 
-	width = maps.maps[pos.m]["width"]
-	height = maps.maps[pos.m]["height"]
+	width = map["width"]
+	height = map["height"]
 
 	view_x1 = min(max(0, pos.x - int(view_width / 2)), width - view_width)
 	view_x2 = view_x1 + view_width
