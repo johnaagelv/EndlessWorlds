@@ -72,7 +72,7 @@ class InGame(State):
 						new_y = 0
 						wh = (wh + 1) % world.components[World].height
 					m = ww * world.components[World].width + wh
-					print(f"Switch to map {m} based on {ww} and {wh}")
+					logging.debug(f"Switch to map {m} based on {ww} and {wh}")
 					world_tools.start_map(m)
 					player.components[Position] = Position(new_x, new_y, m)
 					return None

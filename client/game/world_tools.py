@@ -13,6 +13,8 @@ import client.game.connect_tools
 
 import client.configuration as config
 import client.ui.configuration as ui
+import logging
+logger = logging.getLogger(config.LOG_NAME_CLIENT)
 
 def new_game() -> Registry:
 	game = Registry()
@@ -29,7 +31,7 @@ def new_game() -> Registry:
 			"skin": skin, # Colour, tuple, for the skin colour
 		}
 	)
-	print(result.keys())
+	logging.debug(f"Query result: {result.keys()}")
 
 	map_sizes = result['map_sizes']
 	map_template = {
@@ -80,7 +82,6 @@ def start_map(map_idx: int) -> None:
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
 	if not maps.maps[map_idx]['loaded']:
-		print(f"*** Starting map {map_idx}")
 		definition = maps.defs[map_idx]
 		map_width = int(definition["width"])
 		map_height = int(definition["height"])
@@ -115,7 +116,6 @@ def in_gateway(x: int, y: int, map_idx: int) -> bool:
 
 def go_gateway(x: int, y: int, map_idx: int, direction = None) -> dict:
 	""" Return the gateway at the current location """
-	print(f"go_gateway: {x},{y},{map_idx}, {direction}")
 	(world,) = g.game.Q.all_of(tags=[IsWorld])
 	maps = world.components[Maps]
 	gateway_fallback = {

@@ -20,7 +20,7 @@ def fov(pos: Position, vision: int, map: dict, current_map: bool = True) -> None
 #		return
 	x = pos.x
 	y = pos.y
-	print(f"orig: {pos.m} {x},{y} {map['width']},{map['height']}")
+	#print(f"orig: {pos.m} {x},{y} {map['width']},{map['height']}")
 	if current_map:
 		pass
 	else:
@@ -35,8 +35,11 @@ def fov(pos: Position, vision: int, map: dict, current_map: bool = True) -> None
 	
 	if x < -vision or x >= map["width"] + vision or y < -vision or y >= map["height"] + vision:
 		return
-	print(f"final: {pos.m} {x},{y} {map['width']},{map['height']}")
+	#print(f"final: {pos.m} {x},{y} {map['width']},{map['height']}")
 	
+	if current_map:
+		logging.info("")
+		logging.debug(f"Map idx {pos.m} {x},{y} from {pos.x},{pos.y}")
 	map['visible'][:] = compute_fov(
 		map['tiles']['transparent'],
 		(x, y),
@@ -44,3 +47,6 @@ def fov(pos: Position, vision: int, map: dict, current_map: bool = True) -> None
 		algorithm=FOV_DIAMOND
 	)
 	map['explored'] |= map['visible']
+	if current_map:
+		logging.debug(f"{map['visible']}")
+		logging.debug(f"{map['explored']}")

@@ -1,10 +1,10 @@
 {
 	"id":"EW2025Ankt",
 	"name": "Planet Ankt",
-	"entries": [[10, 10, 0, 0],[20, 10, 0, 1],[30, 10, 0, 2]],
+	"entries": [[5, 5, 0, 0],[5, 5, 0, 1],[5, 5, 0, 2]],
 	"builds": [
 		[
-			["world", 80, 80, 4, 4, ["grass1","grass2","grass3"], 234567890]
+			["world", 40, 40, 4, 4, ["grass1","grass2","grass3"], 234567890]
 		],
 		[
 			[0, "Planet Ankt", 400, 400, ["grass1","grass2","grass3"], true, 234567890, 100, 100],
