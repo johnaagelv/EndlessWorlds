@@ -64,7 +64,8 @@ def query_server(request: dict) -> dict:
 						# Has a request been received?
 						if client_communicator.dispatch(mask):
 							result = client_communicator.message
-#							logger.debug("- response received ...")
+							logger.debug("- response received ...")
+							logger.debug(result)
 							# Message has been received, set False to stop
 							query_on = False
 					else:

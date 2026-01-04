@@ -31,7 +31,7 @@ def new_game() -> Registry:
 			"skin": skin, # Colour, tuple, for the skin colour
 		}
 	)
-	logging.debug(f"Query result: {result.keys()}")
+	logger.debug(f"Query result: {result.keys()}")
 
 	map_sizes = result['map_sizes']
 	map_template = {
@@ -85,7 +85,7 @@ def start_map(map_idx: int) -> None:
 		definition = maps.defs[map_idx]
 		map_width = int(definition["width"])
 		map_height = int(definition["height"])
-		map_visible = False #definition["visible"]
+		map_visible = definition["visible"]
 		maps.maps[map_idx] = {
 			"loaded": True,
 			"name": definition["name"],

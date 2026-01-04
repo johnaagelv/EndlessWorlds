@@ -57,11 +57,16 @@ def world_map(current_map: dict, console: tcod.console.Console, view_port: tuple
 	explored_tiles = current_map['explored']
 	light_tiles = current_map['tiles']['light']
 	dark_tiles = current_map['tiles']['dark']
-
-#	print(f"Render shape: {np.shape(visible_tiles)}")
-
 	# Transfer the tiles within the view port to the console
 	view_x1, view_x2, view_y1, view_y2 = view_port
+
+#	logger.debug(" rendering ")
+#	logger.debug(explored_tiles[view_x1:view_x2, view_y1:view_y2])
+#	logger.debug(visible_tiles[view_x1:view_x2, view_y1:view_y2])
+#	logger.debug(light_tiles[view_x1:view_x2, view_y1:view_y2])
+#	logger.debug(dark_tiles[view_x1:view_x2, view_y1:view_y2])
+#	logger.debug(view_port)
+
 	console.rgba[ui.VIEW_PORT_X:ui.VIEW_PORT_WIDTH, ui.VIEW_PORT_Y:ui.VIEW_PORT_HEIGHT] = np.select(
 		condlist=[visible_tiles[view_x1:view_x2, view_y1:view_y2], explored_tiles[view_x1:view_x2, view_y1:view_y2]],
 		choicelist=[light_tiles[view_x1:view_x2, view_y1:view_y2], dark_tiles[view_x1:view_x2, view_y1:view_y2]],

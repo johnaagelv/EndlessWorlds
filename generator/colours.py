@@ -30,9 +30,21 @@ cryo_base = (32, 64, 96, 255)
 
 ocean_seaside = (224, 242, 241, 255)
 
-grass1 = (124, 252, 0, 255) # lawngreen
-grass2 = (39, 159, 39, 255)
-grass3 = (34, 139, 34, 255) # forestgreen
+grass1 = (24, 192, 24, 255) # lawngreen
+grass2 = (24, 172, 24, 255)
+grass3 = (24, 152, 24, 255) # forestgreen
+grass4 = (24, 132, 24, 255)
+grass5 = (24, 112, 24, 255)
+grass6 = (24, 92, 24, 255)
+grass_background = (9, 64, 9, 255)
+
+ocean1 = (53, 53, 242, 255)
+ocean2 = (53, 53, 222, 255)
+ocean3 = (53, 53, 202, 255)
+ocean4 = (53, 53, 182, 255)
+ocean5 = (53, 53, 162, 255)
+ocean6 = (53, 53, 142, 255)
+ocean_background2 = (0, 0, 128, 255)
 food_parcel = (182, 122, 79, 255)
 backpack = (72, 44, 25, 255)
 background = (0, 0, 0, 0)

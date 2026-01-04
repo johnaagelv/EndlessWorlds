@@ -44,6 +44,7 @@ class TWorld:
 		for map_index, map in enumerate(self.maps):
 			fos: dict = {}
 			if map["visible"]:
+#				print(f"- FOS for visible map {map_index}")
 				fos = self.get_map_field_of_sense(map_index, 0, 0, 0, True)
 			map_sizes.append({
 				"name": map["name"],

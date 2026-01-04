@@ -1,3 +1,5 @@
+# 2026-01-03
+Playing around with map chunks for the planetary surface (large)
 # 2025-12-23
 Considering how to identify items across worlds! Using "face", "iid", or ...?
 # 2025-12-20

@@ -9,9 +9,9 @@ from tcod.ecs import Entity
 #from client.game.tags import IsWorld
 #from client.game.world_tools import start_map
 
-import client.configuration as config
-import logging
-logger = logging.getLogger(config.LOG_NAME_CLIENT)
+#import client.configuration as config
+#import logging
+#logger = logging.getLogger(config.LOG_NAME_CLIENT)
 
 @attrs.define(frozen=True)
 class Position:

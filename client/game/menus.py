@@ -13,9 +13,9 @@ import client.game.state_tools
 from client.constants import DIRECTION_KEYS
 from client.game.state import Pop, State, StateResult
 
-import client.configuration as config
-import logging
-logger = logging.getLogger(config.LOG_NAME_CLIENT)
+#import client.configuration as config
+#import logging
+#logger = logging.getLogger(config.LOG_NAME_CLIENT)
 
 class MenuItem(Protocol):
 	"""

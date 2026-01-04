@@ -102,14 +102,15 @@ class InGame(State):
 		maps = world.components[Maps].maps
 		world_width = world.components[World].width
 		world_height = world.components[World].height
-		render_map = maps[pos.m]
-	
-		if maps[pos.m]["overworld"]:
-			render_map: dict = {}
-			ww = maps[pos.m]["ww"]
-			wh = maps[pos.m]["wh"]
-			map_width = maps[pos.m]["width"]
-			map_height = maps[pos.m]["height"]
+		render_map: dict = {}
+		if not maps[pos.m]["overworld"]:
+			render_map = maps[pos.m]
+		else:
+			ww = world.components[Maps].maps[pos.m]["ww"]
+			wh = world.components[Maps].maps[pos.m]["wh"]
+			map_width = world.components[Maps].maps[pos.m]["width"]
+			map_height = world.components[Maps].maps[pos.m]["height"]
+#			print(f"{map_width},{map_height}")
 
 			qul = ((ww - 1) % world_width) * world_width + (wh - 1) % world_height # Quadrant upper left
 			qml = ((ww - 1) % world_width) * world_width + (wh - 0) % world_height # Quadrant left
@@ -120,7 +121,7 @@ class InGame(State):
 			qur = ((ww + 1) % world_width) * world_width + (wh - 1) % world_height
 			qmr = ((ww + 1) % world_width) * world_width + (wh - 0) % world_height
 			qlr = ((ww + 1) % world_width) * world_width + (wh + 1) % world_height
-
+#			print(f"{qul},{qml},{qll} {qum},{qmm},{qlm} {qur},{qmr},{qlr}")
 			world_tools.start_map(qul)
 			world_tools.start_map(qml)
 			world_tools.start_map(qll)
@@ -130,50 +131,79 @@ class InGame(State):
 			world_tools.start_map(qur)
 			world_tools.start_map(qmr)
 			world_tools.start_map(qlr)
-
-			entity_tools.fov(Position(pos.x - map_width, pos.y - map_height, qul), vision, maps[qul], False)
-			entity_tools.fov(Position(pos.x - map_width, pos.y, qml), vision, maps[qml], False)
-			entity_tools.fov(Position(pos.x - map_width, pos.y + map_height, qll), vision, maps[qll], False)
-			entity_tools.fov(Position(pos.x, pos.y - map_height, qum), vision, maps[qum], False)
-			entity_tools.fov(Position(pos.x, pos.y, qmm), vision, maps[qmm])
-			entity_tools.fov(Position(pos.x, pos.y + map_height, qlm), vision, maps[qlm], False)
-			entity_tools.fov(Position(pos.x + map_width, pos.y - map_height, qur), vision, maps[qur], False)
-			entity_tools.fov(Position(pos.x + map_width, pos.y, qmr), vision, maps[qmr], False)
-			entity_tools.fov(Position(pos.x + map_width, pos.y + map_height, qlr), vision, maps[qlr], False)
+			logger.debug(f"*** qul light tiles {qul} ***")
+			logger.debug(world.components[Maps].maps[0]["tiles"]['light'])
 
 			maps_left: dict = {}
 			maps_left["visible"] = np.concatenate((maps[qul]["visible"], maps[qml]["visible"], maps[qll]["visible"]), axis=1)
 			maps_left["explored"] = np.concatenate((maps[qul]["explored"], maps[qml]["explored"], maps[qll]["explored"]), axis=1)
-			maps_left["tiles"] = np.concatenate((maps[qul]["tiles"], maps[qml]["tiles"], maps[qll]["tiles"]), axis=1)
+			maps_left["tiles"] = np.concatenate((maps[qul]["tiles"], maps[qml]["tiles"], maps[qll]["tiles"]), axis=1, dtype=tile_types.tile_dt)
+			maps_left["dark"] = np.concatenate((maps[qul]["tiles"]["dark"], maps[qml]["tiles"]["dark"], maps[qll]["tiles"]["dark"]), axis=1, dtype=tile_types.graphic_dt)
+			maps_left["light"] = np.concatenate((maps[qul]["tiles"]["light"], maps[qml]["tiles"]["light"], maps[qll]["tiles"]["light"]), axis=1, dtype=tile_types.graphic_dt)
+			maps_left["transparent"] = np.concatenate((maps[qul]["tiles"]["transparent"], maps[qml]["tiles"]["transparent"], maps[qll]["tiles"]["transparent"]), axis=1)
+#			logger.debug(maps_left['light'])
+#			raise SystemExit
 
 			maps_middle: dict = {}
 			maps_middle["visible"] = np.concatenate((maps[qum]["visible"], maps[qmm]["visible"], maps[qlm]["visible"]), axis=1)
 			maps_middle["explored"] = np.concatenate((maps[qum]["explored"], maps[qmm]["explored"], maps[qlm]["explored"]), axis=1)
-			maps_middle["tiles"] = np.concatenate((maps[qum]["tiles"], maps[qmm]["tiles"], maps[qlm]["tiles"]), axis=1)
+			maps_middle["tiles"] = np.concatenate((maps[qum]["tiles"], maps[qmm]["tiles"], maps[qlm]["tiles"]), axis=1, dtype=tile_types.tile_dt)
+			maps_middle["dark"] = np.concatenate((maps[qum]["tiles"]["dark"], maps[qmm]["tiles"]["dark"], maps[qlm]["tiles"]["dark"]), axis=1, dtype=tile_types.graphic_dt)
+			maps_middle["light"] = np.concatenate((maps[qum]["tiles"]["light"], maps[qmm]["tiles"]["light"], maps[qlm]["tiles"]["light"]), axis=1, dtype=tile_types.graphic_dt)
+			maps_middle["transparent"] = np.concatenate((maps[qum]["tiles"]["transparent"], maps[qmm]["tiles"]["transparent"], maps[qlm]["tiles"]["transparent"]), axis=1)
 
 			maps_right: dict = {}
 			maps_right["visible"] = np.concatenate((maps[qur]["visible"], maps[qmr]["visible"], maps[qlr]["visible"]), axis=1)
 			maps_right["explored"] = np.concatenate((maps[qur]["explored"], maps[qmr]["explored"], maps[qlr]["explored"]), axis=1)
-			maps_right["tiles"] = np.concatenate((maps[qur]["tiles"], maps[qmr]["tiles"], maps[qlr]["tiles"]), axis=1)
+			maps_right["tiles"] = np.concatenate((maps[qur]["tiles"], maps[qmr]["tiles"], maps[qlr]["tiles"]), axis=1, dtype=tile_types.tile_dt)
+			maps_right["dark"] = np.concatenate((maps[qur]["tiles"]["dark"], maps[qmr]["tiles"]["dark"], maps[qlr]["tiles"]["dark"]), axis=1, dtype=tile_types.graphic_dt)
+			maps_right["light"] = np.concatenate((maps[qur]["tiles"]["light"], maps[qmr]["tiles"]["light"], maps[qlr]["tiles"]["light"]), axis=1, dtype=tile_types.graphic_dt)
+			maps_right["transparent"] = np.concatenate((maps[qur]["tiles"]["transparent"], maps[qmr]["tiles"]["transparent"], maps[qlr]["tiles"]["transparent"]), axis=1)
 
 			render_map["visible"] = np.concatenate((maps_left["visible"], maps_middle["visible"], maps_right["visible"]), axis=0)
 			render_map["explored"] = np.concatenate((maps_left["explored"], maps_middle["explored"], maps_right["explored"]), axis=0)
-			render_map["tiles"] = np.concatenate((maps_left["tiles"], maps_middle["tiles"], maps_right["tiles"]), axis=0)
+			render_map["tiles"] = np.concatenate((maps_left["tiles"], maps_middle["tiles"], maps_right["tiles"]), axis=0, dtype=tile_types.tile_dt)
+			render_map["dark"] = np.concatenate((maps_left["dark"], maps_middle["dark"], maps_right["dark"]), axis=0, dtype=tile_types.graphic_dt)
+			render_map["light"] = np.concatenate((maps_left["light"], maps_middle["light"], maps_right["light"]), axis=0, dtype=tile_types.graphic_dt)
+			render_map["transparent"] = np.concatenate((maps_left["transparent"], maps_middle["transparent"], maps_right["transparent"]), axis=0)
 			
 			render_map["width"] = map_width * 3
 			render_map["height"] = map_height * 3
-			render_map["name"] = maps[pos.m]["name"]
-			render_map["items"] = maps[pos.m]["items"]
+			render_map["name"] = world.components[Maps].maps[pos.m]["name"]
+			render_map["items"] = world.components[Maps].maps[pos.m]["items"]
 
 			pos = Position(pos.x + map_width, pos.y + map_height, pos.m)
 
-		entity_tools.fov(pos, vision, render_map)
+		render_map = entity_tools.fov(pos, vision, render_map)
 
 		# Get the view port for the rendering methods
 		view_port = world_tools.get_view_port(pos, render_map)
 
+		if maps[pos.m]["overworld"]:
+#			logger.debug(" explored ")
+#			logger.debug(world.components[Maps].maps[qul]["explored"][map_width - 10:map_width,map_height - 10:map_height])
+#			logger.debug(render_map["explored"][map_width - 10:map_width, map_height - 10:map_height])
+#			logger.debug(" visible ")
+#			logger.debug(world.components[Maps].maps[qul]["visible"][map_width - 10:map_width,map_height - 10:map_height])
+#			logger.debug(render_map['visible'][map_width - 10:map_width, map_height - 10:map_height])
+#			logger.debug(render_map['dark'][map_width - 10:map_width, map_height - 10:map_height])
+#			logger.debug(render_map['light'][map_width - 10:map_width, map_height - 10:map_height])
+			# transfer the visible back into visible and explored in quadrants 
+			world.components[Maps].maps[qul]["visible"] = render_map["visible"][0:map_width, 0:map_height]
+			world.components[Maps].maps[qul]["explored"] |= world.components[Maps].maps[qul]["visible"]
+			world.components[Maps].maps[qml]["visible"] = render_map["visible"][0:map_width, map_height:map_height * 2]
+			world.components[Maps].maps[qml]["explored"] |= world.components[Maps].maps[qml]["visible"]
+			world.components[Maps].maps[qll]["visible"] = render_map["visible"][0:map_width, map_height * 2:map_height * 3]
+			world.components[Maps].maps[qll]["explored"] |= world.components[Maps].maps[qll]["visible"]
+			world.components[Maps].maps[qum]["visible"] = render_map["visible"][map_width:map_width * 2, 0:map_height]
+			world.components[Maps].maps[qum]["explored"] |= world.components[Maps].maps[qum]["visible"]
+			world.components[Maps].maps[qmm]["visible"] = render_map["visible"][map_width:map_width * 2, map_height:map_height * 2]
+			world.components[Maps].maps[qmm]["explored"] |= world.components[Maps].maps[qmm]["visible"]
+			world.components[Maps].maps[qlm]["visible"] = render_map["visible"][map_width:map_width * 2, map_height * 2:map_height * 3]
+			world.components[Maps].maps[qlm]["explored"] |= world.components[Maps].maps[qlm]["visible"]
+
 		# Render the current map
-		renders.world_map(render_map, console, view_port)
+		renders.world_map(current_map=render_map, console=console, view_port=view_port)
 
 		# Draw the entities including the player
 #		renders.entities(pos.m, console, view_port)

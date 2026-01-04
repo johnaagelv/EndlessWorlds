@@ -59,6 +59,7 @@ def get_tile_by_name(name: str) -> np.ndarray:
 #	logger.info(f"get_tile_by_name( {name} )")
 	try:
 		tile = tile_types.tiles[name]
+		logger.debug(tile)
 	except Exception:
 		logger.warning(
 			f"- tile {name} not found among tile types! Using tile 'blank' instead!"
@@ -66,7 +67,7 @@ def get_tile_by_name(name: str) -> np.ndarray:
 		tile = tile_types.tiles['blank']
 	return tile
 
-def generate_world(build: list) -> None:
+def gen_world(build: list) -> None:
 	""" Generate a world as a collection of maps """
 	logger.info(f"generate_world( {build} )")
 	generator_name: str = build[0]
@@ -78,9 +79,9 @@ def generate_world(build: list) -> None:
 	# seed = build[6]
 	for ww in range(0, world_data["world_width"]):
 		for wh in range(0, world_data["world_height"]):
-			generate_map([generator_name, map_width, map_height, map_tiles, False, ww, wh, True])
+			gen_map([generator_name, map_width, map_height, map_tiles, True, ww, wh, True])
 
-def generate_map(build: list) -> None:
+def gen_map(build: list) -> None:
 	""" Generate a single map """
 	logger.info(f"generate_map( {build} )")
 	# 0=name, 1=width, 2=height, 3=tiles, 4=visible, 5=ww, 6=wh, 7=Overworld, 8=name (optional)
@@ -114,7 +115,7 @@ def generate_map(build: list) -> None:
 		for x in range(0, map_width):
 			for y in range(0, map_height):
 				map["tiles"][x, y] = get_tile_by_name(build[3][random.randint(0,tile_count - 1)])
-
+	
 	# Initialize the lists to ensure append will work
 	map['items'] = []
 	map['actors'] = []
@@ -122,11 +123,41 @@ def generate_map(build: list) -> None:
 	map['actions'] = []
 	world_data["maps"].append(map)
 
+def gen_circle(build: list) -> None:
+	""" Generate a circular area with a border of a tile or filled with a tile """
+	# 0=name, 1=map_idx, 2=x, 3=y, 4=radius, 4=tiles, 5=fill, 6=thickness
+	logger.info(f"gen_circle( {build!r} )")
+	if len(build) < 8:
+		logger.error(f"- too few build parameters! {len(build)} given")
+		raise SystemError
+	name, map_idx, center_x, center_y, radius, tiles, fill, thickness = build
+	map_tile = get_tile_by_name(tiles[0])
+	if fill:
+		for r in range(0, 360, 1):
+			r_angle = math.radians(r)
+			x = center_x + int(math.sin(r_angle) * radius)
+			y = center_y + int(math.cos(r_angle) * radius)
+			if min(center_x, x) >= 0 and max(center_x, x) <= world_data["maps"][map_idx]['width'] and min(center_y, y) >= 0 and max(center_y, y) <= world_data["maps"][map_idx]['height']:
+				tile_name = tiles[random.randint(0,len(tiles) - 1)]
+				map_tile = get_tile_by_name(tile_name)
+				world_data["maps"][map_idx]['tiles'][min(center_x, x):max(center_x, x), min(center_y, y):max(center_y, y)] = map_tile
+	else:
+		thickness = max(thickness, 1)
+		for r in range(0, 360):
+			r_angle = math.radians(r)
+			for t in range(0, thickness):
+				x = center_x + int(math.sin(r_angle) * (radius - t))
+				y = center_y + int(math.cos(r_angle) * (radius - t))
+				if min(center_x, x) >= 0 and max(center_x, x) < world_data["maps"][map_idx]['width'] and min(center_y, y) >= 0 and max(center_y, y) < world_data["maps"][map_idx]['height']:
+					tile_name = tiles[random.randint(0,len(tiles) - 1)]
+					map_tile = get_tile_by_name(tile_name)
+					world_data["maps"][map_idx]['tiles'][x, y] = map_tile
 
 """ Generators to be used for building a world """
 generators: dict[str, commandFn] = {
-	"world": generate_world,
-	"map": generate_map
+	"world": gen_world,
+	"map": gen_map,
+	"circle": gen_circle
 }
 
 gateway_list: list[dict]

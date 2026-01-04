@@ -26,7 +26,7 @@ class TConnectionHandler:
 	Initialize the communicator
 	"""
 	def __init__(self, primary_selector: selectors.BaseSelector, client_socket: socket.socket, addr: str):
-		logger.debug(f"{__class__.__name__}->__init__( selector, sock, addr )")
+#		logger.debug(f"{__class__.__name__}->__init__( selector, sock, addr )")
 		self.primary_selector = primary_selector
 		self.client_socket = client_socket
 		self.addr = addr # Client address as IP:PORT string
@@ -45,14 +45,14 @@ class TConnectionHandler:
 
 	# Send a message	
 	def prepare_to_send(self):
-		logger.debug(f"{__class__.__name__}->prepare_response( request )")
+#		logger.debug(f"{__class__.__name__}->prepare_response( request )")
 		self._set_selector_events_mask("w")
 
 	"""
 	Dispatch the message
 	"""
 	def dispatch(self, mask: int) -> bool:
-		logger.debug(f"{__class__.__name__}->dispatch( {mask} )")
+#		logger.debug(f"{__class__.__name__}->dispatch( {mask} )")
 		if mask == selectors.EVENT_READ:
 			return self.receive()
 		else:
@@ -62,7 +62,7 @@ class TConnectionHandler:
 	Close down the communication
 	"""
 	def close(self):
-		logger.debug(f"{__class__.__name__}->close()")
+#		logger.debug(f"{__class__.__name__}->close()")
 		try:
 			self.primary_selector.unregister(self.client_socket)
 		except Exception as e:
@@ -112,24 +112,24 @@ class TConnectionHandler:
 	Process the request when fully received
 	"""
 	def process_request(self) -> bool:
-		logger.debug(f"{__class__.__name__}->process_request()")
+#		logger.debug(f"{__class__.__name__}->process_request()")
 		header_keys = self.jsonheader.keys()
 		if "content-length" in header_keys:
 			content_len = self.jsonheader["content-length"]
 			if len(self._buffer) >= content_len:
 				# Content received, process
-				logger.debug(f"- content ready {content_len}")
+#				logger.debug(f"- content ready {content_len}")
 				self.content_state = True
 				data = self._buffer[:content_len]
 				self._buffer = self._buffer[content_len:]
 				if self.jsonheader["content-type"] == "text/json":
 					encoding = self.jsonheader["content-encoding"]
 					self.message = self._json_decode(data, encoding)
-					logger.debug(f"- request is {self.message}")
+#					logger.debug(f"- request is {self.message}")
 				else:
 					# Extract the request from the content
 					self.message = pickle.loads(data)
-					logger.debug(f"- request is {self.message}")
+#					logger.debug(f"- request is {self.message}")
 				return True
 		return False # Content not received in full yet, stop processing
 
@@ -168,7 +168,7 @@ class TConnectionHandler:
 	- read the message in parts till the full message has been received
 	"""
 	def receive(self) -> bool:
-		logger.debug(f"{__class__.__name__}->receive()")
+#		logger.debug(f"{__class__.__name__}->receive()")
 		self._read()
 		if not self.protoheader_state:
 			self.process_protoheader()
@@ -184,8 +184,8 @@ class TConnectionHandler:
 	Transmit the message to the recipient
 	"""
 	def transmit(self) -> bool:
-		logger.debug(f"{__class__.__name__}->transmit()")
-		logger.debug(f"- buffer length: {len(self._buffer)}")
+#		logger.debug(f"{__class__.__name__}->transmit()")
+#		logger.debug(f"- buffer length: {len(self._buffer)}")
 		return self._write()
 
 	"""
@@ -205,7 +205,7 @@ class TConnectionHandler:
 				# Close when the buffer is drained. The response has been sent.
 				if sent and not self._buffer:
 #					self.close()
-					logger.debug("- return True")
+#					logger.debug("- return True")
 					return True
 #		logger.debug("- return False")
 		return False
@@ -215,4 +215,3 @@ class TConnectionHandler:
 	"""
 	def buffer(self, data: bytes):
 		self._buffer = data
-

@@ -98,25 +98,88 @@ tiles["stairway"] = new_tile(
 	light=(ord('X'), (255, 255, 255, 255), (0, 0, 0, 255)),
 	gateway=True,
 )
+tiles["ocean1"] = new_tile(
+	walkable=False,
+	transparent=True,
+	dark=(124, colour.ocean1, colour.black),
+	light=(124, colour.ocean1, colour.ocean2),
+	gateway=False,
+)
+tiles["ocean2"] = new_tile(
+	walkable=False,
+	transparent=True,
+	dark=(163, colour.ocean2, colour.black),
+	light=(163, colour.ocean2, colour.ocean3),
+	gateway=False,
+)
+tiles["ocean3"] = new_tile(
+	walkable=False,
+	transparent=True,
+	dark=(124, colour.ocean3, colour.black),
+	light=(124, colour.ocean3, colour.ocean4),
+	gateway=False,
+)
+tiles["ocean4"] = new_tile(
+	walkable=False,
+	transparent=True,
+	dark=(163, colour.ocean4, colour.black),
+	light=(163, colour.ocean4, colour.ocean5),
+	gateway=False,
+)
+tiles["ocean5"] = new_tile(
+	walkable=False,
+	transparent=True,
+	dark=(124, colour.ocean5, colour.black),
+	light=(124, colour.ocean5, colour.ocean6),
+	gateway=False,
+)
+tiles["ocean6"] = new_tile(
+	walkable=False,
+	transparent=True,
+	dark=(163, colour.ocean6, colour.black),
+	light=(163, colour.ocean6, colour.ocean1),
+	gateway=False,
+)
 tiles["grass1"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(44, colour.grass3, colour.black),
-	light=(44, colour.grass1, colour.black),
+	dark=(44, colour.grass1, colour.grass_background),
+	light=(44, colour.grass1, colour.grass2),
 	gateway=False,
 )
 tiles["grass2"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(46, colour.grass1, colour.black),
-	light=(46, colour.grass2, colour.black),
+	dark=(46, colour.grass2, colour.grass_background),
+	light=(46, colour.grass2, colour.grass3),
 	gateway=False,
 )
 tiles["grass3"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(35, colour.grass2, colour.black),
-	light=(35, colour.grass3, colour.black),
+	dark=(35, colour.grass3, colour.grass_background),
+	light=(35, colour.grass3, colour.grass4),
+	gateway=False,
+)
+tiles["grass4"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(44, colour.grass4, colour.grass_background),
+	light=(44, colour.grass4, colour.grass5),
+	gateway=False,
+)
+tiles["grass5"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(46, colour.grass5, colour.grass_background),
+	light=(46, colour.grass5, colour.grass6),
+	gateway=False,
+)
+tiles["grass6"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(35, colour.grass6, colour.grass_background),
+	light=(35, colour.grass6, colour.grass1),
 	gateway=False,
 )
 tiles["rock1"] = new_tile(
