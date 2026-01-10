@@ -123,6 +123,73 @@ def gen_map(build: list) -> None:
 	map['actions'] = []
 	world_data["maps"].append(map)
 
+def gen_ocean(build: list) -> None:
+	""" Generate a ocean """
+	# ["ocean", 1, [base tiles], [upper, right, lower, left], 1234567, [coast tiles], coast line width, [outer tiles]]
+	logger.info(f"gen_ocean( {build!r} )")
+#	generator = build[0]
+	map = world_data["maps"][build[1]]
+	tiles = build[2]
+	tile_count = len(tiles) - 1
+	coastlines = build[3] # upper, right, lower, left side is a coastline (true)
+	seed = build[4]
+	coastlinetiles = build[5] # Mandatory for any coastline being true
+	coastlinetile_count = len(coastlinetiles) - 1
+	coastlinewidth = build[6]
+	outertiles = build[7]
+	outertiles_count = len(outertiles) - 1
+	random.seed(seed)
+	for x in range(0, map["width"]):
+		for y in range(0, map["height"]):
+			map["tiles"][x, y] = get_tile_by_name(tiles[random.randint(0,tile_count)])
+	# Upper ^ coastline
+	if coastlines[0]:
+		y_max = int(map["height"] / 3)
+		y_current = random.randint(0, y_max)
+		for x in range(0, map["width"]):
+			y_range = random.randint(-1, 1)
+			y_current = max(0, min(y_current + y_range, y_max))
+			y_lower = max(0, y_current - random.randint(2, max(3, coastlinewidth)))
+			for y in range(0, y_lower):
+				map["tiles"][x, y] = get_tile_by_name(outertiles[random.randint(0,outertiles_count)])
+			for y in range(y_lower, y_current):
+				map["tiles"][x, y] = get_tile_by_name(coastlinetiles[random.randint(0,coastlinetile_count)])
+
+	# Right > coastline
+	if coastlines[1]:
+		x_min = int(map["width"] / 3 * 2)
+		x_current = random.randint(x_min, map["width"])
+		for y in range(0, map["height"]):
+			x_range = random.randint(-1, 1)
+			x_current = min(map["width"] - 1, max(x_current + x_range, x_min))
+			x_upper = min(map["width"] - 1, x_current + random.randint(2, max(3, coastlinewidth)))
+			for x in range(x_upper, map["width"]):
+				map["tiles"][x, y] = get_tile_by_name(outertiles[random.randint(0,outertiles_count)])
+			for x in range(x_current, x_upper):
+				map["tiles"][x, y] = get_tile_by_name(coastlinetiles[random.randint(0,coastlinetile_count)])
+
+	# Lower v coastline
+	if coastlines[2]:
+		y_min = int(map["height"] / 3 * 2)
+		y_current = random.randint(y_min, map["height"])
+		for x in range(0, map["width"]):
+			y_range = random.randint(-1, 1)
+			y_current = min(map["height"] - 1, max(y_current + y_range, y_min))
+			y_upper = max(map["height"] - 1, y_current + random.randint(2, max(3, coastlinewidth)))
+			for y in range(y_upper, map["height"]):
+				map["tiles"][x, y] = get_tile_by_name(outertiles[random.randint(0,outertiles_count)])
+			for y in range(y_current, y_upper):
+				map["tiles"][x, y] = get_tile_by_name(coastlinetiles[random.randint(0,coastlinetile_count)])
+
+	# Left < coastline
+	if coastlines[3]:
+		x_max = int(map["width"] / 3)
+		for y in range(0, map["height"]):
+			for x in range(0, random.randint(2, x_max)):
+				map["tiles"][x, y] = get_tile_by_name(coastlinetiles[random.randint(0,coastlinetile_count)])
+
+
+
 def gen_circle(build: list) -> None:
 	""" Generate a circular area with a border of a tile or filled with a tile """
 	# 0=name, 1=map_idx, 2=x, 3=y, 4=radius, 4=tiles, 5=fill, 6=thickness
@@ -157,7 +224,8 @@ def gen_circle(build: list) -> None:
 generators: dict[str, commandFn] = {
 	"world": gen_world,
 	"map": gen_map,
-	"circle": gen_circle
+	"circle": gen_circle,
+	"ocean": gen_ocean
 }
 
 gateway_list: list[dict]
