@@ -28,7 +28,10 @@ glass_wall = (0xE0, 0xF2, 0xF1, 255)
 cryo_fluid = (44, 188, 201, 255)
 cryo_base = (32, 64, 96, 255)
 
-ocean_seaside = (224, 242, 241, 255)
+coastline1 = (222, 184, 135, 255)
+coastline2 = (212, 174, 125, 255)
+coastline3 = (202, 164, 116, 255)
+coastline_background = (128, 84, 64, 255)
 
 grass1 = (24, 192, 24, 255) # lawngreen
 grass2 = (24, 172, 24, 255)

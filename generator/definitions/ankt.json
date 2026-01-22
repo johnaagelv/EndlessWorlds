@@ -4,13 +4,25 @@
 	"entries": [[10, 50, 0, 0],[20, 50, 0, 0],[30, 50, 0, 0]],
 	"builds": [
 		[
-			["world", 80, 80, 4, 4, ["grass1","grass2","grass3","grass4","grass5","grass6"], 234567890],
-			["ocean", 1, ["ocean1", "ocean2"], [true, false, false, true], 1234567, ["coastline1", "coastline2","coastline3"],5,["grass1","grass2","grass3","grass4","grass5","grass6"]],
-			["ocean", 2, ["ocean1", "ocean2"], [false, false, false, true], 1234567, ["coastline1", "coastline2","coastline3"],5,["grass1","grass2","grass3","grass4","grass5","grass6"]],
-			["ocean", 3, ["ocean1", "ocean2"], [false, false, true, true], 1234567, ["coastline1", "coastline2","coastline3"],5,["grass1","grass2","grass3","grass4","grass5","grass6"]],
-			["ocean", 5, ["ocean1", "ocean2"], [true, true, false, false], 1234567, ["coastline1", "coastline2","coastline3"],5,["grass1","grass2","grass3","grass4","grass5","grass6"]],
-			["ocean", 6, ["ocean1", "ocean2"], [false, true, false, false], 1234567, ["coastline1", "coastline2","coastline3"],5,["grass1","grass2","grass3","grass4","grass5","grass6"]],
-			["ocean", 7, ["ocean1", "ocean2"], [false, true, true, false], 1234567, ["coastline1", "coastline2","coastline3"],5,["grass1","grass2","grass3","grass4","grass5","grass6"]]
+			["world", 80, 80, 4, 4, ["DEEPWATER"], 134567890],
+			["continent"],
+			["island", 0, 1039],
+			["island", 1, 3210],
+			["island", 2, 4983],
+			["island", 3, 1234],
+			["island", 4, 2345],
+			["island", 5, 3456],
+			["island", 6, 982],
+			["island", 7, 444],
+			["island", 8, 666],
+			["island", 9, 123],
+			["island", 10, 7830],
+			["island", 11, 1360],
+			["island", 12, 1420],
+			["island", 13, 1630],
+			["island", 14, 20349],
+			["island", 15, 12345678],
+			["dummy"]
 		],
 		[
 			[0, "Planet Ankt", 400, 400, ["grass1","grass2","grass3"], true, 234567890, 100, 100],
