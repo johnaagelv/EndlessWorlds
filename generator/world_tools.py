@@ -73,17 +73,15 @@ def get_tile_by_name(name: str) -> np.ndarray:
 
 def gen_world(build: list) -> None:
 	""" Generate a world as a collection of maps """
+	# 0=name, 1=map size, 2=world size, 3=tiles, 4=seed
 	logger.info(f"generate_world( {build} )")
-	generator_name: str = build[0]
-	map_width: int = build[1]
-	map_height: int = build[2]
-	world_data["world_width"] = build[3]
-	world_data["world_height"] = build[4]
-	map_tiles: list = build[5]
-	# seed = build[6]
+	generator_name, map_size, world_size, map_tiles, seed = build
+	world_data["world_width"] = world_size[0]
+	world_data["world_height"] = world_size[1]
 	for ww in range(0, world_data["world_width"]):
 		for wh in range(0, world_data["world_height"]):
-			gen_map([generator_name, map_width, map_height, map_tiles, True, ww, wh, True])
+			# name, size, tiles, visible, world width index, world height index, map_name
+			gen_map([generator_name, map_size, map_tiles, True, ww, wh, True, None])
 
 # Return corresponding color from 0 - 255
 def get_tile_from_height(val):
@@ -93,7 +91,9 @@ def get_tile_from_height(val):
 		val = 255
 
 	if val <= 84:
-		return tile_types.tiles["DEEPWATER"]
+		if random.random() > 0.5:
+			return tile_types.tiles["DEEPWATER 1"]
+		return tile_types.tiles["DEEPWATER 2"]
 	elif val <= 102:
 		return tile_types.tiles["WATER"]
 	elif val <= 112:
@@ -108,30 +108,27 @@ def get_tile_from_height(val):
 		return tile_types.tiles["DARKROCKS"]
 	elif val <= 242:
 		return tile_types.tiles["ROCKS"]
-	elif val <= 255:
-		return tile_types.tiles["SNOW"]
-	return tile_types.tiles["DEEPWATER"]
+	return tile_types.tiles["SNOW"]
 
-def gen_island(build: list) -> None:
-	""" Generate an island """
-	# 0=name, 1=map_idx, 2=seed
-	print(f"Crafting island {build[1]}")
-	map_idx = build[1] # Map no. on which to generate an island
-	map = world_data["maps"][map_idx]
-	heightMap = np.empty((map["width"], map["height"]), dtype=np.short, order="F")
-	scale = max(map["width"], map["height"]) / 4
-	bias = 10
-	persistance = 0.5
-	lacunarity = 2
-	noise = opensimplex.OpenSimplex(seed=build[2])
-	for y in range(0, map["height"]):
-		for x in range(0, map["width"]):
-			amplitude = 1
-			frequency = 1
+def height_map(build: list, size: tuple[int, int] = (1, 1)) -> np.ndarray:
+	"""
+	HEIGHT MAP
+	generator_name, map_idx, seed, bias, octaves, persistance, lacunarity, amplitude, frequency
+	"""
+	logger.info(f"- height map( {build}, {size} ) -> np.ndarray")
+	generator_name, map_idx, seed, bias, octaves, persistance, lacunarity, start_amplitude, start_frequency, *rest = build
+	width = world_data["maps"][map_idx]["width"] * size[0]
+	height = world_data["maps"][map_idx]["height"] * size[1]
+	heightMap = np.empty((width, height), dtype=np.short, order="F")
+	scale = max(width, height) / 4
+	noise = opensimplex.OpenSimplex(seed=seed)
+	for y in range(0, height):
+		for x in range(0, width):
+			amplitude = start_amplitude
+			frequency = start_frequency
 			noiseHeight = 0
-			octaves = 11
 
-			for octave in range(0, octaves):
+			for _ in range(0, octaves):
 				sampleX = x / scale * frequency
 				sampleY = y / scale * frequency
 
@@ -140,89 +137,91 @@ def gen_island(build: list) -> None:
 
 				amplitude *= persistance
 				frequency *= lacunarity
-				heightMap[y][x] = (noiseHeight + 1) * 128
+				heightMap[x, y] = (noiseHeight + 1) * 128
 
 			# Circular square mask
-			distX = abs(map["width"] / 2 - x)
-			distY = abs(map["height"] / 2 - y)
+			distX = abs(width / 2 - x)
+			distY = abs(height / 2 - y)
 			dist = max(distX, distY)
 
 			# Applying mask
-			maxWidth = map["width"] / 2 - bias
+			maxWidth = width / 2 - bias
 			delta = dist / maxWidth
 			gradient = delta ** 2
-			heightMap[y][x] *= max(0.0, 1.0 - gradient)
+			heightMap[x, y] *= max(0.0, 1.0 - gradient)
+	return heightMap
 
-	# Assigning colors for each value
-	for y in range(0, map["height"]):
-		for x in range(0, map["width"]):
-			map["tiles"][x][y] = get_tile_from_height(heightMap[x][y])
-
-"""
-def gen_island(build: list) -> None:
-	logger.info(f"Generate island( {build} )")
-	generator = build[0]
-	map_idx = build[1] # Map no. on which to generate an island
+def height_map_to_tile_map(map_idx: int, heightMap: np.ndarray, size: tuple[int, int]) -> None:
+	logger.info(f"- height_map_to_tile_map( {map_idx}, heightMap, {size} )")
 	map = world_data["maps"][map_idx]
-	coastlinetiles = ["coastline1", "coastline2", "coastline3"]
-	coastlinetiles_count = len(coastlinetiles)
-	tiles = ["grass1", "grass2", "grass3", "grass4", "grass5"]
-	tiles_count = len(tiles) - 1
-	start = build[2]
-	stop = build[3]
-	width = build[4] # Min and max
-	width_size = abs(start[0] - stop[0]) // 8
-	y_middle = min(start[1], stop[1]) + abs(start[1]-stop[1]) // 2
-	y_upper = y_middle - 1
-	y_lower = y_middle + 1
-	for x in range(start[0], stop[0]):
-		height_min = -2
-		height_max = 2
-		if x > stop[0] - width_size:
-			height_max = 0
-			height_min = -(max(abs(y_upper - y_lower) // 3, 2))
+	# Assigning colors for each value
+	for y in range(size[1], size[1] + map["height"]):
+		for x in range(size[0], size[0] + map["width"]):
+			map["tiles"][x - size[0], y - size[1]] = get_tile_from_height(heightMap[x, y])
 
-		y_upper = max(min(y_upper - random.randint(height_min, height_max), y_middle - 1), y_middle - width[1])
-		y_lower = min(max(y_lower + random.randint(height_min, height_max), y_middle + 1), y_middle + width[1])
-		for y in range(y_upper, y_lower + 1):
-			tile_name = tiles[random.randint(0, tiles_count)]
-			map_tile = get_tile_by_name(tile_name)
-			map['tiles'][x,y] = map_tile
-"""
+def gen_continent(build: list) -> None:
+	"""
+	GENERATE A CONTINENT
+	0=generator name, 1=map_idx, 2=seed, 3=bias, 4=octaves, 5=persistance, 6=lacunarity, 7=amplitude, 8=frequency, 9=world size
+	"""
+	logger.info(build)
+	map_idx = build[1] # Map no. on which to generate an island
+	heightMap = height_map(build, build[9])
+	map = world_data["maps"][map_idx]
+	ww = map["ww"]
+	wh = map["wh"]
+	map_width = map["width"]
+	map_height = map["height"]
+	heightMap = height_map(build, build[9])
+
+	for ww_ in range(0, build[9][0]):
+		for wh_ in range(0, build[9][1]):
+			map_ww = ((ww + ww_) % world_data["world_width"]) * world_data["world_width"]
+			map_wh = (wh + wh_) % world_data["world_height"]
+			map_idx = map_ww + map_wh
+			height_map_to_tile_map(map_idx, heightMap, (ww_ * map_width, wh_ * map_height))
+
+def gen_island(build: list) -> None:
+	"""
+	GENERATE ISLAND(S)
+	0=name, 1=map_idx, 2=seed, 3=bias, 4=octaves, 5=persistance, 6=lacunarity, 7=amplitude, 8=frequency
+	"""
+	logger.debug(build)
+	generator_name, map_idx, *rest = build
+	heightMap = height_map(build)
+	height_map_to_tile_map(map_idx, heightMap, (0, 0))
+
 def gen_map(build: list) -> None:
-	""" Generate a single map """
-	logger.info(f"generate_map( {build} )")
-	# 0=name, 1=width, 2=height, 3=tiles, 4=visible, 5=ww, 6=wh, 7=Overworld, 8=name (optional)
-	map_tile = get_tile_by_name(build[3][0])
-	ww = build[5]
-	wh = build[6]
-	map_name = f"Quadrant {ww} {wh}"
-	if len(build) > 8:
-		map_name = build[8]
-	map_width = build[1]
-	map_height = build[2]
-	map_visibility = build[4]
-	tile_count = len(build[3])
+	"""
+	GENERATE MAP
+	0=name, 1=map size, 2=map tiles, 3=is visible, 4=ww, 5=wh, 6=is overworld, 7=map name
+	"""
+	logger.info(build)
+	generator_name, map_size, map_tiles, is_visible, ww, wh, is_overworld, map_name = build
+	map_tile = get_tile_by_name(map_tiles[0]) # Use first tile by default
+	if map_name is None:
+		map_name = f"Quadrant {ww} {wh}"
+	tile_count = len(map_tiles) - 1
 
 	map: dict = {
 		"name": map_name,
 		"ww": ww,
 		"wh": wh,
-		"overworld": build[7],
-		"width": map_width,
-		"height": map_height,
-		"tiles": np.full((map_width, map_height), fill_value=map_tile, order="F"),
+		"overworld": is_overworld,
+		"width": map_size[0],
+		"height": map_size[1],
+		"tiles": np.full((map_size[0], map_size[1]), fill_value=map_tile, order="F"),
 		"gateways": list,
 		"actions": list,
-		"visible": map_visibility,
+		"visible": is_visible,
 		"items": list,
 		"actors": list
 	}
 	# randomize tiles
-	if tile_count > 1:
-		for x in range(0, map_width):
-			for y in range(0, map_height):
-				map["tiles"][x, y] = get_tile_by_name(build[3][random.randint(0,tile_count - 1)])
+	if tile_count > 0: # Aka there is 1 only
+		for x in range(0, map_size[0]):
+			for y in range(0, map_size[1]):
+				map["tiles"][x, y] = get_tile_by_name(map_tiles[random.randint(0,tile_count)])
 	
 	# Initialize the lists to ensure append will work
 	map['items'] = []
@@ -232,12 +231,12 @@ def gen_map(build: list) -> None:
 	world_data["maps"].append(map)
 
 def gen_circle(build: list) -> None:
-	""" Generate a circular area with a border of a tile or filled with a tile """
-	# 0=name, 1=map_idx, 2=x, 3=y, 4=radius, 4=tiles, 5=fill, 6=thickness
-	logger.info(f"gen_circle( {build!r} )")
-	if len(build) < 8:
-		logger.error(f"- too few build parameters! {len(build)} given")
-		raise SystemError
+	"""
+	GENERATE CIRCLE
+	Generate a circular area with a border of a tile or filled with a tile
+	0=name, 1=map_idx, 2=x, 3=y, 4=radius, 4=tiles, 5=fill, 6=thickness
+	"""
+	logger.info(build)
 	name, map_idx, center_x, center_y, radius, tiles, fill, thickness = build
 	map_tile = get_tile_by_name(tiles[0])
 	if fill:
@@ -267,6 +266,7 @@ generators: dict[str, commandFn] = {
 	"map": gen_map,
 	"circle": gen_circle,
 	"island": gen_island,
+	"continent": gen_continent,
 }
 
 gateway_list: list[dict]
