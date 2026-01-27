@@ -7,6 +7,7 @@ import json
 import pickle
 import random
 import math
+from PIL import Image
 
 from pathlib import Path
 from typing import Callable
@@ -43,6 +44,7 @@ def generate(filename: Path) -> None:
 
 	for build in build_instructions["builds"][0]:
 		generator_name = build[0]
+		print(generator_name)
 		generator = generators.get(generator_name)
 		if generator:
 			generator(build)
@@ -58,6 +60,21 @@ def generate(filename: Path) -> None:
 			"maps": world_data["maps"]
 		}
 		pickle.dump(save_data, f)
+	"""
+	colour_map = np.zeros((world_data["world_width"] * 80, world_data["world_height"] * 80, 4), dtype=np.uint8, order="F")
+	cx = 0
+	cy = 0
+	for map_idx in range(world_data["world_width"] * world_data["world_height"]):
+		map = world_data["maps"][map_idx]
+		cx = int(map_idx / world_data["world_height"]) * map["width"]
+		cy = (map_idx % world_data["world_height"]) * map["height"]
+		for x in range(map["width"]):
+			for y in range(map["height"]):
+	#			print(f"{cx},{x} {cy},{y}")
+				colour_map[cy + y][cx + x] = map["tiles"][x, y]["light"][1]
+	image = Image.fromarray(colour_map, 'RGBA')
+	image.save("Planet Ankt.png")
+	"""
 
 def get_tile_by_name(name: str) -> np.ndarray:
 #	logger.info(f"get_tile_by_name( {name} )")
@@ -78,9 +95,10 @@ def gen_world(build: list) -> None:
 	generator_name, map_size, world_size, map_tiles, seed = build
 	world_data["world_width"] = world_size[0]
 	world_data["world_height"] = world_size[1]
+	world_data["size"] = (world_size[0] * map_size[0], world_size[1] * map_size[1])
 	for ww in range(0, world_data["world_width"]):
 		for wh in range(0, world_data["world_height"]):
-			# name, size, tiles, visible, world width index, world height index, map_name
+			# name, size, tiles, is visible, world width index, world height index, is overworld, map_name
 			gen_map([generator_name, map_size, map_tiles, True, ww, wh, True, None])
 
 # Return corresponding color from 0 - 255
@@ -183,13 +201,24 @@ def gen_continent(build: list) -> None:
 
 def gen_island(build: list) -> None:
 	"""
-	GENERATE ISLAND(S)
+	GENERATE ISLAND
 	0=name, 1=map_idx, 2=seed, 3=bias, 4=octaves, 5=persistance, 6=lacunarity, 7=amplitude, 8=frequency
 	"""
-	logger.debug(build)
+	logger.info(build)
 	generator_name, map_idx, *rest = build
 	heightMap = height_map(build)
 	height_map_to_tile_map(map_idx, heightMap, (0, 0))
+
+def gen_islands(build: list) -> None:
+	"""
+	GENERATE ISLANDS
+	0=generator_name, map numbers, seeds, bias, octaves, persistance, lacunarity, amplitude, frequency
+	"""
+	logger.info(build)
+	generator_name, map_idx_range, seeds, bias, octaves, persistance, lacunarity, amplitude, frequncy = build
+	for map_idx in range(map_idx_range[0], map_idx_range[1]+1):
+		
+		gen_island(build=[generator_name, map_idx, seeds[map_idx - map_idx_range[0]], bias, octaves, persistance, lacunarity, amplitude, frequncy])
 
 def gen_map(build: list) -> None:
 	"""
@@ -266,6 +295,7 @@ generators: dict[str, commandFn] = {
 	"map": gen_map,
 	"circle": gen_circle,
 	"island": gen_island,
+	"islands": gen_islands,
 	"continent": gen_continent,
 }
 
