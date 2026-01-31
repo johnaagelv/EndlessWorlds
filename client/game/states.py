@@ -84,6 +84,11 @@ class InGame(State):
 					player.components[Position] = Position(gateway["gateway"]["x"], gateway["gateway"]["y"], gateway["gateway"]["m"])
 				return None
 
+			case tcod.event.KeyDown(sym=KeySym.V):
+				image = world_tools.gen_map()
+				image.show()
+				return None
+
 			case tcod.event.KeyDown(sym=KeySym.ESCAPE):
 				return Push(MainMenu())
 
@@ -102,6 +107,7 @@ class InGame(State):
 		maps = world.components[Maps].maps
 		world_width = world.components[World].width
 		world_height = world.components[World].height
+		#world_tools.render_map = maps[pos.m]
 		render_map: dict = {}
 		if not maps[pos.m]["overworld"]:
 			render_map = maps[pos.m]
@@ -174,36 +180,28 @@ class InGame(State):
 
 			pos = Position(pos.x + map_width, pos.y + map_height, pos.m)
 
-		render_map = entity_tools.fov(pos, vision, render_map)
+		world_tools.render_map = entity_tools.fov(pos, vision, render_map)
 
 		# Get the view port for the rendering methods
-		view_port = world_tools.get_view_port(pos, render_map)
+		view_port = world_tools.get_view_port(pos, world_tools.render_map)
 
 		if maps[pos.m]["overworld"]:
-#			logger.debug(" explored ")
-#			logger.debug(world.components[Maps].maps[qul]["explored"][map_width - 10:map_width,map_height - 10:map_height])
-#			logger.debug(render_map["explored"][map_width - 10:map_width, map_height - 10:map_height])
-#			logger.debug(" visible ")
-#			logger.debug(world.components[Maps].maps[qul]["visible"][map_width - 10:map_width,map_height - 10:map_height])
-#			logger.debug(render_map['visible'][map_width - 10:map_width, map_height - 10:map_height])
-#			logger.debug(render_map['dark'][map_width - 10:map_width, map_height - 10:map_height])
-#			logger.debug(render_map['light'][map_width - 10:map_width, map_height - 10:map_height])
 			# transfer the visible back into visible and explored in quadrants 
-			world.components[Maps].maps[qul]["visible"] = render_map["visible"][0:map_width, 0:map_height]
+			world.components[Maps].maps[qul]["visible"] = world_tools.render_map["visible"][0:map_width, 0:map_height]
 			world.components[Maps].maps[qul]["explored"] |= world.components[Maps].maps[qul]["visible"]
-			world.components[Maps].maps[qml]["visible"] = render_map["visible"][0:map_width, map_height:map_height * 2]
+			world.components[Maps].maps[qml]["visible"] = world_tools.render_map["visible"][0:map_width, map_height:map_height * 2]
 			world.components[Maps].maps[qml]["explored"] |= world.components[Maps].maps[qml]["visible"]
-			world.components[Maps].maps[qll]["visible"] = render_map["visible"][0:map_width, map_height * 2:map_height * 3]
+			world.components[Maps].maps[qll]["visible"] = world_tools.render_map["visible"][0:map_width, map_height * 2:map_height * 3]
 			world.components[Maps].maps[qll]["explored"] |= world.components[Maps].maps[qll]["visible"]
-			world.components[Maps].maps[qum]["visible"] = render_map["visible"][map_width:map_width * 2, 0:map_height]
+			world.components[Maps].maps[qum]["visible"] = world_tools.render_map["visible"][map_width:map_width * 2, 0:map_height]
 			world.components[Maps].maps[qum]["explored"] |= world.components[Maps].maps[qum]["visible"]
-			world.components[Maps].maps[qmm]["visible"] = render_map["visible"][map_width:map_width * 2, map_height:map_height * 2]
+			world.components[Maps].maps[qmm]["visible"] = world_tools.render_map["visible"][map_width:map_width * 2, map_height:map_height * 2]
 			world.components[Maps].maps[qmm]["explored"] |= world.components[Maps].maps[qmm]["visible"]
-			world.components[Maps].maps[qlm]["visible"] = render_map["visible"][map_width:map_width * 2, map_height * 2:map_height * 3]
+			world.components[Maps].maps[qlm]["visible"] = world_tools.render_map["visible"][map_width:map_width * 2, map_height * 2:map_height * 3]
 			world.components[Maps].maps[qlm]["explored"] |= world.components[Maps].maps[qlm]["visible"]
 
 		# Render the current map
-		renders.world_map(current_map=render_map, console=console, view_port=view_port)
+		renders.world_map(current_map=world_tools.render_map, console=console, view_port=view_port)
 
 		# Draw the entities including the player
 #		renders.entities(pos.m, console, view_port)

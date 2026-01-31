@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+from PIL import Image
 
 from random import Random #, randint
 from tcod.ecs import Registry
@@ -15,6 +16,8 @@ import client.configuration as config
 import client.ui.configuration as ui
 import logging
 logger = logging.getLogger(config.LOG_NAME_CLIENT)
+
+render_map: dict = {}
 
 def new_game() -> Registry:
 	game = Registry()
@@ -160,3 +163,14 @@ def get_items_by_location(pos: Position) -> list:
 	visible_tiles = world.components[Maps].maps[pos.m]["visible"]
 	map_items = world.components[Maps].maps[pos.m]["items"]
 	return [item for item in map_items if x_min <= item["x"] <= x_max and y_min <= item["y"] <= y_max and visible_tiles[item["x"], item["y"]]]
+
+def gen_map() -> Image.Image:
+	map_width = render_map["width"]
+	map_height = render_map["height"]
+	colour_map = np.zeros((map_width, map_height, 4), dtype=np.uint8, order="F")
+	for x in range(map_width):
+		for y in range(map_height):
+			colour_map[y][x] = render_map["tiles"][x, y]["light"][1]
+	image = Image.fromarray(colour_map, 'RGBA')
+#	image.save("Planet Ankt.png")
+	return image
