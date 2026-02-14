@@ -453,7 +453,7 @@ tiles["ocean deep"] = new_tile(
 tiles["DEEPWATER 1"] = new_tile(
 	walkable=False,
 	transparent=True,
-	dark=(163, (0, 62, 178, 255), (0, 62, 178, 192)),
+	dark=(163, (0, 62, 178, 192), (0, 62, 178, 128)),
 	light=(163, (0, 62, 178, 255), (0, 62, 178, 192)),
 	gateway=False,
 )
@@ -513,10 +513,17 @@ tiles["ROCKS"] = new_tile(
 	light=(44, (160, 162, 143, 255), (160, 162, 143, 192)),
 	gateway=False
 )
-tiles["SNOW"] = new_tile(
+tiles["SNOW1"] = new_tile(
 	walkable=True,
 	transparent=True,
-	dark=(44, (255, 255, 255, 192), (255, 255, 255, 128)),
-	light=(44, (255, 255, 255, 255), (255, 255, 255, 192)),
+	dark=(163, (160, 162, 143, 192), (255, 255, 255, 128)),
+	light=(163, (160, 162, 143, 255), (255, 255, 255, 192)),
+	gateway=False
+)
+tiles["SNOW2"] = new_tile(
+	walkable=True,
+	transparent=True,
+	dark=(163, (255, 255, 255, 192), (255, 255, 255, 128)),
+	light=(163, (255, 255, 255, 255), (255, 255, 255, 192)),
 	gateway=False
 )

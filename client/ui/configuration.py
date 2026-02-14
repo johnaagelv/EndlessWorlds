@@ -14,13 +14,13 @@ UI layout - 1: Map; 2: Messages; 3: World information; 4: Player states
 """
 # 0: Console
 CONSOLE_WIDTH = 110
-CONSOLE_HEIGHT = 85
+CONSOLE_HEIGHT = 60
 BORDER = 1 # Border of size 1 between all areas
 # 1: Map view port
 VIEW_PORT_X = BORDER - 1
 VIEW_PORT_Y = BORDER - 1
 VIEW_PORT_WIDTH = 80
-VIEW_PORT_HEIGHT = 80
+VIEW_PORT_HEIGHT = 50
 # 2: Message view port
 MESSAGE_PORT_X = BORDER
 MESSAGE_PORT_Y = VIEW_PORT_Y + VIEW_PORT_HEIGHT + BORDER

@@ -7,7 +7,7 @@ import json
 import pickle
 import random
 import math
-from PIL import Image
+#from PIL import Image
 
 from pathlib import Path
 from typing import Callable
@@ -21,7 +21,6 @@ import numpy as np
 import logging
 logger = logging.getLogger("EWGenerate")
 
-
 world_data: dict = {
 	"name": str,
 	"world_width": int,
@@ -30,9 +29,27 @@ world_data: dict = {
 	"entries": list,
 	"gateways": list
 }
+world_map: np.ndarray
+world_map = np.full((4000, 4000), dtype=np.short, fill_value=0, order="F")
 
 type commandFn = Callable[[list], None]
 
+def new_world(world_name: str = "demo") -> np.ndarray:
+	with open(Path(f"generator/definitions/{world_name}.json"), "rt") as f:
+		build_instructions = json.load(f)
+
+	world_data["name"] = build_instructions["name"]
+	world_data["entries"] = build_instructions["entries"]
+	for build_no, build in enumerate(build_instructions["builds"][0]):
+		generator_name = build[0]
+		print(f"{build_no}: {build}")
+		generator = generators.get(generator_name)
+		if generator:
+			generator(build)
+	
+	map: np.ndarray = np.array([[],[]], dtype=np.int16, order="F")
+	return map
+	
 def generate(filename: Path) -> None:
 	logger.info(f"generate( {filename} )")
 	with open(filename, "rt") as f:
@@ -41,13 +58,16 @@ def generate(filename: Path) -> None:
 	world_data["name"] = build_instructions["name"]
 	world_data["entries"] = build_instructions["entries"]
 	world_data["maps"] = []
-
-	for build in build_instructions["builds"][0]:
+	for build_no, build in enumerate(build_instructions["builds"][0]):
 		generator_name = build[0]
-		print(generator_name)
+		print(f"{build_no}: {build}")
 		generator = generators.get(generator_name)
 		if generator:
 			generator(build)
+
+	world_map_to_file()
+
+	world_map_to_tile_map()
 
 	logger.info("- saving")
 	with open("server/data/ankt.dat", "wb") as f:
@@ -60,21 +80,11 @@ def generate(filename: Path) -> None:
 			"maps": world_data["maps"]
 		}
 		pickle.dump(save_data, f)
-	"""
-	colour_map = np.zeros((world_data["world_width"] * 80, world_data["world_height"] * 80, 4), dtype=np.uint8, order="F")
-	cx = 0
-	cy = 0
-	for map_idx in range(world_data["world_width"] * world_data["world_height"]):
-		map = world_data["maps"][map_idx]
-		cx = int(map_idx / world_data["world_height"]) * map["width"]
-		cy = (map_idx % world_data["world_height"]) * map["height"]
-		for x in range(map["width"]):
-			for y in range(map["height"]):
-	#			print(f"{cx},{x} {cy},{y}")
-				colour_map[cy + y][cx + x] = map["tiles"][x, y]["light"][1]
-	image = Image.fromarray(colour_map, 'RGBA')
-	image.save("Planet Ankt.png")
-	"""
+
+def world_map_to_file() -> None:
+	logger.info("world_map_to_file()")
+	with open("generator/worlds/ankt.map", "wb") as f:
+		pickle.dump(world_map, f)
 
 def get_tile_by_name(name: str) -> np.ndarray:
 #	logger.info(f"get_tile_by_name( {name} )")
@@ -100,17 +110,13 @@ def gen_world(build: list) -> None:
 		for wh in range(0, world_data["world_height"]):
 			# name, size, tiles, is visible, world width index, world height index, is overworld, map_name
 			gen_map([generator_name, map_size, map_tiles, True, ww, wh, True, None])
+	world_map = np.full((world_size[0], world_size[1]), dtype=np.short, fill_value=0, order="F")
 
 # Return corresponding color from 0 - 255
 def get_tile_from_height(val):
-	if val < 0:
-		val = 0
-	if val > 255:
-		val = 255
-
-	if val <= 84:
-		if random.random() > 0.5:
-			return tile_types.tiles["DEEPWATER 1"]
+	if val <= 64:
+		return tile_types.tiles["DEEPWATER 1"]
+	elif val <= 84:
 		return tile_types.tiles["DEEPWATER 2"]
 	elif val <= 102:
 		return tile_types.tiles["WATER"]
@@ -126,86 +132,105 @@ def get_tile_from_height(val):
 		return tile_types.tiles["DARKROCKS"]
 	elif val <= 242:
 		return tile_types.tiles["ROCKS"]
-	return tile_types.tiles["SNOW"]
+	elif val <= 248:
+		return tile_types.tiles["SNOW1"]
+	return tile_types.tiles["SNOW2"]
 
 def height_map(build: list, size: tuple[int, int] = (1, 1)) -> np.ndarray:
 	"""
 	HEIGHT MAP
-	generator_name, map_idx, seed, bias, octaves, persistance, lacunarity, amplitude, frequency
+	generator_name, map_idx, seed, bias, octaves, persistance, lacunarity, amplitude, frequency, variance, angle
 	"""
 	logger.info(f"- height map( {build}, {size} ) -> np.ndarray")
-	generator_name, map_idx, seed, bias, octaves, persistance, lacunarity, start_amplitude, start_frequency, *rest = build
+	generator_name, map_idx, seed, bias, octaves, persistance, lacunarity, start_amplitude, start_frequency, variance, *rest = build
+	rest_len = len(rest)
+	w_factor: int = 4
+	h_factor: int = 4
+	if rest_len > 0:
+		w_factor = rest[0]
+	if rest_len > 1:
+		h_factor = rest[1]
+	wx = world_data["maps"][map_idx]["ww"] * world_data["maps"][map_idx]["width"]
+	wy = world_data["maps"][map_idx]["wh"] * world_data["maps"][map_idx]["height"]
 	width = world_data["maps"][map_idx]["width"] * size[0]
 	height = world_data["maps"][map_idx]["height"] * size[1]
-	heightMap = np.empty((width, height), dtype=np.short, order="F")
-	scale = max(width, height) / 4
+	scale_w = width / w_factor
+	scale_h = height / h_factor
 	noise = opensimplex.OpenSimplex(seed=seed)
-	for y in range(0, height):
-		for x in range(0, width):
+	half_width = width / 2
+	half_height = height / 2
+	maxWidth = half_width - bias
+	for x in range(width):
+		x_scale = x / scale_w
+		for y in range(height):
+			y_scale = y / scale_h
 			amplitude = start_amplitude
 			frequency = start_frequency
 			noiseHeight = 0
-
 			for _ in range(0, octaves):
-				sampleX = x / scale * frequency
-				sampleY = y / scale * frequency
-
-				value = noise.noise2(sampleX, sampleY)
-				noiseHeight += value * amplitude
-
+				noiseHeight += (noise.noise2(x_scale * frequency, y_scale * frequency) * amplitude + random.random() * 0.001 - 0.0005)
 				amplitude *= persistance
 				frequency *= lacunarity
-				heightMap[x, y] = (noiseHeight + 1) * 128
-
 			# Circular square mask
-			distX = abs(width / 2 - x)
-			distY = abs(height / 2 - y)
+			distX = max(bias, min(abs(half_width - x), width - bias))
+			distY = max(bias, min(abs(half_height - y), height - bias))
 			dist = max(distX, distY)
 
 			# Applying mask
-			maxWidth = width / 2 - bias
 			delta = dist / maxWidth
-			gradient = delta ** 2
-			heightMap[x, y] *= max(0.0, 1.0 - gradient)
-	return heightMap
+			gradient = delta ** variance
+			world_map[wx + x, wy + y] += (noiseHeight + 1) * 127 * max(0.0, 1.0 - gradient)
+	return world_map #heightMap
+
+def world_map_to_tile_map() -> None:
+	print("- building maps")
+	ww = 0
+	wh = 0
+	for ww_ in range(0, world_data["world_width"]):
+		for wh_ in range(0, world_data["world_height"]):
+			map_ww = ((ww + ww_) % world_data["world_width"]) * world_data["world_width"]
+			map_wh = (wh + wh_) % world_data["world_height"]
+			map_idx = map_ww + map_wh
+			height_map_to_tile_map(map_idx, world_map, (ww_ * 80, wh_ * 80))
+
 
 def height_map_to_tile_map(map_idx: int, heightMap: np.ndarray, size: tuple[int, int]) -> None:
 	logger.info(f"- height_map_to_tile_map( {map_idx}, heightMap, {size} )")
 	map = world_data["maps"][map_idx]
 	# Assigning colors for each value
-	for y in range(size[1], size[1] + map["height"]):
-		for x in range(size[0], size[0] + map["width"]):
+	for x in range(size[0], size[0] + map["width"]):
+		for y in range(size[1], size[1] + map["height"]):
 			map["tiles"][x - size[0], y - size[1]] = get_tile_from_height(heightMap[x, y])
 
 def gen_continent(build: list) -> None:
 	"""
 	GENERATE A CONTINENT
-	0=generator name, 1=map_idx, 2=seed, 3=bias, 4=octaves, 5=persistance, 6=lacunarity, 7=amplitude, 8=frequency, 9=world size
+	0=generator name, 1=map_idx, 2=seed, 3=bias, 4=octaves, 5=persistance, 6=lacunarity, 7=amplitude, 8=frequency, 9=variance, wfactor, hfactor, 12=world size
 	"""
 	logger.info(build)
 	map_idx = build[1] # Map no. on which to generate an island
-	heightMap = height_map(build, build[9])
 	map = world_data["maps"][map_idx]
 	ww = map["ww"]
 	wh = map["wh"]
 	map_width = map["width"]
 	map_height = map["height"]
-	heightMap = height_map(build, build[9])
-
-	for ww_ in range(0, build[9][0]):
-		for wh_ in range(0, build[9][1]):
-			map_ww = ((ww + ww_) % world_data["world_width"]) * world_data["world_width"]
-			map_wh = (wh + wh_) % world_data["world_height"]
-			map_idx = map_ww + map_wh
-			height_map_to_tile_map(map_idx, heightMap, (ww_ * map_width, wh_ * map_height))
+	heightMap = height_map(build, build[12])
+#	print("- building maps")
+#	for ww_ in range(0, build[12][0]):
+#		for wh_ in range(0, build[12][1]):
+#			map_ww = ((ww + ww_) % world_data["world_width"]) * world_data["world_width"]
+#			map_wh = (wh + wh_) % world_data["world_height"]
+#			map_idx = map_ww + map_wh
+#			height_map_to_tile_map(map_idx, heightMap, (ww_ * map_width, wh_ * map_height))
 
 def gen_island(build: list) -> None:
 	"""
 	GENERATE ISLAND
-	0=name, 1=map_idx, 2=seed, 3=bias, 4=octaves, 5=persistance, 6=lacunarity, 7=amplitude, 8=frequency
+	0=name, 1=map_idx, 2=seed, 3=bias, 4=octaves, 5=persistance, 6=lacunarity, 7=amplitude, 8=frequency, 9=variance
 	"""
 	logger.info(build)
 	generator_name, map_idx, *rest = build
+	build[0] = "island"
 	heightMap = height_map(build)
 	height_map_to_tile_map(map_idx, heightMap, (0, 0))
 
@@ -218,7 +243,7 @@ def gen_islands(build: list) -> None:
 	generator_name, map_idx_range, seeds, bias, octaves, persistance, lacunarity, amplitude, frequncy = build
 	for map_idx in range(map_idx_range[0], map_idx_range[1]+1):
 		
-		gen_island(build=[generator_name, map_idx, seeds[map_idx - map_idx_range[0]], bias, octaves, persistance, lacunarity, amplitude, frequncy])
+		gen_island(build=["island", map_idx, seeds[map_idx - map_idx_range[0]], bias, octaves, persistance, lacunarity, amplitude, frequncy])
 
 def gen_map(build: list) -> None:
 	"""

@@ -118,15 +118,15 @@ class InGame(State):
 			map_height = world.components[Maps].maps[pos.m]["height"]
 #			print(f"{map_width},{map_height}")
 
-			qul = ((ww - 1) % world_width) * world_width + (wh - 1) % world_height # Quadrant upper left
-			qml = ((ww - 1) % world_width) * world_width + (wh - 0) % world_height # Quadrant left
-			qll = ((ww - 1) % world_width) * world_width + (wh + 1) % world_height # Quadrant lower left
-			qum = ((ww - 0) % world_width) * world_width + (wh - 1) % world_height
-			qmm = ((ww - 0) % world_width) * world_width + (wh - 0) % world_height
-			qlm = ((ww - 0) % world_width) * world_width + (wh + 1) % world_height
-			qur = ((ww + 1) % world_width) * world_width + (wh - 1) % world_height
-			qmr = ((ww + 1) % world_width) * world_width + (wh - 0) % world_height
-			qlr = ((ww + 1) % world_width) * world_width + (wh + 1) % world_height
+			qul = ((ww - 1) % world_width) * world_height + (wh - 1) % world_height # Quadrant upper left
+			qml = ((ww - 1) % world_width) * world_height + (wh - 0) % world_height # Quadrant left
+			qll = ((ww - 1) % world_width) * world_height + (wh + 1) % world_height # Quadrant lower left
+			qum = ((ww - 0) % world_width) * world_height + (wh - 1) % world_height
+			qmm = ((ww - 0) % world_width) * world_height + (wh - 0) % world_height
+			qlm = ((ww - 0) % world_width) * world_height + (wh + 1) % world_height
+			qur = ((ww + 1) % world_width) * world_height + (wh - 1) % world_height
+			qmr = ((ww + 1) % world_width) * world_height + (wh - 0) % world_height
+			qlr = ((ww + 1) % world_width) * world_height + (wh + 1) % world_height
 #			print(f"{qul},{qml},{qll} {qum},{qmm},{qlm} {qur},{qmr},{qlr}")
 			world_tools.start_map(qul)
 			world_tools.start_map(qml)

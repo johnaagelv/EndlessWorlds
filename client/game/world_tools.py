@@ -170,7 +170,11 @@ def gen_map() -> Image.Image:
 	colour_map = np.zeros((map_width, map_height, 4), dtype=np.uint8, order="F")
 	for x in range(map_width):
 		for y in range(map_height):
-			colour_map[y][x] = render_map["tiles"][x, y]["light"][1]
+			if render_map["visible"][x, y]:
+				colour_map[y][x] = render_map["tiles"][x, y]["light"][1]
+			elif render_map["explored"][x, y]:
+				colour_map[y][x] = render_map["tiles"][x, y]["dark"][1]
+			else:
+				colour_map[y][x] = (0, 0, 0, 255)
 	image = Image.fromarray(colour_map, 'RGBA')
-#	image.save("Planet Ankt.png")
 	return image

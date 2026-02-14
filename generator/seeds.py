@@ -1,7 +1,7 @@
 from opensimplex import OpenSimplex
 OCTAVES = 11
-SCALE = 80 / 4
-BIAS = 10
+SCALE = 80 / 8
+BIAS = 0
 WIDTH = 80
 HEIGHT = 80
 PERSISTANCE = 0.5
