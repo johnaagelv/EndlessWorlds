@@ -12,7 +12,7 @@ The world information are:
 - entry, is a list of map coordinates where the player may be starting from
 - maps, is a list of all the map build instructions
 
-## Map build instructions
+## Map build instructions (UNDER MODIFICATION)
 The map build instructions each starts with a build instruction number, where:
 - 0 is the instruction that defines the map name, size, default tile to use, visibility (known from the start or not), and an optional seed
 - 1 is the instruction to build a square/rectangle at coordinates x, y with a width and height, a tile to use, and to fill the square/rectangle or not
