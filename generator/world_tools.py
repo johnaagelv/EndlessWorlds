@@ -168,6 +168,7 @@ def height_map(build: list, size: tuple[int, int] = (1, 1)) -> np.ndarray:
 			frequency = start_frequency
 			noiseHeight = 0
 			for _ in range(0, octaves):
+				# Using random to add a little wriggle to map
 				noiseHeight += (noise.noise2(x_scale * frequency, y_scale * frequency) * amplitude + random.random() * 0.001 - 0.0005)
 				amplitude *= persistance
 				frequency *= lacunarity

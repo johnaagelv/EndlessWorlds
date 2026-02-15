@@ -45,7 +45,7 @@ if __name__ == "__main__":
 		epilog="Author: John Aage Andersen, Reddit: johnaagelv, 2025"
 	)
 	parser.add_argument("-f", "--filename", help="the filename (no ext) of the file holding the definitions", required=True)
-	parser.add_argument("-t", "--task", help="task to perform: new, update, save", choices=["new", "update", "save", None])
+	parser.add_argument("-t", "--task", help="task to perform: new, update, save", choices=["new", "add", "save", None])
 	parser.add_argument("-l", "--log_level", help="the logging level to use: 'info' (default), 'warning', or 'debug'", choices=["info","warning","debug", None])
 	args = parser.parse_args()
 

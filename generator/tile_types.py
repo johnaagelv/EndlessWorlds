@@ -449,7 +449,7 @@ tiles["ocean deep"] = new_tile(
 	gateway=False,
 )
 
-# ISLAND
+# WORLD TILES, CONTINENTS, ISLAND
 tiles["DEEPWATER 1"] = new_tile(
 	walkable=False,
 	transparent=True,
@@ -526,4 +526,11 @@ tiles["SNOW2"] = new_tile(
 	dark=(163, (255, 255, 255, 192), (255, 255, 255, 128)),
 	light=(163, (255, 255, 255, 255), (255, 255, 255, 192)),
 	gateway=False
+)
+tiles["CAVE ENTRANCE"] = new_tile(
+	walkable=True,
+	transparent=False,
+	dark=(239, (160, 162, 143, 192), (160, 162, 143, 128)),
+	light=(239, (160, 162, 143, 255), (160, 162, 143, 192)),
+	gateway=False,
 )

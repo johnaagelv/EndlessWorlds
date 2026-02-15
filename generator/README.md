@@ -1,5 +1,6 @@
 # World generator for Endless Worlds
 The generator makes it easier to build a World consisting of one or more maps, where a map may be whatever you wish it to be!
+Currently modifying the generator to also create planet surfaces, a large surface area, as a set of maps, using OpenSimplex noise.
 
 # Generator build definitions
 The build definition is a dictionary of world information and map build instructions.

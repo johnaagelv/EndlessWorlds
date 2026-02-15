@@ -5,28 +5,12 @@
 	"entries": [[10, 10, 0, 0],[12, 12, 0, 0],[14, 14, 0, 0]],
 	"builds": [
 		[
-			["x","     map size,   w size,   tiles                         seed"],
+			["x","name, map size, world size, tiles, seed"],
 			["world", [80, 80], [50, 50], ["DEEPWATER 1","DEEPWATER 2"], 134567890],
 			["x","name,     map,   seed, bias, octave, persistence, lacunarity, amplitude, frequency, variance, wfactor, hfactor, size"],
-			["xcontinent",    21,    777,    0,      6,         0.5,        2.0,       2.0,      0.99,      2.0,       4,       4, [ 9,  9]],
-			["xcontinent",   249,    555,    0,     11,         0.5,        2.0,       2.1,      0.99,      2.0,       4,       4, [ 8,  8]],
-			["xcontinent",    13,  16384,    0,     11,         0.3,        2.0,       1.8,      0.99,      2.5,       8,       8, [ 7,  7]],
-			["xcontinent",   220,   2048,    0,     11,         0.4,        2.0,       2.1,      1.11,      2.0,       8,       8, [ 9,  9]],
-
-			["x","0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380"],
-
 			["continent",     0,    777,    0,     11,         0.5,        2.0,       2.0,      0.99,      2.0,       8,       8, [49, 49]],
-			["xisland",       36,  98303,    0,      6,         0.4,        2.0,       2.2,      0.99,      2.0,       8,       8],
-			["xisland",       37,  65536,    0,      6,         0.4,        2.0,       2.9,      0.99,      2.0,       8,       8],
-			["xisland",       38,  32767,    0,      6,         0.3,        2.0,       2.8,      0.99,      2.0,       8,       8],
-
-			["dummy"]
-		],
-		[
-			[0, "Planet Ankt", 400, 400, ["grass1","grass2","grass3"], true, 234567890, 100, 100],
-			[2, 27, 27, 8, ["wall"], false, 2],
-			[4, 22, 26, "stairway down", 2, 6, 0, 1, "down"],
-			[1, 33, 26, 3, 3, ["grass1", "grass2", "grass3"], true]
+			["xgateway","map, tile, position, gateway"],
+			["gateway", 0, "CAVE ENTRANCE", [0, 0], [2, 6, 0, 2]  ]
 		],
 		[
 			[0, "Underground 1", 80, 80, ["rock1","rock2"], false],
