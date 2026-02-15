@@ -1,3 +1,6 @@
+# 2026-02-15
+Generating a planetary surface requires a change to the server/client communication - the area to provide at startup needs to be limited to the 9 chunks relative to the player's position.
+Redoing the generator map definitions
 # 2026-01-03
 Playing around with map chunks for the planetary surface (large)
 # 2025-12-23
