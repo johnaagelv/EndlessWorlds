@@ -5,12 +5,14 @@
 	"entries": [[10, 10, 0, 0],[12, 12, 0, 0],[14, 14, 0, 0]],
 	"builds": [
 		[
-			["x","name, map size, world size, tiles, seed"],
+			["xworld","map size, world size, tiles, seed"],
 			["world", [80, 80], [50, 50], ["DEEPWATER 1","DEEPWATER 2"], 134567890],
-			["x","name,     map,   seed, bias, octave, persistence, lacunarity, amplitude, frequency, variance, wfactor, hfactor, size"],
-			["continent",     0,    777,    0,     11,         0.5,        2.0,       2.0,      0.99,      2.0,       8,       8, [49, 49]],
+			["heightmap","ankt"],
+			["xcontinent"," map,   seed, bias, octave, persistence, lacunarity, amplitude, frequency, variance, wfactor, hfactor, size"],
+			["xcontinent",     0,    777,    0,     11,         0.5,        2.0,       2.0,      0.99,      2.0,       8,       8, [49, 49]],
+			["xcontinent",     0,    777,    0,     11,         0.5,        2.0,       2.0,      0.99,      2.0,       8,       8, [4, 4]],
 			["xgateway","map, tile, position, gateway"],
-			["gateway", 0, "CAVE ENTRANCE", [0, 0], [2, 6, 0, 2]  ]
+			["gateway", 8, "CAVE ENTRANCE", [25, 79], [20, 79, 0, 8]]
 		],
 		[
 			[0, "Underground 1", 80, 80, ["rock1","rock2"], false],

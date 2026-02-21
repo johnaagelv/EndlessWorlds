@@ -83,7 +83,7 @@ class TRender:
 			self.root_console.print(
 				x = 61,
 				y = 1,
-				text = actor.map['name'],
+				text = f"{actor.map['name']} ({actor.data['x']},{actor.data['y']})",
 				fg=actor.data["colour"]
 			)
 	

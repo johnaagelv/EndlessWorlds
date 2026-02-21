@@ -530,7 +530,7 @@ tiles["SNOW2"] = new_tile(
 tiles["CAVE ENTRANCE"] = new_tile(
 	walkable=True,
 	transparent=False,
-	dark=(239, (160, 162, 143, 192), (160, 162, 143, 128)),
-	light=(239, (160, 162, 143, 255), (160, 162, 143, 192)),
-	gateway=False,
+	dark=(8745, (160, 162, 143, 192), (160, 162, 143, 64)),
+	light=(8745, (160, 162, 143, 255), (160, 162, 143, 128)),
+	gateway=True,
 )

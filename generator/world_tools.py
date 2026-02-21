@@ -65,9 +65,9 @@ def generate(filename: Path) -> None:
 		if generator:
 			generator(build)
 
-	world_map_to_file()
+#	world_map_to_tile_map()
 
-	world_map_to_tile_map()
+	world_map_to_file()
 
 	logger.info("- saving")
 	with open("server/data/ankt.dat", "wb") as f:
@@ -86,6 +86,11 @@ def world_map_to_file() -> None:
 	with open("generator/worlds/ankt.map", "wb") as f:
 		pickle.dump(world_map, f)
 
+def file_to_world_map(filename: str) -> None:
+	logger.info("file to world map()")
+	with open(Path("generator/worlds/" + filename + ".map"), "rb") as f:
+		world_map = pickle.load(f)
+
 def get_tile_by_name(name: str) -> np.ndarray:
 #	logger.info(f"get_tile_by_name( {name} )")
 	try:
@@ -98,11 +103,18 @@ def get_tile_by_name(name: str) -> np.ndarray:
 		tile = tile_types.tiles['blank']
 	return tile
 
+def load_world_map(build: list) -> None:
+	""" Load a world from a height map file """
+	# 0=name, 1=world name
+	logger.info(build)
+	file_to_world_map(build[1])
+	world_map_to_tile_map()
+
 def gen_world(build: list) -> None:
 	""" Generate a world as a collection of maps """
 	# 0=name, 1=map size, 2=world size, 3=tiles, 4=seed
 	logger.info(f"generate_world( {build} )")
-	generator_name, map_size, world_size, map_tiles, seed = build
+	generator_name, map_size, world_size, map_tiles, seed, *rest = build
 	world_data["world_width"] = world_size[0]
 	world_data["world_height"] = world_size[1]
 	world_data["size"] = (world_size[0] * map_size[0], world_size[1] * map_size[1])
@@ -110,7 +122,7 @@ def gen_world(build: list) -> None:
 		for wh in range(0, world_data["world_height"]):
 			# name, size, tiles, is visible, world width index, world height index, is overworld, map_name
 			gen_map([generator_name, map_size, map_tiles, True, ww, wh, True, None])
-	world_map = np.full((world_size[0], world_size[1]), dtype=np.short, fill_value=0, order="F")
+#	world_map = np.full((world_size[0], world_size[1]), dtype=np.short, fill_value=0, order="F")
 
 # Return corresponding color from 0 - 255
 def get_tile_from_height(val):
@@ -136,7 +148,7 @@ def get_tile_from_height(val):
 		return tile_types.tiles["SNOW1"]
 	return tile_types.tiles["SNOW2"]
 
-def height_map(build: list, size: tuple[int, int] = (1, 1)) -> np.ndarray:
+def height_map(build: list, size: tuple[int, int] = (1, 1)) -> None:
 	"""
 	HEIGHT MAP
 	generator_name, map_idx, seed, bias, octaves, persistance, lacunarity, amplitude, frequency, variance, angle
@@ -181,7 +193,7 @@ def height_map(build: list, size: tuple[int, int] = (1, 1)) -> np.ndarray:
 			delta = dist / maxWidth
 			gradient = delta ** variance
 			world_map[wx + x, wy + y] += (noiseHeight + 1) * 127 * max(0.0, 1.0 - gradient)
-	return world_map #heightMap
+#	return world_map #heightMap
 
 def world_map_to_tile_map() -> None:
 	print("- building maps")
@@ -216,13 +228,7 @@ def gen_continent(build: list) -> None:
 	map_width = map["width"]
 	map_height = map["height"]
 	heightMap = height_map(build, build[12])
-#	print("- building maps")
-#	for ww_ in range(0, build[12][0]):
-#		for wh_ in range(0, build[12][1]):
-#			map_ww = ((ww + ww_) % world_data["world_width"]) * world_data["world_width"]
-#			map_wh = (wh + wh_) % world_data["world_height"]
-#			map_idx = map_ww + map_wh
-#			height_map_to_tile_map(map_idx, heightMap, (ww_ * map_width, wh_ * map_height))
+	world_map_to_tile_map()
 
 def gen_island(build: list) -> None:
 	"""
@@ -233,7 +239,7 @@ def gen_island(build: list) -> None:
 	generator_name, map_idx, *rest = build
 	build[0] = "island"
 	heightMap = height_map(build)
-	height_map_to_tile_map(map_idx, heightMap, (0, 0))
+#	height_map_to_tile_map(map_idx, heightMap, (0, 0))
 
 def gen_islands(build: list) -> None:
 	"""
@@ -285,6 +291,30 @@ def gen_map(build: list) -> None:
 	map['actions'] = []
 	world_data["maps"].append(map)
 
+def gen_gateway(build: list) -> None:
+	"""
+	GENERATE GATEWAY
+	Generate a gateway on a map
+	0=name, 1=map_idx, 2=tile, 3=(x, y), 4=(x, y, z, m)
+	"""
+	logger.info(build)
+	name, map_idx, tile, position, gateway_target = build
+	map_tile = get_tile_by_name(tile)
+	world_data["maps"][map_idx]["tiles"][position[0], position[1]] = map_tile
+	world_data["maps"][map_idx]["gateways"].append(
+		{
+			"x": position[0],
+			"y": position[1],
+			"action": None,
+			"gateway": {
+				"x": gateway_target[0],
+				"y": gateway_target[1],
+				"m": gateway_target[3],
+				"h": None
+			}
+		}
+	)
+
 def gen_circle(build: list) -> None:
 	"""
 	GENERATE CIRCLE
@@ -323,6 +353,8 @@ generators: dict[str, commandFn] = {
 	"island": gen_island,
 	"islands": gen_islands,
 	"continent": gen_continent,
+	"gateway": gen_gateway,
+	"heightmap": load_world_map,
 }
 
 gateway_list: list[dict]

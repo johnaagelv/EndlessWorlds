@@ -101,6 +101,7 @@ def player(player: Entity, console: tcod.console.Console, view_port: tuple, pos:
 	""" Render player entity as the last to ensure it is in front """
 	view_x1, view_x2, view_y1, view_y2 = view_port
 	graphic = player.components[Graphic]
-	x = pos.x - view_x1, 
-	y = pos.y - view_y1,
+	x = pos.x - view_x1 
+	y = pos.y - view_y1
 	console.rgb[["ch", "fg"]][x, y] = graphic.face, graphic.colour
+	console.print(x=ui.WORLD_PORT_X, y=ui.WORLD_PORT_Y + 1, text=f"{pos.x - 80}:{pos.y - 80}", fg=colours.bar_text)
